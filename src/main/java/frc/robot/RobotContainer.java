@@ -34,7 +34,7 @@ public class RobotContainer {
 		driverB_Controller = new PS4Controller(RobotMap.kDriverBControllerUSBPort);
 
 		this.arm = ArmSubsystem.getInstance();
-		this.grabber = GrabberSubsystem.getInstace();
+		this.grabber = GrabberSubsystem.getInstance();
 		this.intake = IntakeSubsystem.getInstance();
 		this.turret = TurretSubsystem.getInstance();
 		this.swerve = SwerveSubsystem.getInstance();

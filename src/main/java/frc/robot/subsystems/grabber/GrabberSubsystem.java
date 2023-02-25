@@ -11,7 +11,7 @@ import frc.robot.RobotMap;
 public class GrabberSubsystem extends SubsystemBase {
 	private static GrabberSubsystem instance;
 
-	public static GrabberSubsystem getInstace() {
+	public static GrabberSubsystem getInstance() {
 		if (instance == null) {
 			instance = new GrabberSubsystem();
 		}
