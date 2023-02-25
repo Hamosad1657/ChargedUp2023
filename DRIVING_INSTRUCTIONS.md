@@ -46,7 +46,7 @@ It includes the autonomous behavior of the robot and the manual control / overri
 
 ### **Grabber:**
 ### Autonomous
-- When the color sensor recognizes a game piece in range it shows it on the Shuffleboard.
+- **None** (at the moment).
 
 ### Teleop
 - **Circle button:** Toggles the grabber when pressed.
@@ -62,6 +62,10 @@ It includes the autonomous behavior of the robot and the manual control / overri
 - Controller input:
 	- **Triangle button:** Shelf (for picking up game-pieces from the shelf).
 	- **Cross button:** Inside robot (for holding a game-piece inside of the robot or for the start and end of the match).
+	- **Square button:** High (for putting game pieces in the top level of the gird).
+	- **R1** - Low front (for putting game pieces in the low level of the gird).
+	- **L1** - Middle (for putting game pieces in the middle level of the gird). (might change for low back in the future if the shelf state is good for the middle state aswell.)
+
 	- **Touchpad** - Get to the chosen state.
 
 ### Teleop

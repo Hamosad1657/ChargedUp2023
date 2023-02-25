@@ -1,10 +1,6 @@
 
 package frc.robot.commands.arm;
 
-import java.util.HashMap;
-import java.util.List;
-import edu.wpi.first.math.geometry.Pose2d;
-
 public class ArmActuatorConstants {
 	public static final int kKeyboardControllerPort = 2;
 
