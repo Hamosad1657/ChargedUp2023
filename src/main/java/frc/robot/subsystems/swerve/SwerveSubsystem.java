@@ -87,8 +87,7 @@ public class SwerveSubsystem extends SubsystemBase {
 	public double currentSwerveRotationRatio = SwerveConstants.kSwerveSpinRatioFast;
 
 	private SwerveSubsystem() {
-		SwervePathConstants.kPathCommandsMap.put("CrossLock", this.crossLockWheelsCommand());
-
+		SwervePathConstants.createPathsAndCommands();
 		this.gyro = new HaNavX(RobotMap.kNavXPort);
 		this.zeroGyro();
 

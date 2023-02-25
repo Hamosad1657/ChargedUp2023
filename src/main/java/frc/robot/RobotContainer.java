@@ -2,12 +2,16 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.PS4Controller;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import java.util.function.BiConsumer;
 import com.hamosad1657.lib.math.HaUnits;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import frc.robot.commands.swerve.autonomous.SwervePathConstants;
 import frc.robot.commands.swerve.teleop.TeleopDriveCommand;
 import frc.robot.subsystems.arm.ArmSubsystem;
 import frc.robot.subsystems.grabber.GrabberSubsystem;
@@ -28,13 +32,14 @@ public class RobotContainer {
 	private ArmSubsystem arm;
 	private IntakeSubsystem intake;
 	private TurretSubsystem turret;
+	private SendableChooser<Command> comboxChooser;
 
 	public RobotContainer() {
 		driverA_Controller = new PS4Controller(RobotMap.kDriverAControllerUSBPort);
 		driverB_Controller = new PS4Controller(RobotMap.kDriverBControllerUSBPort);
 
 		this.arm = ArmSubsystem.getInstance();
-		this.grabber = GrabberSubsystem.getInstace();
+		this.grabber = GrabberSubsystem.getInstance();
 		this.intake = IntakeSubsystem.getInstance();
 		this.turret = TurretSubsystem.getInstance();
 		this.swerve = SwerveSubsystem.getInstance();
@@ -51,6 +56,7 @@ public class RobotContainer {
 
 		this.configureButtonsBindings();
 		this.setDefaultCommands();
+		this.createPathsComboBox();
 	}
 
 	private void configureButtonsBindings() {
@@ -90,9 +96,7 @@ public class RobotContainer {
 	 * @return The command to run in autonomous
 	 */
 	public Command getAutoCommand() {
-		return new SequentialCommandGroup(
-				this.swerve.getPathFollowingCommandWithEvents("HangarMobilityAndChargingStation"),
-				this.swerve.crossLockWheelsCommand());
+		return this.comboxChooser.getSelected();
 	}
 
 	public static boolean shouldRobotMove() {
@@ -106,5 +110,20 @@ public class RobotContainer {
 				|| translationYValue < -RobotContainer.kJoystickDeadband
 				|| rotationValue > RobotContainer.kJoystickDeadband
 				|| rotationValue < -RobotContainer.kJoystickDeadband);
+	}
+
+	/**
+	 * Creats and adds the widget for selecting the paths for autonomous.
+	 */
+	private void createPathsComboBox() {
+		ShuffleboardTab autoTab = Shuffleboard.getTab("Auto");
+		this.comboxChooser = new SendableChooser<Command>();
+		SwervePathConstants.kPaths.forEach(new BiConsumer<String, Command>() {
+			@Override
+			public void accept(String name, Command command) {
+				comboxChooser.addOption(name, command);
+			}
+		});
+		autoTab.add("Path Chooser", this.comboxChooser).withWidget("ComboBox Chooser");
 	}
 }

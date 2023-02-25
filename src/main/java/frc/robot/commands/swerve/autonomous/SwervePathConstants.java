@@ -9,11 +9,17 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.subsystems.arm.ArmSubsystem;
+import frc.robot.subsystems.arm.ArmConstants.ArmState;
+import frc.robot.subsystems.grabber.GrabberSubsystem;
 
 public final class SwervePathConstants {
 	/**
 	 * The start position of the first auto path. Should match real life because apriltags.
 	 */
+	private static final ArmSubsystem arm = ArmSubsystem.getInstance();
+	private static final GrabberSubsystem grabber = GrabberSubsystem.getInstance();
 	public static final Pose2d kStartPose = new Pose2d(0, 0, new Rotation2d());
 
 	public static final double kMaxSpeedMPS = 2.0;
@@ -59,4 +65,15 @@ public final class SwervePathConstants {
 
 	// For use with getPathFollowingCommand
 	public static final HashMap<String, Command> kPathCommandsMap = new HashMap<String, Command>();
+	public static final HashMap<String, Command> kPaths = new HashMap<String, Command>();
+
+	public static void createPathsAndCommands() {
+		SwervePathConstants.kPathCommandsMap.put("ArmHigh", arm.setStateCommand(ArmState.kHigh));
+		SwervePathConstants.kPathCommandsMap.put("ArmMiddle", arm.setStateCommand(ArmState.kMid));
+		SwervePathConstants.kPathCommandsMap.put("ArmLow", arm.setStateCommand(ArmState.kLowFront));
+		SwervePathConstants.kPathCommandsMap.put("ToggleGrabber", grabber.toggleGrabberSolenoidCommand());
+		SwervePathConstants.kPaths.put("Path One", new SequentialCommandGroup(null));
+		SwervePathConstants.kPaths.put("Path Two", new SequentialCommandGroup(null));
+		SwervePathConstants.kPaths.put("Path Three", new SequentialCommandGroup(null));
+	}
 }
