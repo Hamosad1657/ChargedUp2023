@@ -7,7 +7,7 @@ public class BalanceChassisConstants {
 	public static final double kGroundAngle = 0;
 	public static final double kTolerance = 1.5;
 	public static final double kDriveSpeed = 0.5;
-	public static final PIDGains kPIDGains = new PIDGains();
+	public static final PIDGains kPIDGains = new PIDGains(0.05, 0.0, 0.0);
 
 	public enum BalancingOptions {
 		kBangBangLimelight, kBangBangNavX, kPIDLimelight, kPIDNavX

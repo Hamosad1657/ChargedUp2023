@@ -64,7 +64,7 @@
       "isReversal": false,
       "velOverride": null,
       "isLocked": true,
-      "isStopPoint": true,
+      "isStopPoint": false,
       "stopEvent": {
         "names": [
           "Print 2 With Stop"

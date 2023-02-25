@@ -36,7 +36,8 @@ import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.RobotMap;
 import frc.robot.commands.swerve.autonomous.SwervePathConstants;
-import java.util.HashMap;
+import frc.robot.commands.swerve.autonomous.balanceChassis.BalanceChassisCommand;
+import frc.robot.commands.swerve.autonomous.balanceChassis.BalanceChassisConstants.BalancingOptions;
 import java.util.List;
 import com.hamosad1657.lib.sensors.HaNavX;
 import com.hamosad1657.lib.vision.limelight.Limelight;
@@ -44,8 +45,6 @@ import com.hamosad1657.lib.vision.limelight.LimelightConstants;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.auto.SwerveAutoBuilder;
-import com.pathplanner.lib.commands.FollowPathWithEvents;
-import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 
 public class SwerveSubsystem extends SubsystemBase {
 	private static SwerveSubsystem instance;
@@ -190,10 +189,13 @@ public class SwerveSubsystem extends SubsystemBase {
 				this);
 
 		SwervePathConstants.createCommands();
-		SwervePathConstants.kPaths.put("Option 1 Chooser Test",
+		SwervePathConstants.kPaths.put("Resh Path",
 				this.getPathPlannerAutoCommand("Option 1 Chooser Test"));
-		SwervePathConstants.kPaths.put("Option 2 Chooser Test",
-				this.getPathPlannerAutoCommand("Option 2 Chooser Test"));
+		SwervePathConstants.kPaths.put("Auto Balance Path",
+				new SequentialCommandGroup(
+						this.getPathPlannerAutoCommand("HangarMobilityAndChargingStation"),
+						new BalanceChassisCommand(this, BalancingOptions.kPIDNavX)));
+		SwervePathConstants.kPaths.put("Auto Balance No Path", new BalanceChassisCommand(this, BalancingOptions.kPIDNavX));	
 	}
 
 	/**
@@ -373,7 +375,7 @@ public class SwerveSubsystem extends SubsystemBase {
 	 */
 	public Rotation2d getPitch() {
 		return (SwerveConstants.invertGyro) ? Rotation2d.fromDegrees(360 - this.gyro.getPitchAngleDeg())
-				: Rotation2d.fromDegrees(this.gyro.getYawAngleDeg());
+				: Rotation2d.fromDegrees(this.gyro.getPitchAngleDeg());
 	}
 
 	/**
@@ -381,7 +383,7 @@ public class SwerveSubsystem extends SubsystemBase {
 	 */
 	public Rotation2d getRoll() {
 		return (SwerveConstants.invertGyro) ? Rotation2d.fromDegrees(360 - this.gyro.getRollAngleDeg())
-				: Rotation2d.fromDegrees(this.gyro.getYawAngleDeg());
+				: Rotation2d.fromDegrees(this.gyro.getRollAngleDeg());
 	}
 
 	public double getYawDegPS() {

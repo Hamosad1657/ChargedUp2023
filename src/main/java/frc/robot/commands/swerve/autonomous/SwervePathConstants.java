@@ -67,7 +67,5 @@ public final class SwervePathConstants {
 		SwervePathConstants.kPathCommandsMap.put("ArmMiddle", arm.setStateCommand(ArmState.kMid));
 		SwervePathConstants.kPathCommandsMap.put("ArmLow", arm.setStateCommand(ArmState.kLowFront));
 		SwervePathConstants.kPathCommandsMap.put("ToggleGrabber", grabber.toggleGrabberSolenoidCommand());
-		SwervePathConstants.kPathCommandsMap.put("Print 1", new PrintCommand("Print 1"));
-		SwervePathConstants.kPathCommandsMap.put("Print 2 With Stop", new PrintCommand("Print 2"));
 	}
 }

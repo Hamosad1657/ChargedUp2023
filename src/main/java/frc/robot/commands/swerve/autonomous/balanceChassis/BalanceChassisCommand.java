@@ -3,11 +3,13 @@ package frc.robot.commands.swerve.autonomous.balanceChassis;
 
 import com.hamosad1657.lib.vision.limelight.Limelight;
 import com.hamosad1657.lib.vision.limelight.LimelightConstants;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Robot;
 import frc.robot.commands.swerve.autonomous.balanceChassis.BalanceChassisConstants.BalancingOptions;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 
@@ -19,6 +21,7 @@ public class BalanceChassisCommand extends CommandBase {
 
 	public BalanceChassisCommand(SwerveSubsystem chassis, BalancingOptions balancingOption) {
 		this.pid = BalanceChassisConstants.kPIDGains.toPIDController();
+		this.pid.setSetpoint(BalanceChassisConstants.kGroundAngle);
 		this.pid.setTolerance(BalanceChassisConstants.kTolerance);
 
 		this.balancingOption = balancingOption;
@@ -29,12 +32,12 @@ public class BalanceChassisCommand extends CommandBase {
 
 	@Override
 	public void initialize() {
-		this.pid.setSetpoint(BalanceChassisConstants.kGroundAngle);
 		if (DriverStation.getAlliance() == Alliance.Blue) {
 			this.alliance = Alliance.Blue;
 		} else {
 			this.alliance = Alliance.Red;
 		}
+		Robot.print("Started Auto Balance Command");
 	}
 
 	@Override
@@ -71,6 +74,7 @@ public class BalanceChassisCommand extends CommandBase {
 	@Override
 	public void end(boolean interrupted) {
 		this.chassis.crossLockWheels();
+		Robot.print("Finished Balance Chassis Command");
 	}
 
 	@Override
@@ -114,8 +118,8 @@ public class BalanceChassisCommand extends CommandBase {
 	}
 
 	private void pidBalance(double currentAngle) {
-		double vxMeters = this.pid.calculate(currentAngle);
-		this.chassis.autonomousDrive(new ChassisSpeeds(vxMeters, 0, 0), true, true);
+		double vxMeters = MathUtil.clamp(this.pid.calculate(currentAngle), -2.0, 2.0);
+		this.chassis.autonomousDrive(new ChassisSpeeds(vxMeters, 0, 0), false, true);
 	}
 
 	private boolean isFinishedPID() {
