@@ -3,6 +3,7 @@ package frc.robot.commands.swerve.autonomous;
 
 import java.util.HashMap;
 import com.hamosad1657.lib.math.HaUnitConvertor;
+import com.hamosad1657.lib.math.HaUnits;
 import com.pathplanner.lib.PathConstraints;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -28,30 +29,22 @@ public final class SwervePathConstants {
 	 * meter/second for every meter of error. If the proportional gain for angle is 2, then the controller will add 2
 	 * radians/second for every radian of error.
 	 */
-	public static final double kXControllerP = 3.5;
-	public static final double kXControllerI = 0.0;
-	public static final double kXControllerD = 0.0;
 
-	public static final double kYControllerP = kXControllerP;
-	public static final double kYControllerI = kXControllerI;
-	public static final double kYControllerD = kXControllerD;
-
-	public static final double kAngleControllerP = -10.0;
-	public static final double kAngleControllerI = 0.0;
-	public static final double kAngleControllerD = 0.0;
+	public static final HaUnits.PIDGains kXControllerGains = new HaUnits.PIDGains(3.5, 0.0, 0.0);
+	public static final HaUnits.PIDGains kYControllerGains = kXControllerGains;
+	public static final HaUnits.PIDGains kRotationControllerGains = new HaUnits.PIDGains(-10.0, 0.0, 0.0);
 
 	public static final double kPoseToleranceM = 0.05;
 	public static final double kAngleToleranceRad = HaUnitConvertor.degToRad(1.0);
 
 	/** X controller. Leaving it 0 will only use feedforwards. */
-	public static final PIDController kXController = new PIDController(kXControllerP, kXControllerI, kXControllerD);
+	public static final PIDController kXController = kXControllerGains.toPIDController();
 
 	/** Y controller. Leaving it 0 will only use feedforwards. */
-	public static final PIDController kYController = new PIDController(kYControllerP, kYControllerI, kYControllerD);
+	public static final PIDController kYController = kYControllerGains.toPIDController();
 
 	/** Angle controller. Leaving it 0 will only use feedforwards. */
-	public static final PIDController kRotationController = new PIDController(kAngleControllerP, kAngleControllerI,
-			kAngleControllerD);
+	public static final PIDController kRotationController = kRotationControllerGains.toPIDController();
 
 	/* Constraint for the motion profilied robot angle controller */
 	public static final TrapezoidProfile.Constraints kThetaControllerConstraints = new TrapezoidProfile.Constraints(
