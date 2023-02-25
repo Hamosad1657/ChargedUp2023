@@ -8,7 +8,6 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Robot;
-import frc.robot.subsystems.swerve.SwerveConstants;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 import java.util.List;
 
@@ -54,8 +53,8 @@ public class FollowJSONPathCommand extends CommandBase {
 		this.positionTolerance = new Pose2d(poseToleranceM, poseToleranceM, Rotation2d.fromRadians(angleToleranceRad));
 		// Controls the robot's pose. When disabled it only uses feedforward; when
 		// enabled it also uses three PID controllers to fix the position error.
-		this.driveController = new PPHolonomicDriveController(SwerveConstants.Auto.kXController,
-				SwerveConstants.Auto.kYController, SwerveConstants.Auto.kAngleController);
+		this.driveController = new PPHolonomicDriveController(SwervePathConstants.kXController,
+				SwervePathConstants.kYController, SwervePathConstants.kRotationController);
 		this.driveController.setTolerance(this.positionTolerance);
 		this.driveController.setEnabled(true);
 
@@ -66,8 +65,8 @@ public class FollowJSONPathCommand extends CommandBase {
 	}
 
 	public FollowJSONPathCommand(SwerveSubsystem swerve, String pathName, Command[] pathCommandsList) {
-		this(swerve, pathName, pathCommandsList, SwerveConstants.Auto.kPathConstraints,
-				SwerveConstants.Auto.kPoseToleranceM, SwerveConstants.Auto.kAngleToleranceRad);
+		this(swerve, pathName, pathCommandsList, SwervePathConstants.kPathConstraints,
+				SwervePathConstants.kPoseToleranceM, SwervePathConstants.kAngleToleranceRad);
 	}
 
 	@Override
@@ -75,8 +74,11 @@ public class FollowJSONPathCommand extends CommandBase {
 		this.timer.reset();
 		this.timer.start();
 		this.swerve.setRobotAngleCorrection(false);
-		this.swerve.resetOdometry(this.trajectory.getInitialHolonomicPose());
-		this.swerve.resetEstimatedPose(this.trajectory.getInitialHolonomicPose());
+
+		Pose2d initialPose = this.trajectory.getInitialHolonomicPose();
+		this.swerve.resetOdometry(initialPose);
+		this.swerve.setGyro(initialPose.getRotation());
+		this.swerve.resetEstimatedPose(initialPose);
 	}
 
 	@Override

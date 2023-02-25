@@ -2,12 +2,11 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.PS4Controller;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import com.hamosad1657.lib.math.HaUnits;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.swerve.autonomous.FollowJSONPathCommand;
 import frc.robot.commands.swerve.teleop.TeleopDriveCommand;
@@ -41,8 +40,6 @@ public class RobotContainer {
 		this.turret = TurretSubsystem.getInstance();
 		this.swerve = SwerveSubsystem.getInstance();
 
-		Shuffleboard.getTab("Chassis").add(this.swerve);
-
 		this.driverA_Share = new JoystickButton(driverA_Controller, PS4Controller.Button.kShare.value);
 		this.driverA_R2 = new JoystickButton(driverA_Controller, PS4Controller.Button.kR2.value);
 		this.driverA_L2 = new JoystickButton(driverA_Controller, PS4Controller.Button.kL2.value);
@@ -61,8 +58,7 @@ public class RobotContainer {
 		this.driverA_Share.onTrue(new InstantCommand(this.swerve::zeroGyro));
 		this.driverA_Circle.onTrue(new InstantCommand(() -> this.swerve.resetEstimatedPose(new Pose2d())));
 		this.driverA_Circle.onTrue(new InstantCommand(this.swerve::resetOdometry));
-		this.driverA_Cross
-				.onTrue(new RunCommand(this.swerve::crossLockWheels, this.swerve).until(this::shouldRobotMove));
+		this.driverA_Cross.onTrue(this.swerve.crossLockWheelsCommand());
 		this.driverA_Triangle.onTrue(new InstantCommand(this.swerve::toggleSwerveSpeed));
 		this.driverA_PS.onTrue(new InstantCommand(this.swerve::modulesToZero, this.swerve));
 
@@ -95,10 +91,12 @@ public class RobotContainer {
 	 * @return The command to run in autonomous
 	 */
 	public Command getAutoCommand() {
-		return new FollowJSONPathCommand(this.swerve, "Hangar!! around charging station", null);
+		return new SequentialCommandGroup(
+				this.swerve.getPathFollowingCommandWithEvents("HangarMobilityAndChargingStation"),
+				this.swerve.crossLockWheelsCommand());
 	}
 
-	private boolean shouldRobotMove() {
+	public static boolean shouldRobotMove() {
 		double translationXValue = driverA_Controller.getLeftX();
 		double translationYValue = driverA_Controller.getLeftY();
 		double rotationValue = driverA_Controller.getRightX();

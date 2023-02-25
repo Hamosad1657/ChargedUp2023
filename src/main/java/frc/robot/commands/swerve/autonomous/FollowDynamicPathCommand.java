@@ -13,7 +13,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.swerve.SwerveConstants.Auto;
 import frc.robot.Robot;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 
@@ -37,8 +36,8 @@ public class FollowDynamicPathCommand extends CommandBase {
 		this.pathConstraints = pathConstraints;
 		this.endPose = endPose;
 
-		this.driveController = new PPHolonomicDriveController(Auto.kXController, Auto.kYController,
-				Auto.kAngleController);
+		this.driveController = new PPHolonomicDriveController(SwervePathConstants.kXController,
+				SwervePathConstants.kYController, SwervePathConstants.kRotationController);
 		this.driveController
 				.setTolerance(new Pose2d(poseToleranceM, poseToleranceM, Rotation2d.fromRadians(angleToleranceRad)));
 		this.driveController.setEnabled(true);
@@ -47,7 +46,8 @@ public class FollowDynamicPathCommand extends CommandBase {
 	}
 
 	public FollowDynamicPathCommand(SwerveSubsystem swerve, Pose2d endPose) {
-		this(swerve, endPose, Auto.kPathConstraints, Auto.kPoseToleranceM, Auto.kAngleToleranceRad);
+		this(swerve, endPose, SwervePathConstants.kPathConstraints, SwervePathConstants.kPoseToleranceM,
+				SwervePathConstants.kAngleToleranceRad);
 	}
 
 	@Override
