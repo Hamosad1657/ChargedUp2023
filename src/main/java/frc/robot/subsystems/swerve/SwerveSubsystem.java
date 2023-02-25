@@ -35,7 +35,6 @@ import frc.robot.RobotContainer;
 import frc.robot.RobotMap;
 import frc.robot.commands.swerve.autonomous.SwervePathConstants;
 import java.util.HashMap;
-import com.hamosad1657.lib.math.HaUnitConvertor;
 import com.hamosad1657.lib.sensors.HaNavX;
 import com.hamosad1657.lib.vision.limelight.Limelight;
 import com.hamosad1657.lib.vision.limelight.LimelightConstants;
