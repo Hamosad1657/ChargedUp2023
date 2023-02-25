@@ -90,8 +90,7 @@ public class RobotContainer {
 	 * @return The command to run in autonomous
 	 */
 	public Command getAutoCommand() {
-		return new SequentialCommandGroup(
-				this.swerve.getPathFollowingCommandWithEvents("HangarMobilityAndChargingStation"),
+		return new SequentialCommandGroup(this.swerve.getPathPlannerAutoCommand("HangarMobilityAndChargingStation"),
 				this.swerve.crossLockWheelsCommand());
 	}
 
