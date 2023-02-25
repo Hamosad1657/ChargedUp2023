@@ -23,10 +23,10 @@ public class RobotContainer {
 			driverA_Triangle;
 	private final JoystickButton driverB_Circle;
 
-	public SwerveSubsystem swerve;
-	public GrabberSubsystem grabber;
-	public ArmSubsystem arm;
-	public IntakeSubsystem intake;
+	private SwerveSubsystem swerve;
+	private GrabberSubsystem grabber;
+	private ArmSubsystem arm;
+	private IntakeSubsystem intake;
 	private TurretSubsystem turret;
 
 	public RobotContainer() {
