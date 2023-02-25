@@ -93,10 +93,6 @@ public class SwerveSubsystem extends SubsystemBase {
 	private final SwerveAutoBuilder autoBuilder;
 
 	private SwerveSubsystem() {
-		SwervePathConstants.kPathCommandsMap.put("Print 1", new PrintCommand("Print 1"));
-		SwervePathConstants.kPathCommandsMap.put("Print 2 With Stop", new PrintCommand("Print 2"));
-		SwervePathConstants.kPathCommandsMap.put("CrossLock", this.crossLockWheelsCommand());
-
 		this.gyro = new HaNavX(RobotMap.kNavXPort);
 		this.zeroGyro();
 
@@ -192,6 +188,12 @@ public class SwerveSubsystem extends SubsystemBase {
 				true,
 				// The drive subsystem. Used to properly set the requirements of path following commands
 				this);
+
+		SwervePathConstants.createCommands();
+		SwervePathConstants.kPaths.put("Option 1 Chooser Test",
+				this.getPathPlannerAutoCommand("Option 1 Chooser Test"));
+		SwervePathConstants.kPaths.put("Option 2 Chooser Test",
+				this.getPathPlannerAutoCommand("Option 2 Chooser Test"));
 	}
 
 	/**
