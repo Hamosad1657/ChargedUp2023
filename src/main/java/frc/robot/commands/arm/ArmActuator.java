@@ -1,18 +1,14 @@
 
 package frc.robot.commands.arm;
 
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.RobotContainer;
-import frc.robot.subsystems.arm.ArmConstants;
 import frc.robot.subsystems.arm.ArmSubsystem;
 import frc.robot.subsystems.arm.ArmConstants.ArmState;
 import frc.robot.subsystems.turret.TurretConstants;
 import frc.robot.subsystems.turret.TurretSubsystem;
 
-public class ArmActuator implements Sendable {
+public class ArmActuator {
 	private static ArmActuator instance;
 
 	public static ArmActuator getInstance() {
@@ -22,23 +18,16 @@ public class ArmActuator implements Sendable {
 		return instance;
 	}
 
-	private final PS4Controller controller;
 	private final CommandScheduler commandScheduler;
 	private final TurretSubsystem turret;
 	private final ArmSubsystem arm;
 
-	private ArmState desiredArmState;
-	private int gridIndex;
 	private boolean turretRotationSide; // true = right, false = left
 
 	private ArmActuator() {
-		this.controller = new PS4Controller(ArmActuatorConstants.kKeyboardControllerPort);
-
 		this.commandScheduler = CommandScheduler.getInstance();
 		this.turret = TurretSubsystem.getInstance();
 		this.arm = ArmSubsystem.getInstance();
-
-		this.gridIndex = 0;
 	}
 
 	/**
@@ -114,10 +103,5 @@ public class ArmActuator implements Sendable {
 		if (RobotContainer.driverB_Controller.getL1Button()) {
 			this.commandScheduler.schedule(this.arm.setStateCommand(ArmState.kMid));
 		}
-	}
-
-	@Override
-	public void initSendable(SendableBuilder builder) {
-		builder.addDoubleProperty("Desired grid index:", () -> this.gridIndex, null);
 	}
 }
