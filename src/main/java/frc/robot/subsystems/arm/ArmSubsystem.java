@@ -106,7 +106,7 @@ public class ArmSubsystem extends SubsystemBase {
 	 */
 	public void setState(ArmState newState) {
 		this.armAnglePIDController.setSetpoint(newState.angleDeg);
-		this.armLengthPIDController.setSetpoint(newState.getPulleyDistance());
+		this.armLengthPIDController.setSetpoint(newState.lengthDeg);
 	}
 
 	/**

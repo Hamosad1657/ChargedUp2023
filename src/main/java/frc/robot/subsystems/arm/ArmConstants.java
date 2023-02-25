@@ -33,35 +33,27 @@ public class ArmConstants {
 
 	// TODO: Make sure the values are correct.
 	// Length CANCoder
-	public static final double kMinLength = 0.714 * ArmConstants.kArmLengthToPulleyDistanceRatio;
-	public static final double kMaxLength = 1.3877 * ArmConstants.kArmLengthToPulleyDistanceRatio;
+	public static final double kMinLength = 0;
+	public static final double kMaxLength = 0;
 
-	public static final double kArmLengthToPulleyDistanceRatio = 0.1; // TODO: Find the correct ratio.
+	public static final double kArmLengthErrorPerDeg = 0.1; // TODO: Find the correct ratio.
 	public static final double kMaxMotorOutput = 0.5; // TODO: Adjust according to the system's requirements.
 
 	public static final double kMinArmLengthDeg = 0;
 	public static final double kMaxArmLengthDeg = 150;
 
 	public static enum ArmState {
-		kHigh(96, 1.2 * ArmConstants.kArmLengthToPulleyDistanceRatio),
-		kMid(80, 0.725 * ArmConstants.kArmLengthToPulleyDistanceRatio),
-		kLowFront(30.5, 1.177 * ArmConstants.kArmLengthToPulleyDistanceRatio),
-		kLowBack(30, 1.1 * ArmConstants.kArmLengthToPulleyDistanceRatio),
-		kShelf(80, 0.700 * ArmConstants.kArmLengthToPulleyDistanceRatio), kInsideRobot(30, kMinLength); // Lenght is in
-																										// meters
+		// Uses the relativity of the encoder as setpoints
+		kHigh(0, 0), kMid(0, 0), kLowFront(0, 0), kLowBack(0, 0), kShelf(0, 0), kInsideRobot(0.0, 0.0);
 
 		public static final ArmState kDefaultState = kInsideRobot;
 
 		public final double angleDeg;
-		public final double lengthMeters;
+		public final double lengthDeg;
 
 		ArmState(double angleDeg, double distanceMeters) {
 			this.angleDeg = angleDeg;
-			this.lengthMeters = distanceMeters;
-		}
-
-		public double getPulleyDistance() {
-			return this.lengthMeters * ArmConstants.kArmLengthToPulleyDistanceRatio;
+			this.lengthDeg = distanceMeters;
 		}
 	}
 }
