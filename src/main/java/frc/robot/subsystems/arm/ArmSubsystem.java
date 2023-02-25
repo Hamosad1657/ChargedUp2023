@@ -216,9 +216,9 @@ public class ArmSubsystem extends SubsystemBase {
 			// Set length setpoint. Aim for 1 degree less/more than the limit
 			// to avoid jumping (increase the number if it jumps anyway)
 			if (forwardsOutputSupplier.getAsDouble() - backwardsOutputSupplier.getAsDouble() < 0) {
-				this.armLengthPIDController.setSetpoint(ArmConstants.kMinLength + 1);
+				this.armLengthPIDController.setSetpoint(ArmConstants.kMinArmLengthDeg + 1);
 			} else {
-				this.armLengthPIDController.setSetpoint(ArmConstants.kMaxLength - 1);
+				this.armLengthPIDController.setSetpoint(ArmConstants.kMaxArmLengthDeg - 1);
 			}
 
 			// Set length motors

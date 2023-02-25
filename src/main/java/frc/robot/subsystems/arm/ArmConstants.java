@@ -27,23 +27,20 @@ public class ArmConstants {
 	public static final double kBottomAngleLimitDeg = 250.0;
 	public static final double kTopAngleLimitDeg = 170.0;
 
+	// TODO: check all limits and input them in correctly
 	// Angle CANCoder
 	public static final double kMinArmAngleDeg = 0;
 	public static final double kMaxArmAngleDeg = 150;
 
-	// TODO: Make sure the values are correct.
 	// Length CANCoder
-	public static final double kMinLength = 0;
-	public static final double kMaxLength = 0;
+	public static final double kMinArmLengthDeg = 0;
+	public static final double kMaxArmLengthDeg = 0;
 
 	public static final double kArmLengthErrorPerDeg = 0.1; // TODO: Find the correct ratio.
 	public static final double kMaxMotorOutput = 0.5; // TODO: Adjust according to the system's requirements.
 
-	public static final double kMinArmLengthDeg = 0;
-	public static final double kMaxArmLengthDeg = 150;
-
 	public static enum ArmState {
-		// Uses the relativity of the encoder as setpoints
+		// Uses the relativity of the encoders as setpoints
 		kHigh(0, 0), kMid(0, 0), kLowFront(0, 0), kLowBack(0, 0), kShelf(0, 0), kInsideRobot(0.0, 0.0);
 
 		public static final ArmState kDefaultState = kInsideRobot;
