@@ -191,7 +191,8 @@ public class ArmSubsystem extends SubsystemBase {
 	}
 
 	/**
-	 * @param output - The output of the length motor in [-1.0, 1.0]. Slows near the limits.
+	 * @param output - The output of the length motor in [-1.0, 1.0]. Positive output extends, negative output retracts.
+	 *               Slows near the limits.
 	 */
 	public void setLengthMotorWithThresholdsAndLimits(double output) {
 		if (output < 0 && !this.extendLimit.get()) { // The magnetic limit switches are normally true.
@@ -210,7 +211,7 @@ public class ArmSubsystem extends SubsystemBase {
 	}
 
 	/**
-	 * @param output - The output of the length motor in [-1.0, 1.0]. Doesn't slow near the limits.
+	 * @param output - The output of the length motor in [-1.0, 1.0]. Positive output extends, negative output retracts. Doesn't slow near the limits.
 	 */
 	public void setLengthMotorWithLimits(double output) {
 		if (output < 0 && !this.extendLimit.get()) { // The magnetic limit switches are normally true.
@@ -331,6 +332,26 @@ public class ArmSubsystem extends SubsystemBase {
 	public Command setStateWithActionCommand(ArmState newState, Command destinationAction) {
 		return new SequentialCommandGroup(this.setStateCommand(newState), destinationAction,
 				this.setStateCommand(this.currentState));
+	}
+
+	public Command homeArmCommand() {
+		return new FunctionalCommand(() -> {}, () -> {
+			// The limits are normally true
+			if (this.retractLimit.get()) {
+			this.setLengthMotorWithThresholdsAndLimits(0.7);
+			} else {
+				this.armLengthMotor.set(0.0);
+				if (this.bottomAngleLimit.get()) {
+					this.setAngleMotorWithThresholdsAndLimits(0.2);
+				} else {
+					this.armAngleMotor.set(0.0);
+				}
+			}
+		}, (interrupted) -> {
+			Robot.print("Done homing arm.");
+		}, () -> {
+			return !this.retractLimit.get() && !this.bottomAngleLimit.get();
+		}, this);
 	}
 
 	@Override
