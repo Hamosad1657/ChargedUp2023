@@ -115,7 +115,11 @@ public class TurretSubsystem extends SubsystemBase {
 	}
 
 	public Command setTurretToRetroflective() {
-		return new RunCommand(() -> this.rotateTurretWithLimits(rotationPIDController.calculate(Limelight.getTX("limelight"))), this);
+		double tx = Limelight.getTX("limelight");
+		double currentAngle = getAngle();
+		double wantedAngle = currentAngle + tx;
+		return new RunCommand(
+				() -> this.rotateTurretWithLimits(rotationPIDController.calculate(currentAngle, wantedAngle)), this);
 	}
 
 	@Override
