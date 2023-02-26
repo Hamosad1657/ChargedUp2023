@@ -158,7 +158,7 @@ public class ArmSubsystem extends SubsystemBase {
 				} else if (armAngle > ArmConstants.kArmAngleBalanceMinDeg) {
 					output = -ArmConstants.kArmAngleBalanceMinMotorOutput;
 				} else {
-					output = 0.0;
+					output = ArmConstants.kArmAngleBalanceMinMotorOutput;
 				}
 			} else {
 				// Make the angle motor slower at the top and bottom
