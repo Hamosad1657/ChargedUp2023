@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Robot;
 import frc.robot.RobotMap;
 
 public class TurretSubsystem extends SubsystemBase {
@@ -116,8 +117,9 @@ public class TurretSubsystem extends SubsystemBase {
 
 	public Command setTurretToRetroflective() {
 		double tx = Limelight.getTX("limelight");
+		Robot.print(tx);
 		double currentAngle = getAngle();
-		double wantedAngle = currentAngle + tx;
+		double wantedAngle = currentAngle + tx + 6;
 		return new RunCommand(
 				() -> this.rotateTurretWithLimits(rotationPIDController.calculate(currentAngle, wantedAngle)), this);
 	}
