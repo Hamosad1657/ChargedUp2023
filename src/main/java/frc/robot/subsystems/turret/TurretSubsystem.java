@@ -5,6 +5,7 @@ import java.util.function.DoubleSupplier;
 import com.ctre.phoenix.sensors.AbsoluteSensorRange;
 import com.hamosad1657.lib.motors.HaCANSparkMax;
 import com.hamosad1657.lib.sensors.HaCANCoder;
+import com.hamosad1657.lib.vision.limelight.Limelight;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
@@ -111,6 +112,10 @@ public class TurretSubsystem extends SubsystemBase {
 		return new FunctionalCommand(() -> this.rotationPIDController.setSetpoint(angle),
 				() -> this.rotateTurretWithLimits(this.calculateRotationMotorOutput()),
 				(interrupted) -> this.setRotationMotor(0.0), () -> this.atAngleSetpoint());
+	}
+
+	public Command setTurretToRetroflective() {
+		return new RunCommand(() -> this.rotateTurretWithLimits(rotationPIDController.calculate(Limelight.getTX("limelight"))), this);
 	}
 
 	@Override
