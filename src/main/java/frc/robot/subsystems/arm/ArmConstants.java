@@ -26,9 +26,9 @@ public class ArmConstants {
 	public static final double kArmLengthThresholdSpeedRatio = 0.5;
 
 	// TODO: Tune the PID gains and tolerance.
-	public static final PIDGains kArmAnglePIDGains = new PIDGains(0.001, 0.0, 0.0);
+	public static final PIDGains kArmAnglePIDGains = new PIDGains(0.02, 0.00001, 0.0);
 	public static final double kArmAngleTolerance = 0.0;
-	public static final PIDGains kArmLengthPIDGains = new PIDGains(0.0, 0.0, 0.0);
+	public static final PIDGains kArmLengthPIDGains = new PIDGains(0.0028, 0.0003, 0.0);
 	public static final double kArmLengthTolerance = 0.0;
 
 	// TODO: Find FF gains
@@ -36,27 +36,22 @@ public class ArmConstants {
 	public static final double kArmAngleFFkG = 0.0;
 	public static final double kArmAngleFFkV = 0.0;
 
+	// TODO: verify
 	public static final double kBottomAngleLimitDeg = 250.0;
 	public static final double kTopAngleLimitDeg = 170.0;
 
 	// TODO: check all limits and input them in correctly
 	// Angle CANCoder
-	public static final double kMinArmAngleDeg = 0;
-	public static final double kMaxArmAngleDeg = 150;
-	public static final double kArmAngleTolarenceDeg = 0;
 
 	// Length CANCoder
 	public static final double kMinArmLengthDeg = 0;
 	public static final double kMaxArmLengthDeg = 0;
 
-	public static final double kArmLengthErrorPerDeg = 0.1; // TODO: Find the correct ratio.
-	public static final double kArmLengthTolarenceDeg = 0;
-
 	public static final double kMaxMotorOutput = 0.5; // TODO: Adjust according to the system's requirements.
 
 	public static enum ArmState {
 		// Uses the relativity of the encoders as setpoints
-		kHigh(0, 0), kMid(0, 0), kLowFront(0, 0), kLowBack(0, 0), kShelf(0, 0), kInsideRobot(0.0, 0.0);
+		kHigh(0, 0), kMid(60, 2200), kLowFront(0, 0), kLowBack(0, 0), kShelf(0, 0), kInsideRobot(0.0, 0.0);
 
 		public static final ArmState kDefaultState = kInsideRobot;
 

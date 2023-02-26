@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.swerve.autonomous.SwervePathConstants;
 import frc.robot.commands.swerve.teleop.TeleopDriveCommand;
 import frc.robot.subsystems.arm.ArmSubsystem;
+import frc.robot.subsystems.arm.ArmConstants.ArmState;
 import frc.robot.subsystems.grabber.GrabberSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
@@ -96,7 +97,8 @@ public class RobotContainer {
 	 * @return The command to run in autonomous
 	 */
 	public Command getAutoCommand() {
-		return this.comboxChooser.getSelected();
+		return this.arm.setStateCommand(ArmState.kMid);
+		// return this.comboxChooser.getSelected();
 	}
 
 	public static boolean shouldRobotMove() {

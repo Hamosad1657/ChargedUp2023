@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.arm.ArmConstants.ArmState;
+import frc.robot.Robot;
 import frc.robot.RobotMap;
 
 public class ArmSubsystem extends SubsystemBase {
@@ -117,34 +118,25 @@ public class ArmSubsystem extends SubsystemBase {
 	 * @return The output for the angle motor calculated by the PID in [-1.0, 1.0].
 	 */
 	public double calculateAngleMotorOutput() {
-		double PIDOutput = this.armAnglePIDController.calculate(this.armAngleCANCoder.getAbsAngleDeg());
-
-		// Used in this way, the FF controller will only help maintain a position, not reach a setpoint.
-		double FFOutput = this.armAngleFFController.calculate(this.armAngleCANCoder.getAbsAngleRad(), 0.0);
-
-		return MathUtil.clamp(PIDOutput + FFOutput, -ArmConstants.kMaxMotorOutput, ArmConstants.kMaxMotorOutput);
-
-		// TODO: After tuning the PID gains, switch the code above to this code:
-		// return
-		// this.armAnglePIDController.calculate(this.armAngleCANCoder.getAbsAngleDeg());
+		double output = -MathUtil.clamp(this.armAnglePIDController.calculate(this.armAngleCANCoder.getAbsAngleDeg()),
+				-ArmConstants.kArmAngleSpeedRatio, ArmConstants.kArmAngleSpeedRatio);
+		return output;
 	}
 
 	/**
 	 * @return The output for the length motor calculated by the PID in [-1.0, 1.0].
 	 */
 	public double calculateLengthMotorOutput() {
-		return MathUtil.clamp(this.armLengthPIDController.calculate(this.armLengthCANCoder.getAbsAngleDeg()),
+		double output = -MathUtil.clamp(this.armLengthPIDController.calculate(this.armLengthCANCoder.getPositionDeg()),
 				-ArmConstants.kMaxMotorOutput, ArmConstants.kMaxMotorOutput);
-
-		// TODO: After tuning the PID gains, switch the code above to this code:
-		// return this.armLengthPIDController.calculate(this.armLengthCANCoder.getAngleDeg());
+		return output;
 	}
 
 	/**
 	 * @param output - The output of the angle motor in [-1.0, 1.0]. Positive output: arm goes down, negative output:
-	 *               arm goes up.
+	 *               arm goes up. Slows near the limits.
 	 */
-	public void setAngleMotorWithLimits(double output) {
+	public void setAngleMotorWithThresholdsAndLimits(double output) {
 		// The magnetic limit switches are normally true.
 		if ((output < 0.0 && !this.topAngleLimit.get()) || (output > 0.0 && !this.bottomAngleLimit.get())) {
 			this.angleMotorOutputEntry.setDouble(0.0);
@@ -173,9 +165,35 @@ public class ArmSubsystem extends SubsystemBase {
 	}
 
 	/**
-	 * @param output - The output of the length motor in [-1.0, 1.0].
+	 * @param output - The output of the angle motor in [-1.0, 1.0]. Positive output: arm goes down, negative output:
+	 *               arm goes up. Doesn't slow near the limits.
 	 */
-	public void setLengthMotorWithLimits(double output) {
+	public void setAngleMotorWithLimits(double output) {
+		// The magnetic limit switches are normally true.
+		if ((output < 0.0 && !this.topAngleLimit.get()) || (output > 0.0 && !this.bottomAngleLimit.get())) {
+			this.angleMotorOutputEntry.setDouble(0.0);
+			this.armAngleMotor.set(0.0);
+		} else {
+			double armAngle = this.armAngleCANCoder.getAbsAngleDeg();
+			if ((output > -ArmConstants.kArmAngleBalanceMiddleMotorOutput
+					&& output < ArmConstants.kArmAngleBalanceMiddleMotorOutput)) {
+				if (armAngle > ArmConstants.kArmAngleBalanceMiddleDeg) {
+					output = -ArmConstants.kArmAngleBalanceMiddleMotorOutput;
+				} else if (armAngle > ArmConstants.kArmAngleBalanceMinDeg) {
+					output = -ArmConstants.kArmAngleBalanceMinMotorOutput;
+				} else {
+					output = ArmConstants.kArmAngleBalanceMinMotorOutput;
+				}
+			}
+			this.angleMotorOutputEntry.setDouble(output);
+			this.armAngleMotor.set(output);
+		}
+	}
+
+	/**
+	 * @param output - The output of the length motor in [-1.0, 1.0]. Slows near the limits.
+	 */
+	public void setLengthMotorWithThresholdsAndLimits(double output) {
 		if (output < 0 && !this.extendLimit.get()) { // The magnetic limit switches are normally true.
 			this.armLengthMotor.set(0.0);
 		} else if (output > 0 && !this.retractLimit.get()) {
@@ -187,8 +205,20 @@ public class ArmSubsystem extends SubsystemBase {
 					|| armLengthPosition < ArmConstants.kArmLengthRetractThreshold) {
 				output *= ArmConstants.kArmLengthThresholdSpeedRatio;
 			}
+			this.armLengthMotor.set(output);
+		}
+	}
 
-			this.armLengthMotor.set(output * ArmConstants.kArmLengthSpeedRatio);
+	/**
+	 * @param output - The output of the length motor in [-1.0, 1.0]. Doesn't slow near the limits.
+	 */
+	public void setLengthMotorWithLimits(double output) {
+		if (output < 0 && !this.extendLimit.get()) { // The magnetic limit switches are normally true.
+			this.armLengthMotor.set(0.0);
+		} else if (output > 0 && !this.retractLimit.get()) {
+			this.armLengthMotor.set(0.0);
+		} else {
+			this.armLengthMotor.set(output);
 		}
 	}
 
@@ -211,12 +241,13 @@ public class ArmSubsystem extends SubsystemBase {
 		return new RunCommand(() -> {
 			// Set angle motor
 			double angleSupplierValue = angleOutputSupplier.getAsDouble();
-			this.setAngleMotorWithLimits(angleSupplierValue * angleSupplierValue * Math.signum(angleSupplierValue)
-					* ArmConstants.kArmAngleSpeedRatio);
+			this.setAngleMotorWithThresholdsAndLimits(angleSupplierValue * angleSupplierValue
+					* Math.signum(angleSupplierValue) * ArmConstants.kArmAngleSpeedRatio);
 
 			// Set length motors
-			this.setLengthMotorWithLimits((forwardsOutputSupplier.getAsDouble() - backwardsOutputSupplier.getAsDouble())
-					* ArmConstants.kArmLengthSpeedRatio);
+			this.setLengthMotorWithThresholdsAndLimits(
+					(forwardsOutputSupplier.getAsDouble() - backwardsOutputSupplier.getAsDouble())
+							* ArmConstants.kArmLengthSpeedRatio * ArmConstants.kArmLengthSpeedRatio);
 		}, this);
 	}
 
@@ -231,7 +262,8 @@ public class ArmSubsystem extends SubsystemBase {
 				this.armAnglePIDController.setSetpoint(ArmConstants.kTopAngleLimitDeg + 1);
 			}
 
-			this.setAngleMotorWithLimits(this.calculateAngleMotorOutput() * angleOutputSupplier.getAsDouble());
+			this.setAngleMotorWithThresholdsAndLimits(
+					this.calculateAngleMotorOutput() * angleOutputSupplier.getAsDouble());
 
 			// Set length setpoint. Aim for 1 degree less/more than the limit
 			// to avoid jumping (increase the number if it jumps anyway)
@@ -242,7 +274,7 @@ public class ArmSubsystem extends SubsystemBase {
 			}
 
 			// Set length motors
-			this.setLengthMotorWithLimits(this.calculateAngleMotorOutput()
+			this.setLengthMotorWithThresholdsAndLimits(this.calculateLengthMotorOutput()
 					* (forwardsOutputSupplier.getAsDouble() - backwardsOutputSupplier.getAsDouble()));
 		}, this); // Require ArmSubsystem
 	}
@@ -254,7 +286,10 @@ public class ArmSubsystem extends SubsystemBase {
 	 * @param newState - The new state of the arm.
 	 */
 	public Command setStateCommand(ArmState newState) {
-		return new FunctionalCommand(() -> this.setState(newState), () -> {
+
+		return new FunctionalCommand(() -> {
+			this.setState(newState);
+		}, () -> {
 			this.setAngleMotorWithLimits(this.calculateAngleMotorOutput());
 			this.setLengthMotorWithLimits(this.calculateLengthMotorOutput());
 		}, (interrupted) -> {
