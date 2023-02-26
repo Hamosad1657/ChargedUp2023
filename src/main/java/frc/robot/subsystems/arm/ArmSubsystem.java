@@ -53,9 +53,11 @@ public class ArmSubsystem extends SubsystemBase {
 	public ArmSubsystem() {
 		this.armAngleMotor = new CANSparkMax(RobotMap.kArmAngleMotorID, MotorType.kBrushless);
 		this.armAngleMotor.setIdleMode(IdleMode.kBrake);
+		this.armAngleMotor.setInverted(true);
 		this.armAngleMotor.enableVoltageCompensation(12.0);
 		this.armAngleCANCoder = new HaCANCoder(RobotMap.kArmAngleCANCoderID, ArmConstants.kAngleCANCoderOffsetDeg);
-		this.armAngleCANCoder.setMeasurmentRange(AbsoluteSensorRange.Signed_PlusMinus180);
+		this.armAngleCANCoder.setMeasurmentRange(AbsoluteSensorRange.Unsigned_0_to_360);
+		this.armAngleCANCoder.setPosition(0);
 
 		this.armLengthMotorA = new WPI_TalonSRX(RobotMap.kArmLengthMotorAID);
 		this.armLengthMotorA.setNeutralMode(NeutralMode.Brake);
@@ -65,6 +67,8 @@ public class ArmSubsystem extends SubsystemBase {
 
 		this.armLengthMotor = new HaTalonSRX(armLengthMotorA);
 		this.armLengthCANCoder = new HaCANCoder(RobotMap.kArmLengthCANCoderID, ArmConstants.kArmLengthEncoderOffset);
+		this.armLengthCANCoder.setMeasurmentRange(AbsoluteSensorRange.Unsigned_0_to_360);
+		this.armLengthCANCoder.setPosition(0);
 
 		this.armAnglePIDController = ArmConstants.kArmAnglePIDGains.toPIDController();
 		this.armAnglePIDController.setTolerance(ArmConstants.kArmAngleTolerance);
@@ -146,14 +150,23 @@ public class ArmSubsystem extends SubsystemBase {
 			this.angleMotorOutputEntry.setDouble(0.0);
 			this.armAngleMotor.set(0.0);
 		} else {
-			if ((output > -ArmConstants.kArmAngleBalanceMotorOutput
-					&& output < ArmConstants.kArmAngleBalanceMotorOutput)) {
-				if (this.armAngleCANCoder.getAbsAngleDeg() > -85.0) {
-					output = 0.0;
+			double armAngle = this.armAngleCANCoder.getAbsAngleDeg();
+			if ((output > -ArmConstants.kArmAngleBalanceMiddleMotorOutput
+					&& output < ArmConstants.kArmAngleBalanceMiddleMotorOutput)) {
+				if (armAngle > ArmConstants.kArmAngleBalanceMiddleDeg) {
+					output = -ArmConstants.kArmAngleBalanceMiddleMotorOutput;
+				} else if (armAngle > ArmConstants.kArmAngleBalanceMinDeg) {
+					output = -ArmConstants.kArmAngleBalanceMinMotorOutput;
 				} else {
-					output = -ArmConstants.kArmAngleBalanceMotorOutput;
+					output = 0.0;
+				}
+			} else {
+				// Make the angle motor slower at the top and bottom
+				if (armAngle < ArmConstants.kArmAngleBottomThreshold || armAngle > ArmConstants.kArmAngleTopThreshold) {
+					output *= ArmConstants.kArmAngleThresholdSpeedRatio;
 				}
 			}
+
 			this.angleMotorOutputEntry.setDouble(output);
 			this.armAngleMotor.set(output);
 		}
@@ -168,6 +181,13 @@ public class ArmSubsystem extends SubsystemBase {
 		} else if (output > 0 && !this.retractLimit.get()) {
 			this.armLengthMotor.set(0.0);
 		} else {
+			// Make the length motor slower at the ends of the telescopic
+			double armLengthPosition = this.armLengthCANCoder.getPositionDeg();
+			if (armLengthPosition > ArmConstants.kArmLengthExtendThreshold
+					|| armLengthPosition < ArmConstants.kArmLengthRetractThreshold) {
+				output *= ArmConstants.kArmLengthThresholdSpeedRatio;
+			}
+
 			this.armLengthMotor.set(output * ArmConstants.kArmLengthSpeedRatio);
 		}
 	}
@@ -285,5 +305,4 @@ public class ArmSubsystem extends SubsystemBase {
 		this.topAngleLimitEntry.setBoolean(!this.topAngleLimit.get());
 		this.bottomAngleLimitEntry.setBoolean(!this.bottomAngleLimit.get());
 	}
-
 }

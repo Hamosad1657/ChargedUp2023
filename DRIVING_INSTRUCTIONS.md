@@ -71,7 +71,7 @@ It includes the autonomous behavior of the robot and the manual control / overri
 ### Teleop
 - **R2 trigger**: Opens (extends) the arm, faster when pressed harder.
 - **L2 trigger**: Closes (retracts) the arm, faster when pressed harder.
-- **Right stick's Y-axis:** Controls the angle of the arm.
+- **Left stick's Y-axis:** Controls the angle of the arm.
 
 <br>
 
@@ -83,7 +83,7 @@ It includes the autonomous behavior of the robot and the manual control / overri
 - **D-Pad Right** witches the D-Pad down location to the right back.
 
 ### Teleop
-- **Left stick's X-axis:** Rotates the turret left or right.
+- **Right stick's X-axis:** Rotates the turret left or right.
 
 <br>
 
