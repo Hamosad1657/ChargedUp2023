@@ -7,6 +7,7 @@ import frc.robot.subsystems.swerve.SwerveSubsystem;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
@@ -42,10 +43,10 @@ public class TeleopDriveCommand extends CommandBase {
 	public void execute() {
 		// Get joysick values and apply deadband.
 		double translationXValue = MathUtil.applyDeadband(translationXSupplier.getAsDouble(),
-				RobotContainer.kJoystickDeadband) * this.swerve.currentSwerveTranslateRatio;
+				RobotContainer.kJoystickDeadband) * this.swerve.filteredTranslationRatio;
 
 		double translationYValue = MathUtil.applyDeadband(translationYSupplier.getAsDouble(),
-				RobotContainer.kJoystickDeadband) * this.swerve.currentSwerveTranslateRatio;
+				RobotContainer.kJoystickDeadband) * this.swerve.filteredTranslationRatio;
 
 		double rotationValue = MathUtil.applyDeadband(rotationSupplier.getAsDouble(), RobotContainer.kJoystickDeadband)
 				* this.swerve.currentSwerveRotationRatio;
