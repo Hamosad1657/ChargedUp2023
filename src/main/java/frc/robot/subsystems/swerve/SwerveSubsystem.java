@@ -498,7 +498,7 @@ public class SwerveSubsystem extends SubsystemBase {
 	 * The function for putting paths inside the chooser
 	 */
 	private void createPaths() {
-		try (Stream<Path> paths = Files.walk(Paths.get("/home/you/Desktop"))) {
+		try (Stream<Path> paths = Files.walk(Paths.get("/deploy/pathplanner"))) {
 			paths.forEach(new Consumer<Path>() {
 				@Override
 				public void accept(Path path) {
