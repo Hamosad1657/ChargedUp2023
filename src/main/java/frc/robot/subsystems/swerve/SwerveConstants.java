@@ -17,7 +17,8 @@ public final class SwerveConstants {
 	public static final boolean invertGyro = false; // HaNavX already inverts the navX
 	public static final double kSwerveTranslateRatioFast = 0.85, kSwerveRotationRatioFast = 0.7;
 	public static final double kSwerveTranslateRatioSlow = 0.3, kSwerveRotationRatioSlow = 0.3;
-	public static final double kRateLimit = 0.5;
+	public static final double kSpeedModeRateLimit = 0.75;
+	public static final double robotIsMovingThresholdMPS = 0.1;
 
 	/* Drivetrain Constants */
 	public static final double kTrackWidthM = 0.42;

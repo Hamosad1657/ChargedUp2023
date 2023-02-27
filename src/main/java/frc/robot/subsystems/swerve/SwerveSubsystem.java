@@ -52,9 +52,8 @@ public class SwerveSubsystem extends SubsystemBase {
 		}
 		return instance;
 	}
-	
+
 	private final SlewRateLimiter speedModeRateLimiter;
-	private final double robotIsMovingThresholdMPS = 0.1;
 	private final Timer angleControlTimer;
 	/** A PIDController for fixing the robot angle skew. */
 	private final Field2d field;
@@ -158,14 +157,14 @@ public class SwerveSubsystem extends SubsystemBase {
 		this.limelightYEntry = this.odometryList.add("Limelight Y", -1657).withWidget(BuiltInWidgets.kTextView)
 				.getEntry();
 
-		this.speedModeRateLimiter = new SlewRateLimiter(SwerveConstants.kRateLimit);
+		this.speedModeRateLimiter = new SlewRateLimiter(SwerveConstants.kSpeedModeRateLimit);
 
 		/*
 		 * By pausing init for a second before setting module offsets, we avoid a bug with inverting motors. See
 		 * https://github.com/Team364/BaseFalconSwerve/issues/8 for more info.
 		 */
 		Timer.delay(1.0);
-		resetModulesToAbsolute();
+		this.resetModulesToAbsolute();
 
 		this.odometry = new SwerveDriveOdometry(SwerveConstants.kSwerveKinematics, this.getYaw(),
 				this.getModulesPositions(), SwervePathConstants.kStartPose);
@@ -489,10 +488,10 @@ public class SwerveSubsystem extends SubsystemBase {
 	}
 
 	public boolean isChassisMoving() {
-		return this.modules[0].getModuleState().speedMetersPerSecond < this.robotIsMovingThresholdMPS
-				&& this.modules[1].getModuleState().speedMetersPerSecond < this.robotIsMovingThresholdMPS
-				&& this.modules[2].getModuleState().speedMetersPerSecond < this.robotIsMovingThresholdMPS
-				&& this.modules[3].getModuleState().speedMetersPerSecond < this.robotIsMovingThresholdMPS;
+		return this.modules[0].getModuleState().speedMetersPerSecond < SwerveConstants.robotIsMovingThresholdMPS
+				&& this.modules[1].getModuleState().speedMetersPerSecond < SwerveConstants.robotIsMovingThresholdMPS
+				&& this.modules[2].getModuleState().speedMetersPerSecond < SwerveConstants.robotIsMovingThresholdMPS
+				&& this.modules[3].getModuleState().speedMetersPerSecond < SwerveConstants.robotIsMovingThresholdMPS;
 	}
 
 	/**

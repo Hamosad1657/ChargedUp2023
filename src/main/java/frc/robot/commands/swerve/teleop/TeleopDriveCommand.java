@@ -7,7 +7,6 @@ import frc.robot.subsystems.swerve.SwerveSubsystem;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
@@ -26,7 +25,7 @@ public class TeleopDriveCommand extends CommandBase {
 			DoubleSupplier translationYSupplier, DoubleSupplier rotationSupplier,
 			BooleanSupplier isRobotOrientedSupplier) {
 		this.swerve = swerve;
-		addRequirements(swerve);
+		this.addRequirements(this.swerve);
 
 		this.translationXSupplier = translationXSupplier;
 		this.translationYSupplier = translationYSupplier;
