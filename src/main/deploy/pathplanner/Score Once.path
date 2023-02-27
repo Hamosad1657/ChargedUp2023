@@ -2,23 +2,23 @@
   "waypoints": [
     {
       "anchorPoint": {
-        "x": 1.722970112606892,
-        "y": 4.996568765067355
+        "x": 2.0857006626293955,
+        "y": 3.8176944774942183
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.7229701126068955,
-        "y": 4.996568765067355
+        "x": 1.904335387618144,
+        "y": 5.33209452383817
       },
-      "holonomicAngle": 0,
+      "holonomicAngle": -180.01,
       "isReversal": false,
       "velOverride": null,
       "isLocked": false,
       "isStopPoint": false,
       "stopEvent": {
         "names": [
-          "ArmHigh",
-          "ToggleGrabber"
+          "OpenIntake",
+          "CloseIntake"
         ],
         "executionBehavior": "sequential",
         "waitBehavior": "none",
@@ -27,12 +27,12 @@
     },
     {
       "anchorPoint": {
-        "x": 1.722970112606892,
-        "y": 4.987500501316792
+        "x": 6.411262471647751,
+        "y": 4.597565160042601
       },
       "prevControl": {
-        "x": 0.7229701126068919,
-        "y": 4.987500501316792
+        "x": 5.411262471647751,
+        "y": 4.597565160042601
       },
       "nextControl": null,
       "holonomicAngle": 0,
