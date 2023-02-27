@@ -15,10 +15,12 @@ import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -48,6 +50,7 @@ public class ArmSubsystem extends SubsystemBase {
 	private final GenericEntry extendLimitEntry, retractLimitEntry, topAngleLimitEntry, bottomAngleLimitEntry,
 			angleMotorOutputEntry;
 	private ArmState currentState;
+	private boolean shouldOverrideLimits = false;
 
 	// Angle lowers when you go up
 	public ArmSubsystem() {
@@ -176,9 +179,10 @@ public class ArmSubsystem extends SubsystemBase {
 	 * @param output - The output of the length motor in [-1.0, 1.0].
 	 */
 	public void setLengthMotorWithLimits(double output) {
-		if (output < 0 && !this.extendLimit.get()) { // The magnetic limit switches are normally true.
+		// The magnetic limit switches are normally true.
+		if (!this.shouldOverrideLimits && output < 0 && !this.extendLimit.get()) {
 			this.armLengthMotor.set(0.0);
-		} else if (output > 0 && !this.retractLimit.get()) {
+		} else if (!this.shouldOverrideLimits && output > 0 && !this.retractLimit.get()) {
 			this.armLengthMotor.set(0.0);
 		} else {
 			// Make the length motor slower at the ends of the telescopic
@@ -207,8 +211,14 @@ public class ArmSubsystem extends SubsystemBase {
 	 * @param backwardsOutputSupplier - The output supplier for the arm's backwards retraction.
 	 */
 	public Command openLoopTeleopArmCommand(DoubleSupplier angleOutputSupplier, DoubleSupplier forwardsOutputSupplier,
-			DoubleSupplier backwardsOutputSupplier) {
+			DoubleSupplier backwardsOutputSupplier, PS4Controller controller) {
 		return new RunCommand(() -> {
+			if (controller.getL3ButtonPressed()) {
+				this.shouldOverrideLimits = true;
+			} else if (controller.getL3ButtonReleased()) {
+				this.shouldOverrideLimits = false;
+			}
+
 			// Set angle motor
 			double angleSupplierValue = angleOutputSupplier.getAsDouble();
 			this.setAngleMotorWithLimits(angleSupplierValue * angleSupplierValue * Math.signum(angleSupplierValue)
@@ -296,6 +306,28 @@ public class ArmSubsystem extends SubsystemBase {
 	public Command setStateWithActionCommand(ArmState newState, Command destinationAction) {
 		return new SequentialCommandGroup(this.setStateCommand(newState), destinationAction,
 				this.setStateCommand(this.currentState));
+	}
+
+	public Command homeArmCommand() {
+		return new RunCommand(() -> {
+			// The limits are normally true
+			if (this.retractLimit.get()) {
+				this.setLengthMotorWithLimits(0.7);
+			} else {
+				this.armLengthMotor.set(0.0);
+				if (this.bottomAngleLimit.get()) {
+					this.setAngleMotorWithLimits(0.2);
+				} else {
+					this.armAngleMotor.set(0.0);
+				}
+			}
+		}, this).until(() -> !this.retractLimit.get() && !this.bottomAngleLimit.get()).andThen(() -> {
+			this.armLengthCANCoder.setPosition(0.0);
+		}, this);
+	}
+
+	public Command resetArmLenPos() {
+		return new InstantCommand(() -> this.armLengthCANCoder.setPosition(0.0));
 	}
 
 	@Override
