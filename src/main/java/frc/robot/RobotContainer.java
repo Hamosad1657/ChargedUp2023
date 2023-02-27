@@ -68,8 +68,9 @@ public class RobotContainer {
 		this.driverA_PS.onTrue(new InstantCommand(this.swerve::modulesToZero, this.swerve));
 
 		this.driverB_Circle.onTrue(this.grabber.toggleGrabberSolenoidCommand());
-		this.driverA_L2.onTrue(this.intake.lowerIntakeCommand());
-		this.driverA_R2.onTrue(this.intake.raiseIntakeCommand());
+
+		this.driverA_R2.onTrue(this.intake.lowerIntakeCommand());
+		this.driverA_L2.onTrue(this.intake.raiseIntakeCommand());
 	}
 
 	private void setDefaultCommands() {
@@ -88,6 +89,9 @@ public class RobotContainer {
 				() -> HaUnits.deadband(driverB_Controller.getLeftY(), kJoystickDeadband),
 				() -> HaUnits.deadband((driverB_Controller.getL2Axis() + 1.0), kJoystickDeadband),
 				() -> HaUnits.deadband((driverB_Controller.getR2Axis() + 1.0), kJoystickDeadband)));
+
+		// Keep intake up
+		this.intake.setDefaultCommand(this.intake.keepIntakeUpCommand());
 	}
 
 	/**
