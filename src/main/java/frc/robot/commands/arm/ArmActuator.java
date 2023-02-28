@@ -92,7 +92,7 @@ public class ArmActuator {
 		}
 
 		if (RobotContainer.driverB_Controller.getCrossButton()) {
-			this.commandScheduler.schedule(this.arm.homeArmCommand());
+			this.commandScheduler.schedule(this.arm.homeCommand());
 		}
 		if (RobotContainer.driverB_Controller.getSquareButton()) {
 			this.commandScheduler.schedule(this.arm.setStateCommand(ArmState.kHigh));

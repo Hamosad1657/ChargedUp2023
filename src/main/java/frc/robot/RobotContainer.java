@@ -71,8 +71,8 @@ public class RobotContainer {
 
 		this.driverB_Circle.onTrue(this.grabber.toggleGrabberSolenoidCommand());
 
-		this.driverB_Share.onTrue(this.arm.homeArmCommand());
-		this.driverB_Options.onTrue(this.arm.resetArmLenPos());
+		this.driverB_Share.onTrue(this.arm.homeCommand());
+		this.driverB_Options.onTrue(this.arm.resetLengthCANCoderPositionCommand());
 
 		this.driverA_R2.onTrue(this.intake.lowerIntakeCommand());
 		this.driverA_L2.onTrue(this.intake.raiseIntakeCommand());
@@ -92,8 +92,8 @@ public class RobotContainer {
 		// Teleop arm open/close - R2 open, L2 close, left Y for angle
 		this.arm.setDefaultCommand(this.arm.openLoopTeleopArmCommand(
 				() -> HaUnits.deadband(driverB_Controller.getLeftY(), kJoystickDeadband),
-				() -> HaUnits.deadband((driverB_Controller.getL2Axis() + 1.0), kJoystickDeadband),
-				() -> HaUnits.deadband((driverB_Controller.getR2Axis() + 1.0), kJoystickDeadband), driverB_Controller));
+				() -> HaUnits.deadband((driverB_Controller.getR2Axis() + 1.0), kJoystickDeadband),
+				() -> HaUnits.deadband((driverB_Controller.getL2Axis() + 1.0), kJoystickDeadband), driverB_Controller));
 
 		// Keep intake up
 		this.intake.setDefaultCommand(this.intake.keepIntakeUpCommand());
@@ -105,8 +105,8 @@ public class RobotContainer {
 	 * @return The command to run in autonomous
 	 */
 	public Command getAutoCommand() {
-		return this.arm.homeArmCommand();
-		//return this.arm.setStateCommand(ArmState.kMid);
+		return this.arm.homeCommand();
+		// return this.arm.setStateCommand(ArmState.kMid);
 		// return this.comboxChooser.getSelected();
 	}
 
@@ -121,6 +121,14 @@ public class RobotContainer {
 				|| translationYValue < -RobotContainer.kJoystickDeadband
 				|| rotationValue > RobotContainer.kJoystickDeadband
 				|| rotationValue < -RobotContainer.kJoystickDeadband);
+	}
+
+	public static boolean shoudlArmMove() {
+		double lengthValue = (driverB_Controller.getL2Axis() + 1.0) - (driverB_Controller.getR2Axis() + 1.0);
+		double angleValue = driverB_Controller.getLeftY();
+
+		return (lengthValue > kJoystickDeadband || lengthValue < -kJoystickDeadband || angleValue > kJoystickDeadband
+				|| angleValue < -kJoystickDeadband);
 	}
 
 	/**

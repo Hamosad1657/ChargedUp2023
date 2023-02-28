@@ -49,6 +49,19 @@ public class ArmConstants {
 
 	public static final double kMaxMotorOutput = 0.5; // TODO: Adjust according to the system's requirements.
 
+	public static double maxLengthForAngle(double angle) {
+		// return (-0.434085 * angle * angle) + (96.3868 * angle) - 250.936;
+		if (angle < 24.0) {
+			return 250.0;
+		}
+
+		if (angle < 28.0) {
+			return 1800.0;
+		}
+
+		return 2600.0;
+	}
+
 	public static enum ArmState {
 		// Uses the relativity of the encoders as setpoints
 		kHigh(0, 0), kMid(60, 2200), kLowFront(0, 0), kLowBack(0, 0), kShelf(0, 0), kInsideRobot(0.0, 0.0);
