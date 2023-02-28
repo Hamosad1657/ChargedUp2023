@@ -4,9 +4,6 @@ package frc.robot.subsystems.turret;
 import com.hamosad1657.lib.math.HaUnits.PIDGains;
 
 public class TurretConstants {
-	public static final int kCCWRotationLimitSwitchPort = 1;
-	public static final int kCWRotationLimitSwitchPort = 0;
-
 	public static final PIDGains kRotationPIDGains = new PIDGains(0.0, 0.0, 0.0);
 	public static final double kFrontAngleSetpoint = 0.0;
 	public static final double kSpeedRatio = 0.25;

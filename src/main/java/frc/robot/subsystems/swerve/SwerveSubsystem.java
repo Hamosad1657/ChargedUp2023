@@ -8,6 +8,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -26,10 +27,7 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.fusionLib.swerve.SwerveModule;
 import frc.robot.Robot;
@@ -57,7 +55,7 @@ public class SwerveSubsystem extends SubsystemBase {
 		return instance;
 	}
 
-	private final double robotIsMovingThresholdMPS = 0.1;
+	private final SlewRateLimiter speedModeRateLimiter;
 	private final Timer angleControlTimer;
 	/** A PIDController for fixing the robot angle skew. */
 	private final Field2d field;
@@ -87,7 +85,9 @@ public class SwerveSubsystem extends SubsystemBase {
 	private double teleopAngleSetpointRad;
 	private boolean isRobotAngleCorrectionEnabled = false, runAngleCorrection = false;
 	public double currentSwerveTranslateRatio = SwerveConstants.kSwerveTranslateRatioFast;
-	public double currentSwerveRotationRatio = SwerveConstants.kSwerveSpinRatioFast;
+	public double currentSwerveRotationRatio = SwerveConstants.kSwerveRotationRatioFast;
+
+	public double filteredTranslationRatio = SwerveConstants.kSwerveTranslateRatioFast;
 
 	private final SwerveAutoBuilder autoBuilder;
 
@@ -158,12 +158,15 @@ public class SwerveSubsystem extends SubsystemBase {
 				.getEntry();
 		this.limelightYEntry = this.odometryList.add("Limelight Y", -1657).withWidget(BuiltInWidgets.kTextView)
 				.getEntry();
+
+		this.speedModeRateLimiter = new SlewRateLimiter(SwerveConstants.kSpeedModeRateLimit);
+
 		/*
 		 * By pausing init for a second before setting module offsets, we avoid a bug with inverting motors. See
 		 * https://github.com/Team364/BaseFalconSwerve/issues/8 for more info.
 		 */
 		Timer.delay(1.0);
-		resetModulesToAbsolute();
+		this.resetModulesToAbsolute();
 
 		this.odometry = new SwerveDriveOdometry(SwerveConstants.kSwerveKinematics, this.getYaw(),
 				this.getModulesPositions(), SwervePathConstants.kStartPose);
@@ -189,13 +192,7 @@ public class SwerveSubsystem extends SubsystemBase {
 				this);
 
 		SwervePathConstants.createCommands();
-		SwervePathConstants.kPaths.put("Resh Path",
-				this.getPathPlannerAutoCommand("Option 1 Chooser Test"));
-		SwervePathConstants.kPaths.put("Auto Balance Path",
-				new SequentialCommandGroup(
-						this.getPathPlannerAutoCommand("HangarMobilityAndChargingStation"),
-						new BalanceChassisCommand(this, BalancingOptions.kPIDNavX)));
-		SwervePathConstants.kPaths.put("Auto Balance No Path", new BalanceChassisCommand(this, BalancingOptions.kPIDNavX));	
+		this.createPaths();
 	}
 
 	/**
@@ -249,10 +246,10 @@ public class SwerveSubsystem extends SubsystemBase {
 	public void toggleSwerveSpeed() {
 		if (this.currentSwerveTranslateRatio == SwerveConstants.kSwerveTranslateRatioFast) {
 			this.currentSwerveTranslateRatio = SwerveConstants.kSwerveTranslateRatioSlow;
-			this.currentSwerveRotationRatio = SwerveConstants.kSwerveSpinRatioSlow;
+			this.currentSwerveRotationRatio = SwerveConstants.kSwerveRotationRatioSlow;
 		} else {
 			this.currentSwerveTranslateRatio = SwerveConstants.kSwerveTranslateRatioFast;
-			this.currentSwerveRotationRatio = SwerveConstants.kSwerveSpinRatioFast;
+			this.currentSwerveRotationRatio = SwerveConstants.kSwerveRotationRatioFast;
 		}
 	}
 
@@ -493,14 +490,26 @@ public class SwerveSubsystem extends SubsystemBase {
 	}
 
 	public boolean isChassisMoving() {
-		return this.modules[0].getModuleState().speedMetersPerSecond < this.robotIsMovingThresholdMPS
-				&& this.modules[1].getModuleState().speedMetersPerSecond < this.robotIsMovingThresholdMPS
-				&& this.modules[2].getModuleState().speedMetersPerSecond < this.robotIsMovingThresholdMPS
-				&& this.modules[3].getModuleState().speedMetersPerSecond < this.robotIsMovingThresholdMPS;
+		return this.modules[0].getModuleState().speedMetersPerSecond < SwerveConstants.robotIsMovingThresholdMPS
+				&& this.modules[1].getModuleState().speedMetersPerSecond < SwerveConstants.robotIsMovingThresholdMPS
+				&& this.modules[2].getModuleState().speedMetersPerSecond < SwerveConstants.robotIsMovingThresholdMPS
+				&& this.modules[3].getModuleState().speedMetersPerSecond < SwerveConstants.robotIsMovingThresholdMPS;
+	}
+
+	/**
+	 * The function for putting paths inside the chooser
+	 */
+	private void createPaths() {
+		SwervePathConstants.kPaths.put("Option 1 Chooser Test",
+				this.getPathPlannerAutoCommand("Option 1 Chooser Test"));
+		SwervePathConstants.kPaths.put("Option 2 Chooser Test",
+				this.getPathPlannerAutoCommand("Option 2 Chooser Test"));
 	}
 
 	@Override
 	public void periodic() {
+		this.filteredTranslationRatio = this.speedModeRateLimiter.calculate(currentSwerveTranslateRatio);
+
 		this.odometry.update(this.getYaw(), this.getModulesPositions());
 		this.field.setRobotPose(this.getEstimatedPose());
 
@@ -555,4 +564,5 @@ public class SwerveSubsystem extends SubsystemBase {
 		this.odometryXEntry.setDouble(this.getOdometryPose().getX());
 		this.odometryYEntry.setDouble(this.getOdometryPose().getY());
 	}
+
 }

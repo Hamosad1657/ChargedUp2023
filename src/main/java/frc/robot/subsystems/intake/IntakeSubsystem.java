@@ -26,38 +26,44 @@ public class IntakeSubsystem extends SubsystemBase {
 	private IntakeSubsystem() {
 		this.intakeMotor = new HaTalonSRX(RobotMap.kIntakeMotorID);
 		this.intakeMotor.setIdleMode(IdleMode.kBrake);
-		isIntakeOpen = false;
+		this.isIntakeOpen = false;
 	}
 
 	/**
 	 * Toggles the intake's motors.
 	 */
 	public Command toggleIntake() {
-		if (isIntakeOpen) {
+		if (this.isIntakeOpen) {
 			this.isIntakeOpen = false;
-			return new SequentialCommandGroup(
-					new InstantCommand(() -> this.intakeMotor.set(IntakeConstants.kDeafultSpeed), this),
-					new WaitCommand(IntakeConstants.kWaitingTime),
-					new InstantCommand(() -> this.intakeMotor.set(0), this));
+			return this.raiseIntakeCommand();
+		} else {
+			this.isIntakeOpen = true;
+			return this.lowerIntakeCommand();
 		}
-		this.isIntakeOpen = true;
-		return new SequentialCommandGroup(
-				new InstantCommand(() -> this.intakeMotor.set(-IntakeConstants.kDeafultSpeed), this),
-				new WaitCommand(IntakeConstants.kWaitingTime), new InstantCommand(() -> this.intakeMotor.set(0), this));
 	}
 
 	public Command lowerIntakeCommand() {
-		this.isIntakeOpen = false;
 		return new SequentialCommandGroup(
-				new InstantCommand(() -> this.intakeMotor.set(IntakeConstants.kDeafultSpeed), this),
-				new WaitCommand(IntakeConstants.kWaitingTime), new InstantCommand(() -> this.intakeMotor.set(0), this));
+				new InstantCommand(() -> this.intakeMotor.set(-IntakeConstants.kDeafultSpeed), this),
+				new WaitCommand(IntakeConstants.kLoweringWaitingTime), new InstantCommand(() -> {
+					this.intakeMotor.set(0.0);
+					this.isIntakeOpen = true;
+				}, this));
+
 	}
 
 	public Command raiseIntakeCommand() {
-		this.isIntakeOpen = true;
 		return new SequentialCommandGroup(
-				new InstantCommand(() -> this.intakeMotor.set(-IntakeConstants.kDeafultSpeed), this),
-				new WaitCommand(IntakeConstants.kWaitingTime), new InstantCommand(() -> this.intakeMotor.set(0), this));
+				new InstantCommand(() -> this.intakeMotor.set(IntakeConstants.kDeafultSpeed), this),
+				new WaitCommand(IntakeConstants.kRaisingWaitingTime), new InstantCommand(() -> {
+					this.intakeMotor.set(0.0);
+					this.isIntakeOpen = false;
+				}, this));
+	}
+
+	public Command keepIntakeUpCommand() {
+		return new InstantCommand(
+				() -> this.intakeMotor.set(this.isIntakeOpen ? 0.0 : IntakeConstants.kKeepInPlaceSpeed), this);
 	}
 
 	public void setIntakeMotor(double speedPercentOutput) {

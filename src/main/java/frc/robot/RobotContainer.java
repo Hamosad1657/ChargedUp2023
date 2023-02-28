@@ -27,7 +27,7 @@ public class RobotContainer {
 
 	private final JoystickButton driverA_Share, driverA_R2, driverA_L2, driverA_PS, driverA_Circle, driverA_Cross,
 			driverA_Triangle, driverA_Square;
-	private final JoystickButton driverB_Circle;
+	private final JoystickButton driverB_Circle, driverB_Share, driverB_Options;
 
 	private SwerveSubsystem swerve;
 	private GrabberSubsystem grabber;
@@ -54,7 +54,8 @@ public class RobotContainer {
 		this.driverA_Triangle = new JoystickButton(driverA_Controller, PS4Controller.Button.kTriangle.value);
 		this.driverA_Square = new JoystickButton(driverA_Controller, PS4Controller.Button.kSquare.value);
 		this.driverA_PS = new JoystickButton(driverA_Controller, PS4Controller.Button.kPS.value);
-
+		this.driverB_Share = new JoystickButton(driverB_Controller, PS4Controller.Button.kShare.value);
+		this.driverB_Options = new JoystickButton(driverB_Controller, PS4Controller.Button.kOptions.value);
 		this.driverB_Circle = new JoystickButton(driverB_Controller, PS4Controller.Button.kCircle.value);
 
 		this.configureButtonsBindings();
@@ -71,8 +72,12 @@ public class RobotContainer {
 		this.driverA_PS.onTrue(new InstantCommand(this.swerve::modulesToZero, this.swerve));
 
 		this.driverB_Circle.onTrue(this.grabber.toggleGrabberSolenoidCommand());
-		this.driverA_L2.onTrue(this.intake.lowerIntakeCommand());
-		this.driverA_R2.onTrue(this.intake.raiseIntakeCommand());
+
+		this.driverB_Share.onTrue(this.arm.homeArmCommand());
+		this.driverB_Options.onTrue(this.arm.resetArmLenPos());
+
+		this.driverA_R2.onTrue(this.intake.lowerIntakeCommand());
+		this.driverA_L2.onTrue(this.intake.raiseIntakeCommand());
 		this.driverA_Square.onTrue(new BalanceChassisCommand(this.swerve, BalancingOptions.kPIDNavX));
 	}
 
@@ -91,7 +96,10 @@ public class RobotContainer {
 		this.arm.setDefaultCommand(this.arm.openLoopTeleopArmCommand(
 				() -> HaUnits.deadband(driverB_Controller.getLeftY(), kJoystickDeadband),
 				() -> HaUnits.deadband((driverB_Controller.getL2Axis() + 1.0), kJoystickDeadband),
-				() -> HaUnits.deadband((driverB_Controller.getR2Axis() + 1.0), kJoystickDeadband)));
+				() -> HaUnits.deadband((driverB_Controller.getR2Axis() + 1.0), kJoystickDeadband), driverB_Controller));
+
+		// Keep intake up
+		this.intake.setDefaultCommand(this.intake.keepIntakeUpCommand());
 	}
 
 	/**

@@ -15,10 +15,12 @@ import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -48,14 +50,17 @@ public class ArmSubsystem extends SubsystemBase {
 	private final GenericEntry extendLimitEntry, retractLimitEntry, topAngleLimitEntry, bottomAngleLimitEntry,
 			angleMotorOutputEntry;
 	private ArmState currentState;
+	private boolean shouldOverrideLimits = false;
 
 	// Angle lowers when you go up
 	public ArmSubsystem() {
 		this.armAngleMotor = new CANSparkMax(RobotMap.kArmAngleMotorID, MotorType.kBrushless);
 		this.armAngleMotor.setIdleMode(IdleMode.kBrake);
+		this.armAngleMotor.setInverted(true);
 		this.armAngleMotor.enableVoltageCompensation(12.0);
 		this.armAngleCANCoder = new HaCANCoder(RobotMap.kArmAngleCANCoderID, ArmConstants.kAngleCANCoderOffsetDeg);
-		this.armAngleCANCoder.setMeasurmentRange(AbsoluteSensorRange.Signed_PlusMinus180);
+		this.armAngleCANCoder.setMeasurmentRange(AbsoluteSensorRange.Unsigned_0_to_360);
+		this.armAngleCANCoder.setPosition(0);
 
 		this.armLengthMotorA = new WPI_TalonSRX(RobotMap.kArmLengthMotorAID);
 		this.armLengthMotorA.setNeutralMode(NeutralMode.Brake);
@@ -65,6 +70,8 @@ public class ArmSubsystem extends SubsystemBase {
 
 		this.armLengthMotor = new HaTalonSRX(armLengthMotorA);
 		this.armLengthCANCoder = new HaCANCoder(RobotMap.kArmLengthCANCoderID, ArmConstants.kArmLengthEncoderOffset);
+		this.armLengthCANCoder.setMeasurmentRange(AbsoluteSensorRange.Unsigned_0_to_360);
+		this.armLengthCANCoder.setPosition(0);
 
 		this.armAnglePIDController = ArmConstants.kArmAnglePIDGains.toPIDController();
 		this.armAnglePIDController.setTolerance(ArmConstants.kArmAngleTolerance);
@@ -146,14 +153,23 @@ public class ArmSubsystem extends SubsystemBase {
 			this.angleMotorOutputEntry.setDouble(0.0);
 			this.armAngleMotor.set(0.0);
 		} else {
-			if ((output > -ArmConstants.kArmAngleBalanceMotorOutput
-					&& output < ArmConstants.kArmAngleBalanceMotorOutput)) {
-				if (this.armAngleCANCoder.getAbsAngleDeg() > -85.0) {
-					output = 0.0;
+			double armAngle = this.armAngleCANCoder.getAbsAngleDeg();
+			if ((output > -ArmConstants.kArmAngleBalanceMiddleMotorOutput
+					&& output < ArmConstants.kArmAngleBalanceMiddleMotorOutput)) {
+				if (armAngle > ArmConstants.kArmAngleBalanceMiddleDeg) {
+					output = -ArmConstants.kArmAngleBalanceMiddleMotorOutput;
+				} else if (armAngle > ArmConstants.kArmAngleBalanceMinDeg) {
+					output = -ArmConstants.kArmAngleBalanceMinMotorOutput;
 				} else {
-					output = -ArmConstants.kArmAngleBalanceMotorOutput;
+					output = ArmConstants.kArmAngleBalanceMinMotorOutput;
+				}
+			} else {
+				// Make the angle motor slower at the top and bottom
+				if (armAngle < ArmConstants.kArmAngleBottomThreshold || armAngle > ArmConstants.kArmAngleTopThreshold) {
+					output *= ArmConstants.kArmAngleThresholdSpeedRatio;
 				}
 			}
+
 			this.angleMotorOutputEntry.setDouble(output);
 			this.armAngleMotor.set(output);
 		}
@@ -163,11 +179,19 @@ public class ArmSubsystem extends SubsystemBase {
 	 * @param output - The output of the length motor in [-1.0, 1.0].
 	 */
 	public void setLengthMotorWithLimits(double output) {
-		if (output < 0 && !this.extendLimit.get()) { // The magnetic limit switches are normally true.
+		// The magnetic limit switches are normally true.
+		if (!this.shouldOverrideLimits && output < 0 && !this.extendLimit.get()) {
 			this.armLengthMotor.set(0.0);
-		} else if (output > 0 && !this.retractLimit.get()) {
+		} else if (!this.shouldOverrideLimits && output > 0 && !this.retractLimit.get()) {
 			this.armLengthMotor.set(0.0);
 		} else {
+			// Make the length motor slower at the ends of the telescopic
+			double armLengthPosition = this.armLengthCANCoder.getPositionDeg();
+			if (armLengthPosition > ArmConstants.kArmLengthExtendThreshold
+					|| armLengthPosition < ArmConstants.kArmLengthRetractThreshold) {
+				output *= ArmConstants.kArmLengthThresholdSpeedRatio;
+			}
+
 			this.armLengthMotor.set(output * ArmConstants.kArmLengthSpeedRatio);
 		}
 	}
@@ -187,8 +211,14 @@ public class ArmSubsystem extends SubsystemBase {
 	 * @param backwardsOutputSupplier - The output supplier for the arm's backwards retraction.
 	 */
 	public Command openLoopTeleopArmCommand(DoubleSupplier angleOutputSupplier, DoubleSupplier forwardsOutputSupplier,
-			DoubleSupplier backwardsOutputSupplier) {
+			DoubleSupplier backwardsOutputSupplier, PS4Controller controller) {
 		return new RunCommand(() -> {
+			if (controller.getL3ButtonPressed()) {
+				this.shouldOverrideLimits = true;
+			} else if (controller.getL3ButtonReleased()) {
+				this.shouldOverrideLimits = false;
+			}
+
 			// Set angle motor
 			double angleSupplierValue = angleOutputSupplier.getAsDouble();
 			this.setAngleMotorWithLimits(angleSupplierValue * angleSupplierValue * Math.signum(angleSupplierValue)
@@ -278,6 +308,28 @@ public class ArmSubsystem extends SubsystemBase {
 				this.setStateCommand(this.currentState));
 	}
 
+	public Command homeArmCommand() {
+		return new RunCommand(() -> {
+			// The limits are normally true
+			if (this.retractLimit.get()) {
+				this.setLengthMotorWithLimits(0.7);
+			} else {
+				this.armLengthMotor.set(0.0);
+				if (this.bottomAngleLimit.get()) {
+					this.setAngleMotorWithLimits(0.2);
+				} else {
+					this.armAngleMotor.set(0.0);
+				}
+			}
+		}, this).until(() -> !this.retractLimit.get() && !this.bottomAngleLimit.get()).andThen(() -> {
+			this.armLengthCANCoder.setPosition(0.0);
+		}, this);
+	}
+
+	public Command resetArmLenPos() {
+		return new InstantCommand(() -> this.armLengthCANCoder.setPosition(0.0));
+	}
+
 	@Override
 	public void periodic() {
 		this.extendLimitEntry.setBoolean(!this.extendLimit.get());
@@ -285,5 +337,4 @@ public class ArmSubsystem extends SubsystemBase {
 		this.topAngleLimitEntry.setBoolean(!this.topAngleLimit.get());
 		this.bottomAngleLimitEntry.setBoolean(!this.bottomAngleLimit.get());
 	}
-
 }

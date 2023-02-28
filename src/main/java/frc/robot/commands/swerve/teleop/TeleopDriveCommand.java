@@ -25,7 +25,7 @@ public class TeleopDriveCommand extends CommandBase {
 			DoubleSupplier translationYSupplier, DoubleSupplier rotationSupplier,
 			BooleanSupplier isRobotOrientedSupplier) {
 		this.swerve = swerve;
-		addRequirements(swerve);
+		this.addRequirements(this.swerve);
 
 		this.translationXSupplier = translationXSupplier;
 		this.translationYSupplier = translationYSupplier;
@@ -42,10 +42,10 @@ public class TeleopDriveCommand extends CommandBase {
 	public void execute() {
 		// Get joysick values and apply deadband.
 		double translationXValue = MathUtil.applyDeadband(translationXSupplier.getAsDouble(),
-				RobotContainer.kJoystickDeadband) * this.swerve.currentSwerveTranslateRatio;
+				RobotContainer.kJoystickDeadband) * this.swerve.filteredTranslationRatio;
 
 		double translationYValue = MathUtil.applyDeadband(translationYSupplier.getAsDouble(),
-				RobotContainer.kJoystickDeadband) * this.swerve.currentSwerveTranslateRatio;
+				RobotContainer.kJoystickDeadband) * this.swerve.filteredTranslationRatio;
 
 		double rotationValue = MathUtil.applyDeadband(rotationSupplier.getAsDouble(), RobotContainer.kJoystickDeadband)
 				* this.swerve.currentSwerveRotationRatio;
