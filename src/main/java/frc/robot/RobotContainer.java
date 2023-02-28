@@ -109,10 +109,7 @@ public class RobotContainer {
 	 * @return The command to run in autonomous
 	 */
 	public Command getAutoCommand() {
-		// return this.arm.homeCommand();
-		// return this.arm.setStateCommand(ArmState.kMid);
 		return this.comboxChooser.getSelected();
-		// return new BalanceChassisCommand(this.swerve, BalancingOptions.kPIDNavX);
 	}
 
 	public static boolean shouldRobotMove() {
