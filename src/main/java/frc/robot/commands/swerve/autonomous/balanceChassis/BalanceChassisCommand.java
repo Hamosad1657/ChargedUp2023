@@ -108,7 +108,7 @@ public class BalanceChassisCommand extends CommandBase {
 			direction = -1.0;
 		}
 
-		this.chassis.autonomousDrive(new ChassisSpeeds(BalanceChassisConstants.kDriveSpeed * direction, 0, 0), true,
+		this.chassis.autonomousDrive(new ChassisSpeeds(BalanceChassisConstants.kDriveSpeedMPS * direction, 0, 0), true,
 				true);
 	}
 

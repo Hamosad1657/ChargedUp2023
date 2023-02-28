@@ -10,6 +10,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.arm.ArmSubsystem;
 import frc.robot.subsystems.arm.ArmConstants.ArmState;
 import frc.robot.subsystems.grabber.GrabberSubsystem;
@@ -68,5 +69,7 @@ public final class SwervePathConstants {
 		SwervePathConstants.kPathCommandsMap.put("ToggleGrabber", grabber.toggleGrabberSolenoidCommand());
 		SwervePathConstants.kPathCommandsMap.put("OpenIntake", intake.lowerIntakeCommand());
 		SwervePathConstants.kPathCommandsMap.put("CloseIntake", intake.raiseIntakeCommand());
+		SwervePathConstants.kPathCommandsMap.put("WaitABit", new WaitCommand(0.15));
+		SwervePathConstants.kPathCommandsMap.put("WaitABitMore", new WaitCommand(0.3));
 	}
 }

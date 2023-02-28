@@ -38,11 +38,9 @@ import frc.robot.RobotMap;
 import frc.robot.commands.swerve.autonomous.SwervePathConstants;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import frc.robot.commands.swerve.autonomous.balanceChassis.BalanceChassisCommand;
-import frc.robot.commands.swerve.autonomous.balanceChassis.BalanceChassisConstants.BalancingOptions;
+import frc.robot.commands.swerve.autonomous.balanceChassis.DriveOnChargeStation;
+import frc.robot.subsystems.intake.IntakeSubsystem;
 import java.util.List;
-import java.util.function.Consumer;
 import java.util.stream.Stream;
 import com.hamosad1657.lib.sensors.HaNavX;
 import com.hamosad1657.lib.vision.limelight.Limelight;
@@ -507,11 +505,16 @@ public class SwerveSubsystem extends SubsystemBase {
 	 * The function for putting paths inside the chooser
 	 */
 	private void createPaths() {
+		// IntakeSubsystem intake = IntakeSubsystem.getInstance();
+		SwervePathConstants.kPaths.putIfAbsent("Hangar Mobility & Station", new SequentialCommandGroup(
+				getPathPlannerAutoCommand("Hangar Mobility & Station"), this.crossLockWheelsCommand()));
+		// new DriveOnChargeStation(this, intake)
+
 		try (Stream<Path> paths = Files.walk(Filesystem.getDeployDirectory().toPath().resolve("pathplanner/"))) {
 			paths.filter(Files::isRegularFile).forEach((path) -> {
 				String name = path.getFileName().toString().replace(".path", "");
-				SwervePathConstants.kPaths.put(name,
-						new SequentialCommandGroup(getPathPlannerAutoCommand(name), crossLockWheelsCommand()));
+				SwervePathConstants.kPaths.putIfAbsent(name,
+						new SequentialCommandGroup(getPathPlannerAutoCommand(name), this.crossLockWheelsCommand()));
 			});
 		} catch (Exception e) {
 			Robot.print(e);

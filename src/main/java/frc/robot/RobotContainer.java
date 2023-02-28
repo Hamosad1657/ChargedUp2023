@@ -16,7 +16,6 @@ import frc.robot.commands.swerve.autonomous.balanceChassis.BalanceChassisCommand
 import frc.robot.commands.swerve.autonomous.balanceChassis.BalanceChassisConstants.BalancingOptions;
 import frc.robot.commands.swerve.teleop.TeleopDriveCommand;
 import frc.robot.subsystems.arm.ArmSubsystem;
-import frc.robot.subsystems.arm.ArmConstants.ArmState;
 import frc.robot.subsystems.grabber.GrabberSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.swerve.SwerveSubsystem;

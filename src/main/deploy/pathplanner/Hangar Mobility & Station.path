@@ -7,58 +7,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.787796330715681,
+        "x": 5.58671221704087,
         "y": 0.5
-      },
-      "holonomicAngle": 180.0,
-      "isReversal": false,
-      "velOverride": null,
-      "isLocked": true,
-      "isStopPoint": false,
-      "stopEvent": {
-        "names": [],
-        "executionBehavior": "parallel",
-        "waitBehavior": "none",
-        "waitTime": 0
-      }
-    },
-    {
-      "anchorPoint": {
-        "x": 5.75,
-        "y": 0.5
-      },
-      "prevControl": {
-        "x": 5.764703673453977,
-        "y": 0.5
-      },
-      "nextControl": {
-        "x": 5.735296326546023,
-        "y": 0.5
-      },
-      "holonomicAngle": 180.0,
-      "isReversal": false,
-      "velOverride": null,
-      "isLocked": true,
-      "isStopPoint": false,
-      "stopEvent": {
-        "names": [],
-        "executionBehavior": "parallel",
-        "waitBehavior": "none",
-        "waitTime": 0
-      }
-    },
-    {
-      "anchorPoint": {
-        "x": 5.5,
-        "y": 2.6
-      },
-      "prevControl": {
-        "x": 5.5,
-        "y": 2.605135283097492
-      },
-      "nextControl": {
-        "x": 5.5,
-        "y": 2.5948647169025083
       },
       "holonomicAngle": 180.0,
       "isReversal": false,
@@ -68,33 +18,63 @@
       "stopEvent": {
         "names": [
           "OpenIntake",
-          "OpenIntake"
+          "WaitABitMore",
+          "CloseIntake"
         ],
         "executionBehavior": "sequential",
         "waitBehavior": "minimum",
+        "waitTime": 1.0
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 5.5,
+        "y": 2.725
+      },
+      "prevControl": {
+        "x": 5.894993187456109,
+        "y": 0.48488231710748186
+      },
+      "nextControl": {
+        "x": 5.498425312525111,
+        "y": 2.7339304964479183
+      },
+      "holonomicAngle": 180.0,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": true,
+      "stopEvent": {
+        "names": [
+          "OpenIntake",
+          "WaitABit",
+          "OpenIntake"
+        ],
+        "executionBehavior": "sequential",
+        "waitBehavior": "none",
         "waitTime": 0
       }
     },
     {
       "anchorPoint": {
-        "x": 3.8,
-        "y": 2.6
+        "x": 3.55,
+        "y": 2.725
       },
       "prevControl": {
-        "x": 4.363905865889254,
-        "y": 2.6
+        "x": 5.295124543278089,
+        "y": 2.725
       },
       "nextControl": null,
       "holonomicAngle": 180.0,
       "isReversal": false,
       "velOverride": null,
-      "isLocked": true,
+      "isLocked": false,
       "isStopPoint": false,
       "stopEvent": {
         "names": [
           "CloseIntake"
         ],
-        "executionBehavior": "parallel",
+        "executionBehavior": "sequential",
         "waitBehavior": "none",
         "waitTime": 0
       }
@@ -103,12 +83,5 @@
   "maxVelocity": 2.0,
   "maxAcceleration": null,
   "isReversed": null,
-  "markers": [
-    {
-      "position": 1.0,
-      "names": [
-        "Print 1"
-      ]
-    }
-  ]
+  "markers": []
 }
