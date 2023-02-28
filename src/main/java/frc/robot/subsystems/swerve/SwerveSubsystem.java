@@ -16,6 +16,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -504,14 +505,11 @@ public class SwerveSubsystem extends SubsystemBase {
 	 * The function for putting paths inside the chooser
 	 */
 	private void createPaths() {
-		try (Stream<Path> paths = Files.walk(Paths.get("/deploy/pathplanner"))) {
-			paths.forEach(new Consumer<Path>() {
-				@Override
-				public void accept(Path path) {
-					String name = path.toString().replace(".path", "");
-					SwervePathConstants.kPaths.put(name,
-							new SequentialCommandGroup(getPathPlannerAutoCommand(name), crossLockWheelsCommand()));
-				}
+		try (Stream<Path> paths = Files.walk(Filesystem.getDeployDirectory().toPath().resolve("pathplanner/"))) {
+			paths.filter(Files::isRegularFile).forEach((path) -> {
+				String name = path.getFileName().toString().replace(".path", "");
+				SwervePathConstants.kPaths.put(name,
+						new SequentialCommandGroup(getPathPlannerAutoCommand(name), crossLockWheelsCommand()));
 			});
 		} catch (Exception e) {
 			Robot.print(e);

@@ -105,9 +105,9 @@ public class RobotContainer {
 	 * @return The command to run in autonomous
 	 */
 	public Command getAutoCommand() {
-		return this.arm.homeCommand();
+		// return this.arm.homeCommand();
 		// return this.arm.setStateCommand(ArmState.kMid);
-		// return this.comboxChooser.getSelected();
+		return this.comboxChooser.getSelected();
 	}
 
 	public static boolean shouldRobotMove() {
