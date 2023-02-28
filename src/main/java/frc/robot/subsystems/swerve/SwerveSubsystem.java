@@ -16,6 +16,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -28,15 +29,21 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.fusionLib.swerve.SwerveModule;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.RobotMap;
 import frc.robot.commands.swerve.autonomous.SwervePathConstants;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import frc.robot.commands.swerve.autonomous.balanceChassis.BalanceChassisCommand;
 import frc.robot.commands.swerve.autonomous.balanceChassis.BalanceChassisConstants.BalancingOptions;
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
 import com.hamosad1657.lib.sensors.HaNavX;
 import com.hamosad1657.lib.vision.limelight.Limelight;
 import com.hamosad1657.lib.vision.limelight.LimelightConstants;
@@ -500,10 +507,15 @@ public class SwerveSubsystem extends SubsystemBase {
 	 * The function for putting paths inside the chooser
 	 */
 	private void createPaths() {
-		SwervePathConstants.kPaths.put("Option 1 Chooser Test",
-				this.getPathPlannerAutoCommand("Option 1 Chooser Test"));
-		SwervePathConstants.kPaths.put("Option 2 Chooser Test",
-				this.getPathPlannerAutoCommand("Option 2 Chooser Test"));
+		try (Stream<Path> paths = Files.walk(Filesystem.getDeployDirectory().toPath().resolve("pathplanner/"))) {
+			paths.filter(Files::isRegularFile).forEach((path) -> {
+				String name = path.getFileName().toString().replace(".path", "");
+				SwervePathConstants.kPaths.put(name,
+						new SequentialCommandGroup(getPathPlannerAutoCommand(name), crossLockWheelsCommand()));
+			});
+		} catch (Exception e) {
+			Robot.print(e);
+		}
 	}
 
 	@Override

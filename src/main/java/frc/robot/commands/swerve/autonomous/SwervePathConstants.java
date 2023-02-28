@@ -10,10 +10,10 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.PrintCommand;
 import frc.robot.subsystems.arm.ArmSubsystem;
 import frc.robot.subsystems.arm.ArmConstants.ArmState;
 import frc.robot.subsystems.grabber.GrabberSubsystem;
+import frc.robot.subsystems.intake.IntakeSubsystem;
 
 public final class SwervePathConstants {
 	/**
@@ -21,6 +21,7 @@ public final class SwervePathConstants {
 	 */
 	private static final ArmSubsystem arm = ArmSubsystem.getInstance();
 	private static final GrabberSubsystem grabber = GrabberSubsystem.getInstance();
+	private static final IntakeSubsystem intake = IntakeSubsystem.getInstance();
 	public static final Pose2d kStartPose = new Pose2d(0, 0, new Rotation2d());
 
 	public static final double kMaxSpeedMPS = 2.0;
@@ -65,5 +66,7 @@ public final class SwervePathConstants {
 		SwervePathConstants.kPathCommandsMap.put("ArmMiddle", arm.setStateCommand(ArmState.kMid));
 		SwervePathConstants.kPathCommandsMap.put("ArmLow", arm.setStateCommand(ArmState.kLowFront));
 		SwervePathConstants.kPathCommandsMap.put("ToggleGrabber", grabber.toggleGrabberSolenoidCommand());
+		SwervePathConstants.kPathCommandsMap.put("OpenIntake", intake.lowerIntakeCommand());
+		SwervePathConstants.kPathCommandsMap.put("CloseIntake", intake.raiseIntakeCommand());
 	}
 }
