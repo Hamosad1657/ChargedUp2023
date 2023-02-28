@@ -28,6 +28,7 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -98,7 +99,6 @@ public class SwerveSubsystem extends SubsystemBase {
 
 	private SwerveSubsystem() {
 		this.gyro = new HaNavX(RobotMap.kNavXPort);
-		this.zeroGyro();
 
 		this.modules = new SwerveModule[] { new SwerveModule(0, SwerveConstants.FrontLeftModule.constants),
 				new SwerveModule(1, SwerveConstants.FrontRightModule.constants),
@@ -117,7 +117,7 @@ public class SwerveSubsystem extends SubsystemBase {
 		this.anglePIDRunningEntry = this.swerveTab.add("Angle PID Running", false).getEntry();
 		this.teleopAngleErrorEntry = this.swerveTab.add("Angle PID Error", 0.0).getEntry();
 
-		this.swerveTab.add("Gyro", this.gyro);
+		this.swerveTab.add("Gyro", this.gyro).withPosition(0, 3).withSize(2, 3);
 		this.swerveTab.add("Angle PID", this.anglePIDController);
 		this.frontLeftModuleList = this.swerveTab.getLayout("Front Left Module", BuiltInLayouts.kList)
 				.withPosition(0, 0).withSize(2, 3);
@@ -447,10 +447,17 @@ public class SwerveSubsystem extends SubsystemBase {
 				&& Math.abs(error.getRotation().getDegrees()) < tolerance.getRotation().getDegrees();
 	}
 
-	public CommandBase getPathPlannerAutoCommand(String pathGroupName) {
+	public Command resetGyroFromPathStartCommand(PathPlannerTrajectory firstPath) {
+		Rotation2d initialRotation = firstPath.getInitialHolonomicPose().getRotation()
+				.rotateBy(Rotation2d.fromDegrees(180.0));
+		return new InstantCommand(() -> this.setGyro(initialRotation), this);
+	}
+
+	public Command getPathPlannerAutoCommand(String pathGroupName) {
 		List<PathPlannerTrajectory> pathGroup = PathPlanner.loadPathGroup(pathGroupName,
 				SwervePathConstants.kMaxSpeedMPS, SwervePathConstants.kMaxAccelMPSSquared);
-		return this.autoBuilder.fullAuto(pathGroup);
+		return new SequentialCommandGroup(this.resetGyroFromPathStartCommand(pathGroup.get(0)),
+				this.autoBuilder.fullAuto(pathGroup));
 	}
 
 	public Command crossLockWheelsCommand() {
@@ -506,13 +513,13 @@ public class SwerveSubsystem extends SubsystemBase {
 	 */
 	private void createPaths() {
 		SwervePathConstants.kPaths.putIfAbsent("Mobility & Station", new SequentialCommandGroup(
-				getPathPlannerAutoCommand("Mobility & Station"), this.crossLockWheelsCommand()));
+				this.getPathPlannerAutoCommand("Mobility & Station"), this.crossLockWheelsCommand()));
 
 		try (Stream<Path> paths = Files.walk(Filesystem.getDeployDirectory().toPath().resolve("pathplanner/"))) {
 			paths.filter(Files::isRegularFile).forEach((path) -> {
 				String name = path.getFileName().toString().replace(".path", "");
-				SwervePathConstants.kPaths.putIfAbsent(name,
-						new SequentialCommandGroup(getPathPlannerAutoCommand(name), this.crossLockWheelsCommand()));
+				SwervePathConstants.kPaths.putIfAbsent(name, new SequentialCommandGroup(
+						this.getPathPlannerAutoCommand(name), this.crossLockWheelsCommand()));
 			});
 		} catch (Exception e) {
 			Robot.print(e);

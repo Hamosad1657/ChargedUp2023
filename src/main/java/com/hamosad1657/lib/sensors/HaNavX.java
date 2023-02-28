@@ -121,6 +121,7 @@ public class HaNavX implements Sendable {
 	 * Used to set the angle the navX is currently facing minus the offset as zero.
 	 */
 	public void zeroYaw(double offsetDeg) {
+		this.zeroYaw();
 		this.yawOffsetDeg = offsetDeg;
 	}
 
@@ -128,6 +129,7 @@ public class HaNavX implements Sendable {
 	 * Used to set the angle the navX is currently facing minus the offset as zero.
 	 */
 	public void zeroYaw(Rotation2d offsetDeg) {
+		this.zeroYaw();
 		this.yawOffsetDeg = offsetDeg.getDegrees();
 	}
 
