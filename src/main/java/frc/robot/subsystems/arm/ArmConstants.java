@@ -27,9 +27,9 @@ public class ArmConstants {
 
 	// TODO: Tune the PID gains and tolerance.
 	public static final PIDGains kArmAnglePIDGains = new PIDGains(0.02, 0.00001, 0.0);
-	public static final double kArmAngleTolerance = 0.0;
+	public static final double kArmAngleTolerance = 3.0;
 	public static final PIDGains kArmLengthPIDGains = new PIDGains(0.0028, 0.0003, 0.0);
-	public static final double kArmLengthTolerance = 0.0;
+	public static final double kArmLengthTolerance = 150.0;
 
 	// TODO: Find FF gains
 	public static final double kArmAngleFFkS = 0.0;

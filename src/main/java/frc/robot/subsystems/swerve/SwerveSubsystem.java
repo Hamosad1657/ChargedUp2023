@@ -505,10 +505,8 @@ public class SwerveSubsystem extends SubsystemBase {
 	 * The function for putting paths inside the chooser
 	 */
 	private void createPaths() {
-		// IntakeSubsystem intake = IntakeSubsystem.getInstance();
-		SwervePathConstants.kPaths.putIfAbsent("Hangar Mobility & Station", new SequentialCommandGroup(
-				getPathPlannerAutoCommand("Hangar Mobility & Station"), this.crossLockWheelsCommand()));
-		// new DriveOnChargeStation(this, intake)
+		SwervePathConstants.kPaths.putIfAbsent("Mobility & Station", new SequentialCommandGroup(
+				getPathPlannerAutoCommand("Mobility & Station"), this.crossLockWheelsCommand()));
 
 		try (Stream<Path> paths = Files.walk(Filesystem.getDeployDirectory().toPath().resolve("pathplanner/"))) {
 			paths.filter(Files::isRegularFile).forEach((path) -> {

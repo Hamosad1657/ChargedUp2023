@@ -16,6 +16,7 @@ import frc.robot.commands.swerve.chargestation.BalanceChassisConstants.Balancing
 import frc.robot.commands.swerve.paths.SwervePathConstants;
 import frc.robot.commands.swerve.teleop.TeleopDriveCommand;
 import frc.robot.subsystems.arm.ArmSubsystem;
+import frc.robot.subsystems.arm.ArmConstants.ArmState;
 import frc.robot.subsystems.grabber.GrabberSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
@@ -78,7 +79,7 @@ public class RobotContainer {
 
 		this.driverA_R2.onTrue(this.intake.lowerIntakeCommand());
 		this.driverA_L2.onTrue(this.intake.raiseIntakeCommand());
-		this.driverA_Square.onTrue(new BalanceChassisCommand(this.swerve, BalancingOptions.kPIDNavX));
+		this.driverA_Square.onTrue(this.arm.setStateCommand(ArmState.kHigh));
 	}
 
 	private void setDefaultCommands() {

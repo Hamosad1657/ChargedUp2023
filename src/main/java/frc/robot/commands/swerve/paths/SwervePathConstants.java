@@ -64,6 +64,7 @@ public final class SwervePathConstants {
 
 	public static void createCommands() {
 		SwervePathConstants.kPathCommandsMap.put("ArmHigh", arm.setStateCommand(ArmState.kHigh));
+		SwervePathConstants.kPathCommandsMap.put("HomeArm", arm.homeCommand());
 		SwervePathConstants.kPathCommandsMap.put("ToggleGrabber", grabber.toggleGrabberSolenoidCommand());
 		SwervePathConstants.kPathCommandsMap.put("OpenIntake", intake.lowerIntakeCommand());
 		SwervePathConstants.kPathCommandsMap.put("CloseIntake", intake.raiseIntakeCommand());

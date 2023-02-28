@@ -46,7 +46,7 @@ public class ArmSubsystem extends SubsystemBase {
 	/** The object to use for controlling both length motors. */
 	private final HaTalonSRX armLengthMotor;
 	private final HaCANCoder armAngleCANCoder, armLengthCANCoder;
-	private final PIDController armLengthPIDController, armAnglePIDController;
+	private final PIDController armLengthPIDController, anglePIDController;
 	private final ArmFeedforward armAngleFFController;
 	private final DigitalInput extendLimit, retractLimit, bottomAngleLimit, topAngleLimit;
 	private final GenericEntry extendLimitEntry, retractLimitEntry, topAngleLimitEntry, bottomAngleLimitEntry,
@@ -75,8 +75,8 @@ public class ArmSubsystem extends SubsystemBase {
 		this.armLengthCANCoder.setMeasurmentRange(AbsoluteSensorRange.Unsigned_0_to_360);
 		this.armLengthCANCoder.setPosition(0);
 
-		this.armAnglePIDController = ArmConstants.kArmAnglePIDGains.toPIDController();
-		this.armAnglePIDController.setTolerance(ArmConstants.kArmAngleTolerance);
+		this.anglePIDController = ArmConstants.kArmAnglePIDGains.toPIDController();
+		this.anglePIDController.setTolerance(ArmConstants.kArmAngleTolerance);
 		// TODO: Implement arm angle FF control
 		this.armAngleFFController = new ArmFeedforward(ArmConstants.kArmAngleFFkS, ArmConstants.kArmAngleFFkG,
 				ArmConstants.kArmAngleFFkV);
@@ -120,7 +120,7 @@ public class ArmSubsystem extends SubsystemBase {
 	 * @param newState - The new arm state.
 	 */
 	public void setState(ArmState newState) {
-		this.armAnglePIDController.setSetpoint(newState.angleDeg);
+		this.anglePIDController.setSetpoint(newState.angleDeg);
 		this.armLengthPIDController.setSetpoint(newState.lengthDeg);
 	}
 
@@ -128,7 +128,7 @@ public class ArmSubsystem extends SubsystemBase {
 	 * @return The output for the angle motor calculated by the PID in [-1.0, 1.0].
 	 */
 	public double calculateAngleMotorOutput() {
-		double output = -MathUtil.clamp(this.armAnglePIDController.calculate(this.getCurrentAngle()),
+		double output = -MathUtil.clamp(this.anglePIDController.calculate(this.getCurrentAngle()),
 				-ArmConstants.kArmAngleSpeedRatio, ArmConstants.kArmAngleSpeedRatio);
 		return output;
 	}
@@ -266,7 +266,7 @@ public class ArmSubsystem extends SubsystemBase {
 	 * @return If both the angle and length motors are at their setpoint.
 	 */
 	public boolean isAtSetpoint() {
-		return this.armAnglePIDController.atSetpoint() && this.armLengthPIDController.atSetpoint();
+		return this.anglePIDController.atSetpoint() && this.armLengthPIDController.atSetpoint();
 	}
 
 	/**
@@ -303,9 +303,9 @@ public class ArmSubsystem extends SubsystemBase {
 			// Set angle setpoint. Aim for 1 degree less/more than the limit
 			// to avoid jumping (increase the number if it jumps anyway)
 			if (angleOutputSupplier.getAsDouble() < 0.0) {
-				this.armAnglePIDController.setSetpoint(ArmConstants.kBottomAngleLimitDeg - 1);
+				this.anglePIDController.setSetpoint(ArmConstants.kBottomAngleLimitDeg - 1);
 			} else {
-				this.armAnglePIDController.setSetpoint(ArmConstants.kTopAngleLimitDeg + 1);
+				this.anglePIDController.setSetpoint(ArmConstants.kTopAngleLimitDeg + 1);
 			}
 
 			this.setAngleMotorWithLengthLimits(this.calculateAngleMotorOutput() * angleOutputSupplier.getAsDouble());
@@ -334,12 +334,14 @@ public class ArmSubsystem extends SubsystemBase {
 			this.setState(newState);
 		}, () -> {
 			this.setAngleMotorWithLimits(this.calculateAngleMotorOutput());
-			this.setLengthMotorWithLimits(this.calculateLengthMotorOutput());
+			if (this.anglePIDController.atSetpoint()) {
+				this.setLengthMotorWithLimits(this.calculateLengthMotorOutput());
+			}
 		}, (interrupted) -> {
 			this.setAngleMotorWithLimits(0.0);
 			this.setLengthMotorWithLimits(0.0);
 		}, () -> {
-			return false;
+			return this.isAtSetpoint();
 		}, this);
 	}
 
