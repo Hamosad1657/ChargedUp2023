@@ -89,8 +89,6 @@ public class ArmSubsystem extends SubsystemBase {
 		this.bottomAngleLimit = new DigitalInput(RobotMap.kBottomArmAngleLimitport);
 		this.topAngleLimit = new DigitalInput(RobotMap.kTopArmAngleLimitport);
 
-		this.currentState = ArmState.kDefaultState;
-
 		ShuffleboardTab armTab = Shuffleboard.getTab("Arm");
 		// armTab.add("Arm Angle Motor", this.armAngleMotor);
 		armTab.add("Arm Length Motor", this.armLengthMotor);

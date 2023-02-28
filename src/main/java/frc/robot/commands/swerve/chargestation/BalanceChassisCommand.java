@@ -1,5 +1,5 @@
 
-package frc.robot.commands.swerve.autonomous.balanceChassis;
+package frc.robot.commands.swerve.chargestation;
 
 import com.hamosad1657.lib.vision.limelight.Limelight;
 import com.hamosad1657.lib.vision.limelight.LimelightConstants;
@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Robot;
-import frc.robot.commands.swerve.autonomous.balanceChassis.BalanceChassisConstants.BalancingOptions;
+import frc.robot.commands.swerve.chargestation.BalanceChassisConstants.BalancingOptions;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 
 public class BalanceChassisCommand extends CommandBase {

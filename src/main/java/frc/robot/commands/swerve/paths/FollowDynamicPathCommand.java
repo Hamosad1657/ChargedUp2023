@@ -1,5 +1,5 @@
 
-package frc.robot.commands.swerve.autonomous;
+package frc.robot.commands.swerve.paths;
 
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;

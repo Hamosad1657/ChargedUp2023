@@ -1,5 +1,5 @@
 
-package frc.robot.commands.swerve.autonomous;
+package frc.robot.commands.swerve.paths;
 
 import java.util.HashMap;
 import com.hamosad1657.lib.math.HaUnitConvertor;
@@ -64,8 +64,6 @@ public final class SwervePathConstants {
 
 	public static void createCommands() {
 		SwervePathConstants.kPathCommandsMap.put("ArmHigh", arm.setStateCommand(ArmState.kHigh));
-		SwervePathConstants.kPathCommandsMap.put("ArmMiddle", arm.setStateCommand(ArmState.kMid));
-		SwervePathConstants.kPathCommandsMap.put("ArmLow", arm.setStateCommand(ArmState.kLowFront));
 		SwervePathConstants.kPathCommandsMap.put("ToggleGrabber", grabber.toggleGrabberSolenoidCommand());
 		SwervePathConstants.kPathCommandsMap.put("OpenIntake", intake.lowerIntakeCommand());
 		SwervePathConstants.kPathCommandsMap.put("CloseIntake", intake.raiseIntakeCommand());

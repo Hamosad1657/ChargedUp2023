@@ -64,16 +64,14 @@ public class ArmConstants {
 
 	public static enum ArmState {
 		// Uses the relativity of the encoders as setpoints
-		kHigh(0, 0), kMid(60, 2200), kLowFront(0, 0), kLowBack(0, 0), kShelf(0, 0), kInsideRobot(0.0, 0.0);
-
-		public static final ArmState kDefaultState = kInsideRobot;
+		kHigh(93.0, 2500.0);
 
 		public final double angleDeg;
 		public final double lengthDeg;
 
-		ArmState(double angleDeg, double distanceMeters) {
+		ArmState(double angleDeg, double armLength) {
 			this.angleDeg = angleDeg;
-			this.lengthDeg = distanceMeters;
+			this.lengthDeg = armLength;
 		}
 	}
 }
