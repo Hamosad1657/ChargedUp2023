@@ -387,7 +387,7 @@ public class ArmSubsystem extends SubsystemBase {
 			} else {
 				this.setLengthMotorWithLimits(0.0);
 				if (this.bottomAngleLimit.get()) {
-					this.setAngleMotorWithLimits(0.3);
+					this.setAngleMotorWithLimits(0.2);
 				} else {
 					this.armAngleMotor.set(0.0);
 				}
