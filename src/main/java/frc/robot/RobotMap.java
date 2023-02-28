@@ -1,13 +1,13 @@
 
 package frc.robot;
 
-import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.SerialPort;
 
 /** This class contains CAN IDs and port numbers. */
 public class RobotMap {
 	public static int kDriverAControllerUSBPort = 0;
 	public static int kDriverBControllerUSBPort = 1;
-	public static SPI.Port kNavXPort = SPI.Port.kMXP;
+	public static SerialPort.Port kNavXPort = SerialPort.Port.kUSB1;
 
 	// Front left module
 	public static final int kFrontLeftDriveMotorID = 15;
