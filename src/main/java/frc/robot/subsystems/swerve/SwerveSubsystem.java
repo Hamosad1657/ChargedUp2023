@@ -8,6 +8,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -58,7 +59,7 @@ public class SwerveSubsystem extends SubsystemBase {
 		return instance;
 	}
 
-	private final double robotIsMovingThresholdMPS = 0.1;
+	private final SlewRateLimiter speedModeRateLimiter;
 	private final Timer angleControlTimer;
 	/** A PIDController for fixing the robot angle skew. */
 	private final Field2d field;
@@ -88,7 +89,9 @@ public class SwerveSubsystem extends SubsystemBase {
 	private double teleopAngleSetpointRad;
 	private boolean isRobotAngleCorrectionEnabled = false, runAngleCorrection = false;
 	public double currentSwerveTranslateRatio = SwerveConstants.kSwerveTranslateRatioFast;
-	public double currentSwerveRotationRatio = SwerveConstants.kSwerveSpinRatioFast;
+	public double currentSwerveRotationRatio = SwerveConstants.kSwerveRotationRatioFast;
+
+	public double filteredTranslationRatio = SwerveConstants.kSwerveTranslateRatioFast;
 
 	private final SwerveAutoBuilder autoBuilder;
 
@@ -159,12 +162,15 @@ public class SwerveSubsystem extends SubsystemBase {
 				.getEntry();
 		this.limelightYEntry = this.odometryList.add("Limelight Y", -1657).withWidget(BuiltInWidgets.kTextView)
 				.getEntry();
+
+		this.speedModeRateLimiter = new SlewRateLimiter(SwerveConstants.kSpeedModeRateLimit);
+
 		/*
 		 * By pausing init for a second before setting module offsets, we avoid a bug with inverting motors. See
 		 * https://github.com/Team364/BaseFalconSwerve/issues/8 for more info.
 		 */
 		Timer.delay(1.0);
-		resetModulesToAbsolute();
+		this.resetModulesToAbsolute();
 
 		this.odometry = new SwerveDriveOdometry(SwerveConstants.kSwerveKinematics, this.getYaw(),
 				this.getModulesPositions(), SwervePathConstants.kStartPose);
@@ -244,10 +250,10 @@ public class SwerveSubsystem extends SubsystemBase {
 	public void toggleSwerveSpeed() {
 		if (this.currentSwerveTranslateRatio == SwerveConstants.kSwerveTranslateRatioFast) {
 			this.currentSwerveTranslateRatio = SwerveConstants.kSwerveTranslateRatioSlow;
-			this.currentSwerveRotationRatio = SwerveConstants.kSwerveSpinRatioSlow;
+			this.currentSwerveRotationRatio = SwerveConstants.kSwerveRotationRatioSlow;
 		} else {
 			this.currentSwerveTranslateRatio = SwerveConstants.kSwerveTranslateRatioFast;
-			this.currentSwerveRotationRatio = SwerveConstants.kSwerveSpinRatioFast;
+			this.currentSwerveRotationRatio = SwerveConstants.kSwerveRotationRatioFast;
 		}
 	}
 
@@ -488,10 +494,10 @@ public class SwerveSubsystem extends SubsystemBase {
 	}
 
 	public boolean isChassisMoving() {
-		return this.modules[0].getModuleState().speedMetersPerSecond < this.robotIsMovingThresholdMPS
-				&& this.modules[1].getModuleState().speedMetersPerSecond < this.robotIsMovingThresholdMPS
-				&& this.modules[2].getModuleState().speedMetersPerSecond < this.robotIsMovingThresholdMPS
-				&& this.modules[3].getModuleState().speedMetersPerSecond < this.robotIsMovingThresholdMPS;
+		return this.modules[0].getModuleState().speedMetersPerSecond < SwerveConstants.robotIsMovingThresholdMPS
+				&& this.modules[1].getModuleState().speedMetersPerSecond < SwerveConstants.robotIsMovingThresholdMPS
+				&& this.modules[2].getModuleState().speedMetersPerSecond < SwerveConstants.robotIsMovingThresholdMPS
+				&& this.modules[3].getModuleState().speedMetersPerSecond < SwerveConstants.robotIsMovingThresholdMPS;
 	}
 
 	/**
@@ -514,6 +520,8 @@ public class SwerveSubsystem extends SubsystemBase {
 
 	@Override
 	public void periodic() {
+		this.filteredTranslationRatio = this.speedModeRateLimiter.calculate(currentSwerveTranslateRatio);
+
 		this.odometry.update(this.getYaw(), this.getModulesPositions());
 		this.field.setRobotPose(this.getEstimatedPose());
 
