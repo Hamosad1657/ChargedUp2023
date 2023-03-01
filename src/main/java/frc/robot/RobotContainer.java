@@ -11,8 +11,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import frc.robot.commands.swerve.chargestation.BalanceChassisCommand;
-import frc.robot.commands.swerve.chargestation.BalanceChassisConstants.BalancingOptions;
 import frc.robot.commands.swerve.paths.SwervePathConstants;
 import frc.robot.commands.swerve.teleop.TeleopDriveCommand;
 import frc.robot.subsystems.arm.ArmSubsystem;
@@ -27,7 +25,7 @@ public class RobotContainer {
 	public static final double kJoystickDeadband = 0.075;
 
 	private final JoystickButton driverA_Share, driverA_R2, driverA_L2, driverA_PS, driverA_Circle, driverA_Cross,
-			driverA_Triangle, driverA_Square;
+			driverA_Triangle;
 	private final JoystickButton driverB_Circle, driverB_Share, driverB_Options;
 
 	private SwerveSubsystem swerve;
@@ -53,7 +51,6 @@ public class RobotContainer {
 		this.driverA_Circle = new JoystickButton(driverA_Controller, PS4Controller.Button.kCircle.value);
 		this.driverA_Cross = new JoystickButton(driverA_Controller, PS4Controller.Button.kCross.value);
 		this.driverA_Triangle = new JoystickButton(driverA_Controller, PS4Controller.Button.kTriangle.value);
-		this.driverA_Square = new JoystickButton(driverA_Controller, PS4Controller.Button.kSquare.value);
 		this.driverA_PS = new JoystickButton(driverA_Controller, PS4Controller.Button.kPS.value);
 		this.driverB_Share = new JoystickButton(driverB_Controller, PS4Controller.Button.kShare.value);
 		this.driverB_Options = new JoystickButton(driverB_Controller, PS4Controller.Button.kOptions.value);
@@ -62,6 +59,7 @@ public class RobotContainer {
 		this.configureButtonsBindings();
 		this.setDefaultCommands();
 		this.createPathsComboBox();
+		this.comboxChooser.setDefaultOption("Arm & Mobility", this.swerve.getPathPlannerAutoCommand("Arm & Mobility"));
 	}
 
 	private void configureButtonsBindings() {
@@ -79,7 +77,6 @@ public class RobotContainer {
 
 		this.driverA_R2.onTrue(this.intake.lowerIntakeCommand());
 		this.driverA_L2.onTrue(this.intake.raiseIntakeCommand());
-		this.driverA_Square.onTrue(this.arm.setStateCommand(ArmState.kHigh));
 	}
 
 	private void setDefaultCommands() {
