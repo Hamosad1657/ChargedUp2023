@@ -381,7 +381,7 @@ public class ArmSubsystem extends SubsystemBase {
 	public Command homeCommand() {
 		return new FunctionalCommand(() -> {
 		}, () -> {
-			if (this.getCurrentAngle() > 75.0) {
+			if (this.getCurrentAngle() > 70.0) {
 				this.setAngleMotorWithLimits(0.2);
 				return;
 			}
