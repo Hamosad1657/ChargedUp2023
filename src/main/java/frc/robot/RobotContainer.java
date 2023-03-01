@@ -62,6 +62,7 @@ public class RobotContainer {
 		this.configureButtonsBindings();
 		this.setDefaultCommands();
 		this.createPathsComboBox();
+		this.comboxChooser.setDefaultOption("Mobility & Station", this.swerve.getPathPlannerAutoCommand("Mobility & Station"));
 	}
 
 	private void configureButtonsBindings() {
