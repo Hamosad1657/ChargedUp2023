@@ -261,6 +261,7 @@ public class HaNavX implements Sendable {
 		builder.addDoubleProperty("YawAngleRad", this::getYawAngleRad, null);
 		builder.addDoubleProperty("PitchAngleDeg", this::getPitchAngleDeg, null);
 		builder.addDoubleProperty("RollAngleDeg", this::getRollAngleDeg, null);
+		builder.addDoubleProperty("Offset", () -> this.yawOffsetDeg, null);
 
 		// builder.addDoubleProperty("AngularVelocityDegPS",
 		// this::getAngularVelocityDegPS, null);

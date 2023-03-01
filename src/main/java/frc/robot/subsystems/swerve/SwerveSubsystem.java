@@ -27,8 +27,6 @@ import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandBase;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -36,11 +34,9 @@ import frc.fusionLib.swerve.SwerveModule;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.RobotMap;
-import frc.robot.commands.swerve.chargestation.DriveOnChargeStation;
 import frc.robot.commands.swerve.paths.SwervePathConstants;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import frc.robot.subsystems.intake.IntakeSubsystem;
 import java.util.List;
 import java.util.stream.Stream;
 import com.hamosad1657.lib.sensors.HaNavX;
@@ -447,17 +443,10 @@ public class SwerveSubsystem extends SubsystemBase {
 				&& Math.abs(error.getRotation().getDegrees()) < tolerance.getRotation().getDegrees();
 	}
 
-	public Command resetGyroFromPathStartCommand(PathPlannerTrajectory firstPath) {
-		Rotation2d initialRotation = firstPath.getInitialHolonomicPose().getRotation()
-				.rotateBy(Rotation2d.fromDegrees(180.0));
-		return new InstantCommand(() -> this.setGyro(initialRotation), this);
-	}
-
 	public Command getPathPlannerAutoCommand(String pathGroupName) {
 		List<PathPlannerTrajectory> pathGroup = PathPlanner.loadPathGroup(pathGroupName,
 				SwervePathConstants.kMaxSpeedMPS, SwervePathConstants.kMaxAccelMPSSquared);
-		return new SequentialCommandGroup(this.resetGyroFromPathStartCommand(pathGroup.get(0)),
-				this.autoBuilder.fullAuto(pathGroup));
+		return this.autoBuilder.fullAuto(pathGroup);
 	}
 
 	public Command crossLockWheelsCommand() {
