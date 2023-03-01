@@ -2,26 +2,23 @@
 package frc.robot.subsystems.swerve;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.hamosad1657.lib.math.HaUnitConvertor;
 import com.hamosad1657.lib.math.HaUnits.PIDGains;
-import com.pathplanner.lib.PathConstraints;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import frc.fusionLib.swerve.SwerveModuleConstants;
 import frc.robot.RobotMap;
 
 public final class SwerveConstants {
 	public static final boolean invertGyro = false; // HaNavX already inverts the navX
-	public static final double kSwerveTranslateRatioFast = 0.85, kSwerveSpinRatioFast = 0.7;
-	public static final double kSwerveTranslateRatioSlow = 0.3, kSwerveSpinRatioSlow = 0.3;
+	public static final double kSwerveTranslateRatioFast = 0.85, kSwerveRotationRatioFast = 0.7;
+	public static final double kSwerveTranslateRatioSlow = 0.3, kSwerveRotationRatioSlow = 0.3;
+	public static final double kSpeedModeRateLimit = 0.75;
+	public static final double robotIsMovingThresholdMPS = 0.1;
 
 	/* Drivetrain Constants */
 	public static final double kTrackWidthM = 0.42;
@@ -163,49 +160,5 @@ public final class SwerveConstants {
 		public static final SwerveModuleConstants constants = new SwerveModuleConstants(kDriveMotorID, kSteerMotorID,
 				canCoderID, kAngleOffset);
 		public static final double kCrossAngleDeg = -135.0;
-	}
-
-	public static final class Auto {
-		/**
-		 * The start position of the first auto path. Should match real life because apriltags.
-		 */
-		public static final Pose2d kStartPose = new Pose2d(0, 0, new Rotation2d());
-
-		public static final double kMaxSpeedMPS = 1;
-		public static final double kMaxAccelMPSSquared = 3;
-		public static final double kMaxAngularSpeedRadPS = Math.PI;
-		public static final double kMaxAngularAccelRadPSSquared = Math.PI;
-		public static final PathConstraints kPathConstraints = new PathConstraints(kMaxSpeedMPS, kMaxAccelMPSSquared);
-
-		// PID gains for path following. If zero it works on only feedforwards.
-		/*
-		 * How it works: for example, if the proportional gain for X and Y is 1.5, then the controller will add another
-		 * 1.5 meter/second for every meter of error. If the proportional gain for angle is 2, then the controller will
-		 * add 2 radians/second for every radian of error.
-		 */
-		public static final double kXControllerP = 3.5;
-		public static final double kXControllerI = 0.0;
-		public static final double kXControllerD = 0.0;
-
-		public static final double kYControllerP = kXControllerP;
-		public static final double kYControllerI = kXControllerI;
-		public static final double kYControllerD = kXControllerD;
-
-		public static final double kAngleControllerP = -10.0;
-		public static final double kAngleControllerI = 0.0;
-		public static final double kAngleControllerD = 0.0;
-
-		public static final double kPoseToleranceM = 0.05;
-		public static final double kAngleToleranceRad = HaUnitConvertor.degToRad(1);
-
-		public static final PIDController kXController = new PIDController(kXControllerP, kXControllerI, kXControllerD);
-		public static final PIDController kYController = new PIDController(kYControllerP, kYControllerI, kYControllerD);
-		public static final PIDController kAngleController = new PIDController(kAngleControllerP, kAngleControllerI,
-				kAngleControllerD);
-
-		/* Constraint for the motion profilied robot angle controller */
-		public static final TrapezoidProfile.Constraints kThetaControllerConstraints = new TrapezoidProfile.Constraints(
-				kMaxAngularSpeedRadPS, kMaxAngularAccelRadPSSquared);
-
 	}
 }

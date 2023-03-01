@@ -2,6 +2,7 @@
 package com.hamosad1657.lib.math;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 
 public class HaUnitConvertor {
@@ -232,7 +233,8 @@ public class HaUnitConvertor {
 	 */
 	public static Pose2d matchPoseToAlliance(Pose2d position) {
 		return DriverStation.getAlliance() == DriverStation.Alliance.Blue ? position
-				: new Pose2d(HaUnits.kChargedUpFieldLength - position.getX(), position.getY(), position.getRotation());
+				: new Pose2d(HaUnits.kChargedUpFieldLength - position.getX(), position.getY(),
+						position.getRotation().rotateBy(Rotation2d.fromDegrees(180.0)));
 	}
 
 }

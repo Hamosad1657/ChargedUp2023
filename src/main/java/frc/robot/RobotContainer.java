@@ -3,15 +3,20 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import java.util.function.BiConsumer;
 import com.hamosad1657.lib.math.HaUnits;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import frc.robot.commands.swerve.autonomous.FollowJSONPathCommand;
+import frc.robot.commands.swerve.chargestation.BalanceChassisCommand;
+import frc.robot.commands.swerve.chargestation.BalanceChassisConstants.BalancingOptions;
+import frc.robot.commands.swerve.paths.SwervePathConstants;
 import frc.robot.commands.swerve.teleop.TeleopDriveCommand;
 import frc.robot.subsystems.arm.ArmSubsystem;
+import frc.robot.subsystems.arm.ArmConstants.ArmState;
 import frc.robot.subsystems.grabber.GrabberSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
@@ -22,26 +27,25 @@ public class RobotContainer {
 	public static final double kJoystickDeadband = 0.075;
 
 	private final JoystickButton driverA_Share, driverA_R2, driverA_L2, driverA_PS, driverA_Circle, driverA_Cross,
-			driverA_Triangle;
-	private final JoystickButton driverB_Circle;
+			driverA_Triangle, driverA_Square;
+	private final JoystickButton driverB_Circle, driverB_Share, driverB_Options;
 
-	public SwerveSubsystem swerve;
-	public GrabberSubsystem grabber;
-	public ArmSubsystem arm;
-	public IntakeSubsystem intake;
+	private SwerveSubsystem swerve;
+	private GrabberSubsystem grabber;
+	private ArmSubsystem arm;
+	private IntakeSubsystem intake;
 	private TurretSubsystem turret;
+	private SendableChooser<Command> comboxChooser;
 
 	public RobotContainer() {
 		driverA_Controller = new PS4Controller(RobotMap.kDriverAControllerUSBPort);
 		driverB_Controller = new PS4Controller(RobotMap.kDriverBControllerUSBPort);
 
 		this.arm = ArmSubsystem.getInstance();
-		this.grabber = GrabberSubsystem.getInstace();
+		this.grabber = GrabberSubsystem.getInstance();
 		this.intake = IntakeSubsystem.getInstance();
 		this.turret = TurretSubsystem.getInstance();
 		this.swerve = SwerveSubsystem.getInstance();
-
-		Shuffleboard.getTab("Chassis").add(this.swerve);
 
 		this.driverA_Share = new JoystickButton(driverA_Controller, PS4Controller.Button.kShare.value);
 		this.driverA_R2 = new JoystickButton(driverA_Controller, PS4Controller.Button.kR2.value);
@@ -49,26 +53,33 @@ public class RobotContainer {
 		this.driverA_Circle = new JoystickButton(driverA_Controller, PS4Controller.Button.kCircle.value);
 		this.driverA_Cross = new JoystickButton(driverA_Controller, PS4Controller.Button.kCross.value);
 		this.driverA_Triangle = new JoystickButton(driverA_Controller, PS4Controller.Button.kTriangle.value);
+		this.driverA_Square = new JoystickButton(driverA_Controller, PS4Controller.Button.kSquare.value);
 		this.driverA_PS = new JoystickButton(driverA_Controller, PS4Controller.Button.kPS.value);
-
+		this.driverB_Share = new JoystickButton(driverB_Controller, PS4Controller.Button.kShare.value);
+		this.driverB_Options = new JoystickButton(driverB_Controller, PS4Controller.Button.kOptions.value);
 		this.driverB_Circle = new JoystickButton(driverB_Controller, PS4Controller.Button.kCircle.value);
 
 		this.configureButtonsBindings();
 		this.setDefaultCommands();
+		this.createPathsComboBox();
 	}
 
 	private void configureButtonsBindings() {
 		this.driverA_Share.onTrue(new InstantCommand(this.swerve::zeroGyro));
 		this.driverA_Circle.onTrue(new InstantCommand(() -> this.swerve.resetEstimatedPose(new Pose2d())));
 		this.driverA_Circle.onTrue(new InstantCommand(this.swerve::resetOdometry));
-		this.driverA_Cross
-				.onTrue(new RunCommand(this.swerve::crossLockWheels, this.swerve).until(this::shouldRobotMove));
+		this.driverA_Cross.onTrue(this.swerve.crossLockWheelsCommand());
 		this.driverA_Triangle.onTrue(new InstantCommand(this.swerve::toggleSwerveSpeed));
 		this.driverA_PS.onTrue(new InstantCommand(this.swerve::modulesToZero, this.swerve));
 
 		this.driverB_Circle.onTrue(this.grabber.toggleGrabberSolenoidCommand());
-		this.driverA_L2.onTrue(this.intake.lowerIntakeCommand());
-		this.driverA_R2.onTrue(this.intake.raiseIntakeCommand());
+
+		this.driverB_Share.onTrue(this.arm.homeCommand());
+		this.driverB_Options.onTrue(this.arm.resetLengthCANCoderPositionCommand());
+
+		this.driverA_R2.onTrue(this.intake.lowerIntakeCommand());
+		this.driverA_L2.onTrue(this.intake.raiseIntakeCommand());
+		this.driverA_Square.onTrue(this.arm.setStateCommand(ArmState.kHigh));
 	}
 
 	private void setDefaultCommands() {
@@ -85,8 +96,11 @@ public class RobotContainer {
 		// Teleop arm open/close - R2 open, L2 close, left Y for angle
 		this.arm.setDefaultCommand(this.arm.openLoopTeleopArmCommand(
 				() -> HaUnits.deadband(driverB_Controller.getLeftY(), kJoystickDeadband),
-				() -> HaUnits.deadband((driverB_Controller.getL2Axis() + 1.0), kJoystickDeadband),
-				() -> HaUnits.deadband((driverB_Controller.getR2Axis() + 1.0), kJoystickDeadband)));
+				() -> HaUnits.deadband((driverB_Controller.getR2Axis() + 1.0), kJoystickDeadband),
+				() -> HaUnits.deadband((driverB_Controller.getL2Axis() + 1.0), kJoystickDeadband), driverB_Controller));
+
+		// Keep intake up
+		this.intake.setDefaultCommand(this.intake.keepIntakeUpCommand());
 	}
 
 	/**
@@ -95,10 +109,10 @@ public class RobotContainer {
 	 * @return The command to run in autonomous
 	 */
 	public Command getAutoCommand() {
-		return new FollowJSONPathCommand(this.swerve, "Hangar!! around charging station", null);
+		return this.comboxChooser.getSelected();
 	}
 
-	private boolean shouldRobotMove() {
+	public static boolean shouldRobotMove() {
 		double translationXValue = driverA_Controller.getLeftX();
 		double translationYValue = driverA_Controller.getLeftY();
 		double rotationValue = driverA_Controller.getRightX();
@@ -109,5 +123,28 @@ public class RobotContainer {
 				|| translationYValue < -RobotContainer.kJoystickDeadband
 				|| rotationValue > RobotContainer.kJoystickDeadband
 				|| rotationValue < -RobotContainer.kJoystickDeadband);
+	}
+
+	public static boolean shoudlArmMove() {
+		double lengthValue = (driverB_Controller.getL2Axis() + 1.0) - (driverB_Controller.getR2Axis() + 1.0);
+		double angleValue = driverB_Controller.getLeftY();
+
+		return (lengthValue > kJoystickDeadband || lengthValue < -kJoystickDeadband || angleValue > kJoystickDeadband
+				|| angleValue < -kJoystickDeadband);
+	}
+
+	/**
+	 * Creats and adds the widget for selecting the paths for autonomous.
+	 */
+	private void createPathsComboBox() {
+		ShuffleboardTab autoTab = Shuffleboard.getTab("Auto");
+		this.comboxChooser = new SendableChooser<Command>();
+		SwervePathConstants.kPaths.forEach(new BiConsumer<String, Command>() {
+			@Override
+			public void accept(String name, Command command) {
+				comboxChooser.addOption(name, command);
+			}
+		});
+		autoTab.add("Path Chooser", this.comboxChooser).withWidget("ComboBox Chooser");
 	}
 }

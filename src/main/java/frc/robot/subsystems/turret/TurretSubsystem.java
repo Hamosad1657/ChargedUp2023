@@ -46,13 +46,13 @@ public class TurretSubsystem extends SubsystemBase {
 		this.rotationMotor.setIdleMode(IdleMode.kBrake);
 		this.rotationEncoder = new HaCANCoder(RobotMap.kTurretCANCoderID, TurretConstants.kCANCoderOffsetDeg);
 		this.rotationEncoder.setMeasurmentRange(AbsoluteSensorRange.Signed_PlusMinus180);
-		this.rotationCCWLimitSwitch = new DigitalInput(TurretConstants.kCCWRotationLimitSwitchPort);
-		this.rotationCWLimitSwitch = new DigitalInput(TurretConstants.kCWRotationLimitSwitchPort);
+		this.rotationCCWLimitSwitch = new DigitalInput(RobotMap.kTurretCCWLimitPort);
+		this.rotationCWLimitSwitch = new DigitalInput(RobotMap.kTurretCWLimitPort);
 		this.rotationPIDController = TurretConstants.kRotationPIDGains.toPIDController();
-		this.turretTab = Shuffleboard.getTab("turret");
+		this.turretTab = Shuffleboard.getTab("Turret");
 		this.dio1Entry = this.turretTab.add("CCW Limit", false).withPosition(2, 1).withSize(1, 1).getEntry();
 		this.dio0Entry = this.turretTab.add("CW Limit", false).withPosition(2, 0).withSize(1, 1).getEntry();
-		this.turretTab.add("turret encoder", this.rotationEncoder).withPosition(1, 0).withSize(2, 2);
+		this.turretTab.add("Turret Encoder", this.rotationEncoder).withPosition(1, 0).withSize(2, 2);
 	}
 
 	/**

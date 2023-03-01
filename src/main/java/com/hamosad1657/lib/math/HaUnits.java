@@ -1,6 +1,7 @@
 
 package com.hamosad1657.lib.math;
 
+import com.pathplanner.lib.auto.PIDConstants;
 import edu.wpi.first.math.controller.PIDController;
 
 public class HaUnits {
@@ -74,6 +75,10 @@ public class HaUnits {
 
 		public PIDController toPIDController() {
 			return new PIDController(this.p, this.i, this.d);
+		}
+
+		public PIDConstants toPathPlannerPIDConstants() {
+			return new PIDConstants(this.p, this.i, this.d);
 		}
 	}
 

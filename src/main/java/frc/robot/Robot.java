@@ -64,11 +64,16 @@ public class Robot extends TimedRobot {
 	@Override
 	public void teleopInit() {
 		// Tell the robot that it's facing us
-		SwerveSubsystem.getInstance().zeroGyroWith(180.0);
+		// SwerveSubsystem.getInstance().setGyro(180.0);
 
 		if (this.autonomousCommand != null) {
 			this.autonomousCommand.cancel();
 		}
+	}
+
+	@Override
+	public void disabledInit() {
+		SwerveSubsystem.getInstance().crossLockWheels();
 	}
 
 	@Override

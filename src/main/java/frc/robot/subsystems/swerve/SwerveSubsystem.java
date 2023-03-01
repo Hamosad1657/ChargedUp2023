@@ -8,6 +8,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -15,6 +16,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -25,25 +27,27 @@ import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
+import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
-import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.fusionLib.swerve.SwerveModule;
 import frc.robot.Robot;
+import frc.robot.RobotContainer;
 import frc.robot.RobotMap;
-import java.util.HashMap;
-import com.hamosad1657.lib.math.HaUnitConvertor;
+import frc.robot.commands.swerve.chargestation.DriveOnChargeStation;
+import frc.robot.commands.swerve.paths.SwervePathConstants;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import frc.robot.subsystems.intake.IntakeSubsystem;
+import java.util.List;
+import java.util.stream.Stream;
 import com.hamosad1657.lib.sensors.HaNavX;
 import com.hamosad1657.lib.vision.limelight.Limelight;
 import com.hamosad1657.lib.vision.limelight.LimelightConstants;
-import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
-import com.pathplanner.lib.commands.FollowPathWithEvents;
-import com.pathplanner.lib.commands.PPSwerveControllerCommand;
+import com.pathplanner.lib.auto.SwerveAutoBuilder;
 
 public class SwerveSubsystem extends SubsystemBase {
 	private static SwerveSubsystem instance;
@@ -56,7 +60,7 @@ public class SwerveSubsystem extends SubsystemBase {
 		return instance;
 	}
 
-	private final double robotIsMovingThresholdMPS = 0.1;
+	private final SlewRateLimiter speedModeRateLimiter;
 	private final Timer angleControlTimer;
 	/** A PIDController for fixing the robot angle skew. */
 	private final Field2d field;
@@ -86,7 +90,11 @@ public class SwerveSubsystem extends SubsystemBase {
 	private double teleopAngleSetpointRad;
 	private boolean isRobotAngleCorrectionEnabled = false, runAngleCorrection = false;
 	public double currentSwerveTranslateRatio = SwerveConstants.kSwerveTranslateRatioFast;
-	public double currentSwerveRotationRatio = SwerveConstants.kSwerveSpinRatioFast;
+	public double currentSwerveRotationRatio = SwerveConstants.kSwerveRotationRatioFast;
+
+	public double filteredTranslationRatio = SwerveConstants.kSwerveTranslateRatioFast;
+
+	private final SwerveAutoBuilder autoBuilder;
 
 	private SwerveSubsystem() {
 		this.gyro = new HaNavX(RobotMap.kNavXPort);
@@ -155,18 +163,41 @@ public class SwerveSubsystem extends SubsystemBase {
 				.getEntry();
 		this.limelightYEntry = this.odometryList.add("Limelight Y", -1657).withWidget(BuiltInWidgets.kTextView)
 				.getEntry();
+
+		this.speedModeRateLimiter = new SlewRateLimiter(SwerveConstants.kSpeedModeRateLimit);
+
 		/*
 		 * By pausing init for a second before setting module offsets, we avoid a bug with inverting motors. See
 		 * https://github.com/Team364/BaseFalconSwerve/issues/8 for more info.
 		 */
 		Timer.delay(1.0);
-		resetModulesToAbsolute();
+		this.resetModulesToAbsolute();
 
 		this.odometry = new SwerveDriveOdometry(SwerveConstants.kSwerveKinematics, this.getYaw(),
-				this.getModulesPositions(), SwerveConstants.Auto.kStartPose);
+				this.getModulesPositions(), SwervePathConstants.kStartPose);
 
 		this.poseEstimator = new SwerveDrivePoseEstimator(SwerveConstants.kSwerveKinematics, this.getYaw(),
-				this.getModulesPositions(), SwerveConstants.Auto.kStartPose);
+				this.getModulesPositions(), SwervePathConstants.kStartPose);
+
+		// Create the AutoBuilder. This only needs to be created once when robot code starts, not every time you want to
+		// create an auto command.
+		this.autoBuilder = new SwerveAutoBuilder(
+				// Pose2d supplier
+				this::getOdometryPose,
+				// Pose2d consumer, used to reset odometry at the beginning of auto
+				this::resetOdometry, SwerveConstants.kSwerveKinematics,
+				// PID constants to correct for translation and rotation error
+				SwervePathConstants.kXControllerGains.toPathPlannerPIDConstants(),
+				SwervePathConstants.kRotationControllerGains.toPathPlannerPIDConstants(),
+				// Module states consumer used to output to the drive subsystem
+				this::setModuleStates, SwervePathConstants.kPathCommandsMap,
+				// Should the path be automatically mirrored depending on alliance color. Optional, defaults to true
+				true,
+				// The drive subsystem. Used to properly set the requirements of path following commands
+				this);
+
+		SwervePathConstants.createCommands();
+		this.createPaths();
 	}
 
 	/**
@@ -220,10 +251,10 @@ public class SwerveSubsystem extends SubsystemBase {
 	public void toggleSwerveSpeed() {
 		if (this.currentSwerveTranslateRatio == SwerveConstants.kSwerveTranslateRatioFast) {
 			this.currentSwerveTranslateRatio = SwerveConstants.kSwerveTranslateRatioSlow;
-			this.currentSwerveRotationRatio = SwerveConstants.kSwerveSpinRatioSlow;
+			this.currentSwerveRotationRatio = SwerveConstants.kSwerveRotationRatioSlow;
 		} else {
 			this.currentSwerveTranslateRatio = SwerveConstants.kSwerveTranslateRatioFast;
-			this.currentSwerveRotationRatio = SwerveConstants.kSwerveSpinRatioFast;
+			this.currentSwerveRotationRatio = SwerveConstants.kSwerveRotationRatioFast;
 		}
 	}
 
@@ -323,12 +354,12 @@ public class SwerveSubsystem extends SubsystemBase {
 		this.teleopAngleSetpointRad = 0.0;
 	}
 
-	public void zeroGyroWith(double offsetDeg) {
+	public void setGyro(double offsetDeg) {
 		this.gyro.zeroYaw(offsetDeg);
 		this.teleopAngleSetpointRad = this.getYaw().getRadians();
 	}
 
-	public void zeroGyroWith(Rotation2d offset) {
+	public void setGyro(Rotation2d offset) {
 		this.gyro.zeroYaw(offset);
 		this.teleopAngleSetpointRad = this.getYaw().getRadians();
 	}
@@ -346,7 +377,7 @@ public class SwerveSubsystem extends SubsystemBase {
 	 */
 	public Rotation2d getPitch() {
 		return (SwerveConstants.invertGyro) ? Rotation2d.fromDegrees(360 - this.gyro.getPitchAngleDeg())
-				: Rotation2d.fromDegrees(this.gyro.getYawAngleDeg());
+				: Rotation2d.fromDegrees(this.gyro.getPitchAngleDeg());
 	}
 
 	/**
@@ -354,7 +385,7 @@ public class SwerveSubsystem extends SubsystemBase {
 	 */
 	public Rotation2d getRoll() {
 		return (SwerveConstants.invertGyro) ? Rotation2d.fromDegrees(360 - this.gyro.getRollAngleDeg())
-				: Rotation2d.fromDegrees(this.gyro.getYawAngleDeg());
+				: Rotation2d.fromDegrees(this.gyro.getRollAngleDeg());
 	}
 
 	public double getYawDegPS() {
@@ -416,52 +447,14 @@ public class SwerveSubsystem extends SubsystemBase {
 				&& Math.abs(error.getRotation().getDegrees()) < tolerance.getRotation().getDegrees();
 	}
 
-	/**
-	 * @param path
-	 * @param isFirstPath
-	 * @return A command to follow a PathPlanner path without events.
-	 */
-	public Command getPathFollowingCommand(PathPlannerTrajectory path) {
-		this.field.getObject("Path").setTrajectory(path);
-		return new SequentialCommandGroup(
-				// If the Limelight has a target in the next 0.5 seconds or less, reset the
-				// estimated pose from the limelight
-				new ParallelRaceGroup(new WaitCommand(0.5).andThen(() -> {
-					this.resetEstimatedPose(HaUnitConvertor.matchPoseToAlliance(path.getInitialHolonomicPose()));
-				}), new WaitUntilCommand(() -> Limelight.hasTargets(LimelightConstants.kLimelightName)).andThen(() -> {
-					Pose3d robotPose = (DriverStation.getAlliance() == Alliance.Blue)
-							? Limelight.getBotpose_wpiBlue(LimelightConstants.kLimelightName)
-							: Limelight.getBotpose_wpiRed(LimelightConstants.kLimelightName);
-					if (robotPose != null) {
-						this.resetEstimatedPose(robotPose.toPose2d());
-					}
-				})), new PPSwerveControllerCommand(path,
-						// this::getEstimatedPose, // Pose supplier
-						this::getOdometryPose, // TODO Change to estimated pose once it works properly
-						SwerveConstants.kSwerveKinematics, // SwerveDriveKinematics
-						SwerveConstants.Auto.kXController, // X controller. Tune these values for your robot. Leaving
-						// them 0
-						// will only use feedforwards.
-						SwerveConstants.Auto.kYController, // Y controller (usually the same values as X controller)
-						SwerveConstants.Auto.kAngleController, // Rotation controller. Tune these values for your robot.
-						// Leaving
-						// them 0 will only use feedforwards.
-						this::setModuleStates, // Module states consumer
-						this // Requires this drive subsystem
-				), new InstantCommand(() -> Robot.print("Path finished")));
+	public CommandBase getPathPlannerAutoCommand(String pathGroupName) {
+		List<PathPlannerTrajectory> pathGroup = PathPlanner.loadPathGroup(pathGroupName,
+				SwervePathConstants.kMaxSpeedMPS, SwervePathConstants.kMaxAccelMPSSquared);
+		return this.autoBuilder.fullAuto(pathGroup);
 	}
 
-	/**
-	 * @param pathName        - Case sensitive
-	 * @param commandsList    - A HashMap containing Commands to run (by order) and matching String keys.
-	 * @param pathConstraints - A PathConstraints object containing max velocity and acceleration for the path.
-	 * @param isFirstPath     - Is this path the first one to run in auto.
-	 * @return A command to follow a path with events.
-	 */
-	public FollowPathWithEvents getPathFollowingCommandWithEvents(String pathName,
-			HashMap<String, Command> commandsList, PathConstraints pathConstraints) {
-		PathPlannerTrajectory path = PathPlanner.loadPath(pathName, pathConstraints);
-		return new FollowPathWithEvents(getPathFollowingCommand(path), path.getMarkers(), commandsList);
+	public Command crossLockWheelsCommand() {
+		return new RunCommand(this::crossLockWheels, this).until(RobotContainer::shouldRobotMove);
 	}
 
 	/**
@@ -502,14 +495,34 @@ public class SwerveSubsystem extends SubsystemBase {
 	}
 
 	public boolean isChassisMoving() {
-		return this.modules[0].getModuleState().speedMetersPerSecond < this.robotIsMovingThresholdMPS
-				&& this.modules[1].getModuleState().speedMetersPerSecond < this.robotIsMovingThresholdMPS
-				&& this.modules[2].getModuleState().speedMetersPerSecond < this.robotIsMovingThresholdMPS
-				&& this.modules[3].getModuleState().speedMetersPerSecond < this.robotIsMovingThresholdMPS;
+		return this.modules[0].getModuleState().speedMetersPerSecond < SwerveConstants.robotIsMovingThresholdMPS
+				&& this.modules[1].getModuleState().speedMetersPerSecond < SwerveConstants.robotIsMovingThresholdMPS
+				&& this.modules[2].getModuleState().speedMetersPerSecond < SwerveConstants.robotIsMovingThresholdMPS
+				&& this.modules[3].getModuleState().speedMetersPerSecond < SwerveConstants.robotIsMovingThresholdMPS;
+	}
+
+	/**
+	 * The function for putting paths inside the chooser
+	 */
+	private void createPaths() {
+		SwervePathConstants.kPaths.putIfAbsent("Mobility & Station", new SequentialCommandGroup(
+				getPathPlannerAutoCommand("Mobility & Station"), this.crossLockWheelsCommand()));
+
+		try (Stream<Path> paths = Files.walk(Filesystem.getDeployDirectory().toPath().resolve("pathplanner/"))) {
+			paths.filter(Files::isRegularFile).forEach((path) -> {
+				String name = path.getFileName().toString().replace(".path", "");
+				SwervePathConstants.kPaths.putIfAbsent(name,
+						new SequentialCommandGroup(getPathPlannerAutoCommand(name), this.crossLockWheelsCommand()));
+			});
+		} catch (Exception e) {
+			Robot.print(e);
+		}
 	}
 
 	@Override
 	public void periodic() {
+		this.filteredTranslationRatio = this.speedModeRateLimiter.calculate(currentSwerveTranslateRatio);
+
 		this.odometry.update(this.getYaw(), this.getModulesPositions());
 		this.field.setRobotPose(this.getEstimatedPose());
 
@@ -564,4 +577,5 @@ public class SwerveSubsystem extends SubsystemBase {
 		this.odometryXEntry.setDouble(this.getOdometryPose().getX());
 		this.odometryYEntry.setDouble(this.getOdometryPose().getY());
 	}
+
 }
