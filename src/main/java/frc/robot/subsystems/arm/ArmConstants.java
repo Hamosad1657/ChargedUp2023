@@ -17,13 +17,13 @@ public class ArmConstants {
 	public static final double kArmAngleBalanceMiddleDeg = 26.0;
 	public static final double kArmAngleBalanceMiddleMotorOutput = 0.035;
 
-	public static final double kArmAngleBottomThreshold = 18.0;
-	public static final double kArmAngleTopThreshold = 74.0;
+	public static final double kArmAngleBottomThreshold = 16.0;
+	public static final double kArmAngleTopThreshold = 76.0;
 	public static final double kArmAngleThresholdSpeedRatio = 0.5;
 
-	public static final double kArmLengthRetractThreshold = 300.0;
-	public static final double kArmLengthExtendThreshold = 5000.0;// 2200.0;
-	public static final double kArmLengthThresholdSpeedRatio = 0.65;
+	public static final double kArmLengthRetractThreshold = 200.0;
+	public static final double kArmLengthExtendThreshold = 5000.0;
+	public static final double kArmLengthThresholdSpeedRatio = 0.75;
 
 	// TODO: Tune the PID gains and tolerance.
 	public static final PIDGains kArmAnglePIDGains = new PIDGains(0.02, 0.00001, 0.0);

@@ -382,18 +382,18 @@ public class ArmSubsystem extends SubsystemBase {
 		return new FunctionalCommand(() -> {
 		}, () -> {
 			if (this.getCurrentAngle() > 70.0) {
-				this.setAngleMotorWithLimits(0.2);
+				this.setAngleMotorWithLimits(0.25);
 				return;
 			}
 
 			// The limits are normally true
 			if (this.retractLimit.get()) {
-				this.setLengthMotorWithLimits(0.8);
+				this.setLengthMotorWithLimits(0.85);
 				this.setAngleMotorWithLimits(0.0);
 			} else {
 				this.setLengthMotorWithLimits(0.0);
 				if (this.bottomAngleLimit.get()) {
-					this.setAngleMotorWithLimits(0.2);
+					this.setAngleMotorWithLimits(0.25);
 				} else {
 					this.armAngleMotor.set(0.0);
 				}
