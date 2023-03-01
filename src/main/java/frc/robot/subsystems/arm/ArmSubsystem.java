@@ -279,9 +279,9 @@ public class ArmSubsystem extends SubsystemBase {
 	public Command openLoopTeleopArmCommand(DoubleSupplier angleOutputSupplier, DoubleSupplier forwardsOutputSupplier,
 			DoubleSupplier backwardsOutputSupplier, PS4Controller controller) {
 		return new RunCommand(() -> {
-			if (controller.getL3ButtonPressed()) {
+			if (controller.getL1ButtonPressed()) {
 				this.shouldOverrideLimits = true;
-			} else if (controller.getL3ButtonReleased()) {
+			} else if (controller.getL1ButtonReleased()) {
 				this.shouldOverrideLimits = false;
 			}
 
