@@ -22,7 +22,7 @@ public class ArmConstants {
 	public static final double kArmAngleThresholdSpeedRatio = 0.5;
 
 	public static final double kArmLengthRetractThreshold = 300.0;
-	public static final double kArmLengthExtendThreshold = 2200.0;
+	public static final double kArmLengthExtendThreshold = 5000.0;// 2200.0;
 	public static final double kArmLengthThresholdSpeedRatio = 0.65;
 
 	// TODO: Tune the PID gains and tolerance.
