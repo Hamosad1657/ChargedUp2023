@@ -2,18 +2,18 @@
   "waypoints": [
     {
       "anchorPoint": {
-        "x": 2.275,
+        "x": 2.29,
         "y": 4.43
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.2789204017519076,
-        "y": 4.43
+        "x": 1.9240538481076972,
+        "y": 4.453475573617815
       },
-      "holonomicAngle": 0.0,
+      "holonomicAngle": 0,
       "isReversal": false,
       "velOverride": null,
-      "isLocked": false,
+      "isLocked": true,
       "isStopPoint": false,
       "stopEvent": {
         "names": [
@@ -21,7 +21,7 @@
         ],
         "executionBehavior": "sequential",
         "waitBehavior": "none",
-        "waitTime": 1.0
+        "waitTime": 0
       }
     },
     {
@@ -30,23 +30,23 @@
         "y": 4.43
       },
       "prevControl": {
-        "x": 1.6839782533790735,
-        "y": 4.42402634919714
+        "x": 1.9113139897328109,
+        "y": 4.419442056543662
       },
       "nextControl": {
-        "x": 2.389612047645148,
-        "y": 4.439871707462713
+        "x": 2.953920074506817,
+        "y": 4.703983574633816
       },
       "holonomicAngle": 0,
       "isReversal": false,
       "velOverride": null,
-      "isLocked": false,
+      "isLocked": true,
       "isStopPoint": true,
       "stopEvent": {
         "names": [
           "WaitABit",
           "ToggleGrabber",
-          "WaitABit",
+          "WaitABitMore",
           "ToggleGrabber"
         ],
         "executionBehavior": "sequential",
@@ -56,48 +56,23 @@
     },
     {
       "anchorPoint": {
-        "x": 2.5,
-        "y": 4.6
+        "x": 4.75,
+        "y": 4.75
       },
       "prevControl": {
-        "x": 2.1859430775700965,
-        "y": 4.6
-      },
-      "nextControl": {
-        "x": 3.8366690949163162,
-        "y": 4.6
-      },
-      "holonomicAngle": 0,
-      "isReversal": false,
-      "velOverride": null,
-      "isLocked": false,
-      "isStopPoint": true,
-      "stopEvent": {
-        "names": [
-          "HomeArm"
-        ],
-        "executionBehavior": "sequential",
-        "waitBehavior": "none",
-        "waitTime": 0
-      }
-    },
-    {
-      "anchorPoint": {
-        "x": 4.25,
-        "y": 4.6
-      },
-      "prevControl": {
-        "x": 2.1945198276354483,
-        "y": 4.5929806736775385
+        "x": 3.481754296841928,
+        "y": 4.742646685293372
       },
       "nextControl": null,
       "holonomicAngle": 0.0,
       "isReversal": false,
       "velOverride": null,
-      "isLocked": false,
+      "isLocked": true,
       "isStopPoint": false,
       "stopEvent": {
-        "names": [],
+        "names": [
+          "HomeArm"
+        ],
         "executionBehavior": "sequential",
         "waitBehavior": "none",
         "waitTime": 0

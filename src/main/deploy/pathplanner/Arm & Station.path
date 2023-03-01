@@ -13,7 +13,7 @@
       "holonomicAngle": 0.0,
       "isReversal": false,
       "velOverride": null,
-      "isLocked": false,
+      "isLocked": true,
       "isStopPoint": false,
       "stopEvent": {
         "names": [
@@ -40,13 +40,13 @@
       "holonomicAngle": 0,
       "isReversal": false,
       "velOverride": null,
-      "isLocked": false,
+      "isLocked": true,
       "isStopPoint": true,
       "stopEvent": {
         "names": [
           "WaitABit",
           "ToggleGrabber",
-          "WaitABit",
+          "WaitABitMore",
           "ToggleGrabber"
         ],
         "executionBehavior": "sequential",
@@ -56,21 +56,21 @@
     },
     {
       "anchorPoint": {
-        "x": 2.3,
+        "x": 2.75,
         "y": 2.8
       },
       "prevControl": {
-        "x": 1.9859430775700964,
+        "x": 2.4359430775700965,
         "y": 2.8
       },
       "nextControl": {
-        "x": 3.636669094916316,
+        "x": 4.086669094916316,
         "y": 2.8
       },
       "holonomicAngle": 0,
       "isReversal": false,
       "velOverride": null,
-      "isLocked": false,
+      "isLocked": true,
       "isStopPoint": true,
       "stopEvent": {
         "names": [
@@ -97,7 +97,7 @@
       "holonomicAngle": 0.0,
       "isReversal": false,
       "velOverride": null,
-      "isLocked": false,
+      "isLocked": true,
       "isStopPoint": false,
       "stopEvent": {
         "names": [
