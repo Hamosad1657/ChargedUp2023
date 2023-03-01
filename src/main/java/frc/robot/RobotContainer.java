@@ -11,8 +11,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import frc.robot.commands.swerve.chargestation.BalanceChassisCommand;
-import frc.robot.commands.swerve.chargestation.BalanceChassisConstants.BalancingOptions;
 import frc.robot.commands.swerve.paths.SwervePathConstants;
 import frc.robot.commands.swerve.teleop.TeleopDriveCommand;
 import frc.robot.subsystems.arm.ArmSubsystem;
@@ -62,7 +60,7 @@ public class RobotContainer {
 		this.configureButtonsBindings();
 		this.setDefaultCommands();
 		this.createPathsComboBox();
-		this.comboxChooser.setDefaultOption("Mobility & Station", this.swerve.getPathPlannerAutoCommand("Mobility & Station"));
+		this.comboxChooser.setDefaultOption("Arm & Mobility", this.swerve.getPathPlannerAutoCommand("Arm & Mobility"));
 	}
 
 	private void configureButtonsBindings() {
