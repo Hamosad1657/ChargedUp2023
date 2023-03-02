@@ -107,7 +107,7 @@ public class ArmSubsystem extends SubsystemBase {
 	}
 
 	private double getCurrentLength() {
-		return this.armLengthCANCoder.getPositionDeg();
+		return -this.armLengthCANCoder.getPositionDeg();
 	}
 
 	private double getCurrentAngle() {
@@ -387,7 +387,7 @@ public class ArmSubsystem extends SubsystemBase {
 			}
 
 			// The limits are normally true
-			if (this.retractLimit.get()) {
+			if (this.getCurrentLength() > 150) {
 				this.setLengthMotorWithLimits(0.85);
 				this.setAngleMotorWithLimits(0.0);
 			} else {

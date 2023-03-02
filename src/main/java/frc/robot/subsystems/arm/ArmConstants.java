@@ -5,7 +5,7 @@ import com.hamosad1657.lib.math.HaUnits.PIDGains;
 
 public class ArmConstants {
 	public static final double kArmAngleSpeedRatio = 0.3;
-	public static final double kArmLengthSpeedRatio = 0.6;
+	public static final double kArmLengthSpeedRatio = -0.6;
 
 	// TODO: Find the correct offset. It should measure 260 when the arm is at most closed position possible.
 	public static final double kAngleCANCoderOffsetDeg = 352.8;
