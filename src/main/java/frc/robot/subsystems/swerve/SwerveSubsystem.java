@@ -35,7 +35,6 @@ import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.RobotMap;
 import frc.robot.commands.swerve.paths.SwervePathConstants;
-import frc.robot.subsystems.arm.ArmSubsystem;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
