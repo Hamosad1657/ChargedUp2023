@@ -64,7 +64,7 @@ public class ArmConstants {
 
 	public static enum ArmState {
 		// Uses the relativity of the encoders as setpoints
-		kHigh(83.0, 2310.0);
+		kHigh(83.0, 2100.0);
 
 		public final double angleDeg;
 		public final double lengthDeg;
