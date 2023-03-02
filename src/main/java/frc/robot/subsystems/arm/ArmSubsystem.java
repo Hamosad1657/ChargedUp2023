@@ -142,20 +142,25 @@ public class ArmSubsystem extends SubsystemBase {
 	 */
 	public void setAngleMotorWithThresholdsAndLimits(double output) {
 		// The magnetic limit switches are normally true.
+		// If at limits and trying to go in the direction of the limit, set output as zero.
 		if ((output < 0.0 && !this.topAngleLimit.get()) || (output > 0.0 && !this.bottomAngleLimit.get())) {
 			this.angleMotorOutputEntry.setDouble(0.0);
 			this.armAngleMotor.set(0.0);
 		} else {
 			double armAngle = this.getCurrentAngle();
+			// If output is very low
 			if ((output > -ArmConstants.kArmAngleBalanceMiddleMotorOutput
 					&& output < ArmConstants.kArmAngleBalanceMiddleMotorOutput)) {
+				// Set the correct balancing output according to the angle.
 				if (armAngle > ArmConstants.kArmAngleBalanceMiddleDeg) {
 					output = -ArmConstants.kArmAngleBalanceMiddleMotorOutput;
 				} else if (armAngle > ArmConstants.kArmAngleBalanceMinDeg) {
 					output = -ArmConstants.kArmAngleBalanceMinMotorOutput;
 				} else {
+					// If angle is very low, keep it low unless commanded something else (to stop arm from going up due to the constant-force spring).
 					output = ArmConstants.kArmAngleBalanceMinMotorOutput;
 				}
+		
 			} else {
 				// Make the angle motor slower at the top and bottom
 				if (armAngle < ArmConstants.kArmAngleBottomThreshold || armAngle > ArmConstants.kArmAngleTopThreshold) {
