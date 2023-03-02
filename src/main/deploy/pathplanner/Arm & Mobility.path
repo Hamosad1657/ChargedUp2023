@@ -46,8 +46,7 @@
         "names": [
           "WaitABit",
           "ToggleGrabber",
-          "WaitABitMore",
-          "ToggleGrabber"
+          "WaitABit"
         ],
         "executionBehavior": "sequential",
         "waitBehavior": "none",
@@ -74,6 +73,7 @@
       "isStopPoint": true,
       "stopEvent": {
         "names": [
+          "ToggleGrabber",
           "HomeArm"
         ],
         "executionBehavior": "sequential",

@@ -5,7 +5,7 @@ import com.hamosad1657.lib.math.HaUnits.PIDGains;
 
 public class ArmConstants {
 	public static final double kArmAngleSpeedRatio = 0.3;
-	public static final double kArmLengthSpeedRatio = 0.6;
+	public static final double kArmLengthSpeedRatio = -0.6;
 
 	// TODO: Find the correct offset. It should measure 260 when the arm is at most closed position possible.
 	public static final double kAngleCANCoderOffsetDeg = 352.8;
@@ -17,13 +17,13 @@ public class ArmConstants {
 	public static final double kArmAngleBalanceMiddleDeg = 26.0;
 	public static final double kArmAngleBalanceMiddleMotorOutput = 0.035;
 
-	public static final double kArmAngleBottomThreshold = 18.0;
-	public static final double kArmAngleTopThreshold = 74.0;
+	public static final double kArmAngleBottomThreshold = 16.0;
+	public static final double kArmAngleTopThreshold = 76.0;
 	public static final double kArmAngleThresholdSpeedRatio = 0.5;
 
-	public static final double kArmLengthRetractThreshold = 300.0;
-	public static final double kArmLengthExtendThreshold = 5000.0;// 2200.0;
-	public static final double kArmLengthThresholdSpeedRatio = 0.65;
+	public static final double kArmLengthRetractThreshold = 200.0;
+	public static final double kArmLengthExtendThreshold = 5000.0;
+	public static final double kArmLengthThresholdSpeedRatio = 0.75;
 
 	// TODO: Tune the PID gains and tolerance.
 	public static final PIDGains kArmAnglePIDGains = new PIDGains(0.02, 0.00001, 0.0);
@@ -64,7 +64,7 @@ public class ArmConstants {
 
 	public static enum ArmState {
 		// Uses the relativity of the encoders as setpoints
-		kHigh(83.0, 2310.0);
+		kHigh(83.0, 2100.0);
 
 		public final double angleDeg;
 		public final double lengthDeg;
