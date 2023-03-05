@@ -11,7 +11,6 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -25,7 +24,6 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.arm.ArmConstants.ArmState;
-import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.RobotMap;
 
@@ -47,7 +45,6 @@ public class ArmSubsystem extends SubsystemBase {
 	private final HaTalonSRX armLengthMotor;
 	private final HaCANCoder armAngleCANCoder, armLengthCANCoder;
 	private final PIDController armLengthPIDController, anglePIDController;
-	private final ArmFeedforward armAngleFFController;
 	private final DigitalInput extendLimit, retractLimit, bottomAngleLimit, topAngleLimit;
 	private final GenericEntry extendLimitEntry, retractLimitEntry, topAngleLimitEntry, bottomAngleLimitEntry,
 			angleMotorOutputEntry;
@@ -77,9 +74,6 @@ public class ArmSubsystem extends SubsystemBase {
 
 		this.anglePIDController = ArmConstants.kArmAnglePIDGains.toPIDController();
 		this.anglePIDController.setTolerance(ArmConstants.kArmAngleTolerance);
-		// TODO: Implement arm angle FF control
-		this.armAngleFFController = new ArmFeedforward(ArmConstants.kArmAngleFFkS, ArmConstants.kArmAngleFFkG,
-				ArmConstants.kArmAngleFFkV);
 
 		this.armLengthPIDController = ArmConstants.kArmLengthPIDGains.toPIDController();
 		this.armLengthPIDController.setTolerance(ArmConstants.kArmLengthTolerance);
@@ -138,7 +132,7 @@ public class ArmSubsystem extends SubsystemBase {
 	 */
 	public double calculateLengthMotorOutput() {
 		double output = -MathUtil.clamp(this.armLengthPIDController.calculate(this.getCurrentLength()),
-				-ArmConstants.kMaxMotorOutput, ArmConstants.kMaxMotorOutput);
+				-ArmConstants.kMaxLengthMotorOutput, ArmConstants.kMaxLengthMotorOutput);
 		return output;
 	}
 
@@ -148,20 +142,25 @@ public class ArmSubsystem extends SubsystemBase {
 	 */
 	public void setAngleMotorWithThresholdsAndLimits(double output) {
 		// The magnetic limit switches are normally true.
+		// If at limits and trying to go in the direction of the limit, set output as zero.
 		if ((output < 0.0 && !this.topAngleLimit.get()) || (output > 0.0 && !this.bottomAngleLimit.get())) {
 			this.angleMotorOutputEntry.setDouble(0.0);
 			this.armAngleMotor.set(0.0);
 		} else {
 			double armAngle = this.getCurrentAngle();
+			// If output is very low
 			if ((output > -ArmConstants.kArmAngleBalanceMiddleMotorOutput
 					&& output < ArmConstants.kArmAngleBalanceMiddleMotorOutput)) {
+				// Set the correct balancing output according to the angle.
 				if (armAngle > ArmConstants.kArmAngleBalanceMiddleDeg) {
 					output = -ArmConstants.kArmAngleBalanceMiddleMotorOutput;
 				} else if (armAngle > ArmConstants.kArmAngleBalanceMinDeg) {
 					output = -ArmConstants.kArmAngleBalanceMinMotorOutput;
 				} else {
+					// If angle is very low, keep it low unless commanded something else (to stop arm from going up due to the constant-force spring).
 					output = ArmConstants.kArmAngleBalanceMinMotorOutput;
 				}
+		
 			} else {
 				// Make the angle motor slower at the top and bottom
 				if (armAngle < ArmConstants.kArmAngleBottomThreshold || armAngle > ArmConstants.kArmAngleTopThreshold) {

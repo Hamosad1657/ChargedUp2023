@@ -35,7 +35,6 @@ import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.RobotMap;
 import frc.robot.commands.swerve.paths.SwervePathConstants;
-import frc.robot.subsystems.arm.ArmSubsystem;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -502,16 +501,14 @@ public class SwerveSubsystem extends SubsystemBase {
 	 * The function for putting paths inside the chooser
 	 */
 	private void createPaths() {
-		SwervePathConstants.kPaths.putIfAbsent("Mobility & Station",
-				new SequentialCommandGroup(ArmSubsystem.getInstance().homeCommand(),
-						this.getPathPlannerAutoCommand("Mobility & Station"), this.crossLockWheelsCommand()));
+		SwervePathConstants.kPaths.putIfAbsent("Mobility & Station", new SequentialCommandGroup(
+				this.getPathPlannerAutoCommand("Mobility & Station"), this.crossLockWheelsCommand()));
 
 		try (Stream<Path> paths = Files.walk(Filesystem.getDeployDirectory().toPath().resolve("pathplanner/"))) {
 			paths.filter(Files::isRegularFile).forEach((path) -> {
 				String name = path.getFileName().toString().replace(".path", "");
-				SwervePathConstants.kPaths.putIfAbsent(name,
-						new SequentialCommandGroup(ArmSubsystem.getInstance().homeCommand().withTimeout(1.5),
-								this.getPathPlannerAutoCommand(name), this.crossLockWheelsCommand()));
+				SwervePathConstants.kPaths.putIfAbsent(name, new SequentialCommandGroup(
+						this.getPathPlannerAutoCommand(name), this.crossLockWheelsCommand()));
 			});
 		} catch (Exception e) {
 			Robot.print(e);
