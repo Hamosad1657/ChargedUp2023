@@ -12,6 +12,7 @@ import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.PS4Controller;
@@ -44,7 +45,8 @@ public class ArmSubsystem extends SubsystemBase {
 	/** The object to use for controlling both length motors. */
 	private final HaTalonSRX armLengthMotor;
 	private final HaCANCoder armAngleCANCoder, armLengthCANCoder;
-	private final PIDController armLengthPIDController, anglePIDController;
+	private final PIDController armLengthPIDController;
+	private final ProfiledPIDController anglePIDController;
 	private final DigitalInput extendLimit, retractLimit, bottomAngleLimit, topAngleLimit;
 	private final GenericEntry extendLimitEntry, retractLimitEntry, topAngleLimitEntry, bottomAngleLimitEntry,
 			angleMotorOutputEntry;
@@ -72,7 +74,9 @@ public class ArmSubsystem extends SubsystemBase {
 		this.armLengthCANCoder.setMeasurmentRange(AbsoluteSensorRange.Unsigned_0_to_360);
 		this.armLengthCANCoder.setPosition(0);
 
-		this.anglePIDController = ArmConstants.kArmAnglePIDGains.toPIDController();
+		this.anglePIDController = new ProfiledPIDController(ArmConstants.kAngleP, ArmConstants.kAngleI,
+				ArmConstants.kAngleD, ArmConstants.kAngleTrapezoidProfile,
+				ArmConstants.kAngleControllerUpdateWaitPeriod);
 		this.anglePIDController.setTolerance(ArmConstants.kArmAngleTolerance);
 
 		this.armLengthPIDController = ArmConstants.kArmLengthPIDGains.toPIDController();
@@ -114,7 +118,7 @@ public class ArmSubsystem extends SubsystemBase {
 	 * @param newState - The new arm state.
 	 */
 	public void setState(ArmState newState) {
-		this.anglePIDController.setSetpoint(newState.angleDeg);
+		this.anglePIDController.setGoal(newState.angleDeg);
 		this.armLengthPIDController.setSetpoint(newState.lengthDeg);
 	}
 
@@ -157,10 +161,11 @@ public class ArmSubsystem extends SubsystemBase {
 				} else if (armAngle > ArmConstants.kArmAngleBalanceMinDeg) {
 					output = -ArmConstants.kArmAngleBalanceMinMotorOutput;
 				} else {
-					// If angle is very low, keep it low unless commanded something else (to stop arm from going up due to the constant-force spring).
+					// If angle is very low, keep it low unless commanded something else (to stop arm from going up due
+					// to the constant-force spring).
 					output = ArmConstants.kArmAngleBalanceMinMotorOutput;
 				}
-		
+
 			} else {
 				// Make the angle motor slower at the top and bottom
 				if (armAngle < ArmConstants.kArmAngleBottomThreshold || armAngle > ArmConstants.kArmAngleTopThreshold) {
@@ -265,7 +270,7 @@ public class ArmSubsystem extends SubsystemBase {
 	 * @return If both the angle and length motors are at their setpoint.
 	 */
 	public boolean isAtSetpoint() {
-		return this.anglePIDController.atSetpoint() && this.armLengthPIDController.atSetpoint();
+		return this.anglePIDController.atGoal() && this.armLengthPIDController.atSetpoint();
 	}
 
 	/**
@@ -302,9 +307,9 @@ public class ArmSubsystem extends SubsystemBase {
 			// Set angle setpoint. Aim for 1 degree less/more than the limit
 			// to avoid jumping (increase the number if it jumps anyway)
 			if (angleOutputSupplier.getAsDouble() < 0.0) {
-				this.anglePIDController.setSetpoint(ArmConstants.kBottomAngleLimitDeg - 1);
+				this.anglePIDController.setGoal(ArmConstants.kBottomAngleLimitDeg - 1);
 			} else {
-				this.anglePIDController.setSetpoint(ArmConstants.kTopAngleLimitDeg + 1);
+				this.anglePIDController.setGoal(ArmConstants.kTopAngleLimitDeg + 1);
 			}
 
 			this.setAngleMotorWithLengthLimits(this.calculateAngleMotorOutput() * angleOutputSupplier.getAsDouble());
@@ -333,7 +338,7 @@ public class ArmSubsystem extends SubsystemBase {
 			this.setState(newState);
 		}, () -> {
 			this.setAngleMotorWithLimits(this.calculateAngleMotorOutput());
-			if (this.anglePIDController.atSetpoint()) {
+			if (this.anglePIDController.atGoal()) {
 				this.setLengthMotorWithLimits(this.calculateLengthMotorOutput());
 			}
 		}, (interrupted) -> {

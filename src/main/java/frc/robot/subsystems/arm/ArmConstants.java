@@ -2,6 +2,8 @@
 package frc.robot.subsystems.arm;
 
 import com.hamosad1657.lib.math.HaUnits.PIDGains;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 
 public class ArmConstants {
 	public static final double kArmAngleSpeedRatio = 0.3;
@@ -23,7 +25,15 @@ public class ArmConstants {
 	public static final double kArmLengthExtendThreshold = 5000.0;
 	public static final double kArmLengthThresholdSpeedRatio = 0.75;
 
-	public static final PIDGains kArmAnglePIDGains = new PIDGains(0.02, 0.00001, 0.0);
+	public static final double kAngleP = 0.02;
+	public static final double kAngleI = 0.00001;
+	public static final double kAngleD = 0.0;
+	public static final double kMaxAngleVelocityRadPerSecond = 0.0;
+	public static final double kMaxAngleAccelerationRadPerSecSquared = 0.0;
+	public static final double kAngleControllerUpdateWaitPeriod = 0.0;
+	public static final Constraints kAngleTrapezoidProfile = new TrapezoidProfile.Constraints(
+			ArmConstants.kMaxAngleVelocityRadPerSecond, ArmConstants.kMaxAngleAccelerationRadPerSecSquared);
+
 	public static final double kArmAngleTolerance = 3.0;
 	public static final PIDGains kArmLengthPIDGains = new PIDGains(0.0028, 0.0003, 0.0);
 	public static final double kArmLengthTolerance = 150.0;
