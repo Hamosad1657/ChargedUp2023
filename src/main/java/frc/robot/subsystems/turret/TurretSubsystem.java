@@ -50,8 +50,8 @@ public class TurretSubsystem extends SubsystemBase {
 		this.rotationCWLimitSwitch = new DigitalInput(RobotMap.kTurretCWLimitPort);
 		this.rotationPIDController = TurretConstants.kRotationPIDGains.toPIDController();
 		this.turretTab = Shuffleboard.getTab("Turret");
-		this.dio1Entry = this.turretTab.add("CCW Limit", false).withPosition(2, 1).withSize(1, 1).getEntry();
-		this.dio0Entry = this.turretTab.add("CW Limit", false).withPosition(2, 0).withSize(1, 1).getEntry();
+		this.dio1Entry = this.turretTab.add("CCW Limit", false).withPosition(0, 1).withSize(1, 1).getEntry();
+		this.dio0Entry = this.turretTab.add("CW Limit", false).withPosition(0, 0).withSize(1, 1).getEntry();
 		this.turretTab.add("Turret Encoder", this.rotationEncoder).withPosition(1, 0).withSize(2, 2);
 	}
 
