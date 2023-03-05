@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.swerve.paths.SwervePathConstants;
 import frc.robot.commands.swerve.teleop.TeleopDriveCommand;
 import frc.robot.subsystems.arm.ArmSubsystem;
+import frc.robot.subsystems.arm.ArmConstants.ArmState;
 import frc.robot.subsystems.grabber.GrabberSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
@@ -32,9 +33,12 @@ public class RobotContainer {
 	private ArmSubsystem arm;
 	private IntakeSubsystem intake;
 	private TurretSubsystem turret;
-	private SendableChooser<Command> comboxChooser;
+	private SendableChooser<Command> comboxChooser, testComboxChooser;
+	ShuffleboardTab autoTab;
 
 	public RobotContainer() {
+		this.autoTab = Shuffleboard.getTab("Auto");
+
 		driverA_Controller = new PS4Controller(RobotMap.kDriverAControllerUSBPort);
 		driverB_Controller = new PS4Controller(RobotMap.kDriverBControllerUSBPort);
 
@@ -58,7 +62,7 @@ public class RobotContainer {
 		this.configureButtonsBindings();
 		this.setDefaultCommands();
 		this.createPathsComboBox();
-		this.comboxChooser.setDefaultOption("Arm & Mobility", this.swerve.getPathPlannerAutoCommand("Arm & Mobility"));
+		this.createTestCommand();
 	}
 
 	private void configureButtonsBindings() {
@@ -108,6 +112,15 @@ public class RobotContainer {
 		return this.comboxChooser.getSelected();
 	}
 
+	/**
+	 * Use this to pass the test command to Robot.java.
+	 * 
+	 * @return The command to run in the start of test.
+	 */
+	public Command getTestCommand() {
+		return this.testComboxChooser.getSelected();
+	}
+
 	public static boolean shouldRobotMove() {
 		double translationXValue = driverA_Controller.getLeftX();
 		double translationYValue = driverA_Controller.getLeftY();
@@ -133,7 +146,6 @@ public class RobotContainer {
 	 * Creats and adds the widget for selecting the paths for autonomous.
 	 */
 	private void createPathsComboBox() {
-		ShuffleboardTab autoTab = Shuffleboard.getTab("Auto");
 		this.comboxChooser = new SendableChooser<Command>();
 		SwervePathConstants.kPaths.forEach(new BiConsumer<String, Command>() {
 			@Override
@@ -141,6 +153,26 @@ public class RobotContainer {
 				comboxChooser.addOption(name, command);
 			}
 		});
-		autoTab.add("Path Chooser", this.comboxChooser).withWidget("ComboBox Chooser");
+		this.comboxChooser.setDefaultOption("Arm & Mobility", this.swerve.getPathPlannerAutoCommand("Arm & Mobility"));
+		this.autoTab.add("Path Chooser", this.comboxChooser).withWidget("ComboBox Chooser");
+	}
+
+	/**
+	 * Creates and adds all of the test commands into the chooser.
+	 */
+	private void createTestCommand() {
+
+		comboxChooser.setDefaultOption("None", new InstantCommand());
+		comboxChooser.addOption("Arm High", this.arm.setStateCommand(ArmState.kHigh));
+		comboxChooser.addOption("Arm High", new InstantCommand());
+		comboxChooser.addOption("Arm High", new InstantCommand());
+		comboxChooser.addOption("Arm High", new InstantCommand());
+		comboxChooser.addOption("Arm High", new InstantCommand());
+		comboxChooser.addOption("Arm High", new InstantCommand());
+		comboxChooser.addOption("Arm High", new InstantCommand());
+		comboxChooser.addOption("Arm High", new InstantCommand());
+		comboxChooser.addOption("Arm High", new InstantCommand());
+
+		this.autoTab.add("Test Command Chooser", this.testComboxChooser).withWidget("ComboBox Chooser");
 	}
 }
