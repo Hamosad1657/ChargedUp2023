@@ -4,6 +4,7 @@ package com.hamosad1657.lib.sensors;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.I2C;
+import edu.wpi.first.wpilibj.util.Color;
 import com.revrobotics.ColorSensorV3;
 import com.revrobotics.ColorSensorV3.RawColor;
 
@@ -101,6 +102,49 @@ public class HaColorSensor implements Sendable {
 				+ ((this.getProximity() - this.minProx) * (this.maxCm - this.minCm)) / (this.maxProx - this.minProx);
 	}
 
+	/**
+	 * @param minColor - The minimum acceptable color values (inclusive).
+	 * @param maxColor - The maximum acceptable color values (inclusive).
+	 * 
+	 * @return Whether the detected color is in the specified range (inclusive).
+	 */
+	public boolean isColorInRangePercent(Color minColor, Color maxColor) {
+		Color color = this.colorSensor.getColor();
+		return (color.red >= minColor.red && color.red <= maxColor.red && color.blue >= minColor.blue
+				&& color.blue <= maxColor.blue && color.green >= minColor.green && color.green <= maxColor.green);
+	}
+
+	/**
+	 * @return The raw color detected by the sensor, as a RawColor object.
+	 */
+	public Color getColorPercent() {
+		return this.colorSensor.getColor();
+	}
+
+	/**
+	 * 
+	 * @return The red value of the detected color.
+	 */
+	public double getRedPercent() {
+		return this.colorSensor.getColor().red;
+	}
+
+	/**
+	 * 
+	 * @return The green value of the detected color.
+	 */
+	public double getGreenPercent() {
+		return this.colorSensor.getColor().green;
+	}
+
+	/**
+	 * 
+	 * @return The blue value of the detected color.
+	 */
+	public double getBluePercent() {
+		return this.colorSensor.getColor().blue;
+	}
+
 	@Override
 	public void initSendable(SendableBuilder builder) {
 		builder.setSmartDashboardType("HaColorSensor");
@@ -109,7 +153,11 @@ public class HaColorSensor implements Sendable {
 		builder.addDoubleProperty("Green", this::getGreen, null);
 		builder.addDoubleProperty("Blue", this::getBlue, null);
 
-		builder.addDoubleProperty("Proximity (CM)", this::getProximity, null);
+		builder.addDoubleProperty("Red %", this::getRedPercent, null);
+		builder.addDoubleProperty("Green %", this::getGreenPercent, null);
+		builder.addDoubleProperty("Blue %", this::getBluePercent, null);
+
+		builder.addDoubleProperty("Proximity (CM)", this::getCmProximity, null);
 
 		builder.addDoubleProperty("Proximity (0-2047)", this::getProximity, null);
 		builder.addDoubleProperty("IR", this::getIR, null);
