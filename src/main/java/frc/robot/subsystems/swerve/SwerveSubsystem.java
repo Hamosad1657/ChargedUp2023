@@ -38,6 +38,7 @@ import frc.robot.commands.swerve.paths.SwervePathConstants;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.function.DoubleSupplier;
 import java.util.stream.Stream;
 import com.hamosad1657.lib.sensors.HaNavX;
 import com.hamosad1657.lib.vision.limelight.Limelight;
@@ -450,8 +451,20 @@ public class SwerveSubsystem extends SubsystemBase {
 		return this.autoBuilder.fullAuto(pathGroup);
 	}
 
-	public Command crossLockWheelsCommand() {
-		return new RunCommand(this::crossLockWheels, this).until(RobotContainer::shouldRobotMove);
+	public Command crossLockWheelsCommand(DoubleSupplier translationXSupplier, DoubleSupplier translationSupplier,
+			DoubleSupplier rotationSupplier) {
+		return new RunCommand(this::crossLockWheels, this)
+				.until(() -> this.shouldRobotMove(translationXSupplier.getAsDouble(), translationSupplier.getAsDouble(),
+						rotationSupplier.getAsDouble()));
+	}
+
+	public boolean shouldRobotMove(double translationXValue, double translationYValue, double rotationValue) {
+		return (translationXValue > RobotContainer.kJoystickDeadband
+				|| translationXValue < -RobotContainer.kJoystickDeadband
+				|| translationYValue > RobotContainer.kJoystickDeadband
+				|| translationYValue < -RobotContainer.kJoystickDeadband
+				|| rotationValue > RobotContainer.kJoystickDeadband
+				|| rotationValue < -RobotContainer.kJoystickDeadband);
 	}
 
 	/**

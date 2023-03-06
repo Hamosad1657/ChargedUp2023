@@ -10,6 +10,7 @@ import com.hamosad1657.lib.math.HaUnits;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.swerve.paths.SwervePathConstants;
 import frc.robot.commands.swerve.teleop.TeleopDriveCommand;
@@ -20,8 +21,10 @@ import frc.robot.subsystems.swerve.SwerveSubsystem;
 import frc.robot.subsystems.turret.TurretSubsystem;
 
 public class RobotContainer {
-	public static PS4Controller driverA_Controller, driverB_Controller;
 	public static final double kJoystickDeadband = 0.075;
+
+	public PS4Controller driverA_Controller, driverB_Controller;
+	public CommandPS4Controller driverA_CommandController, driverB_CommandController;
 
 	private final JoystickButton driverA_Share, driverA_R2, driverA_L2, driverA_PS, driverA_Circle, driverA_Cross,
 			driverA_Triangle;
@@ -35,9 +38,10 @@ public class RobotContainer {
 	private SendableChooser<Command> comboxChooser;
 
 	public RobotContainer() {
-		driverA_Controller = new PS4Controller(RobotMap.kDriverAControllerUSBPort);
-		driverB_Controller = new PS4Controller(RobotMap.kDriverBControllerUSBPort);
-
+		this.driverA_Controller = new PS4Controller(RobotMap.kDriverAControllerUSBPort);
+		this.driverB_Controller = new PS4Controller(RobotMap.kDriverBControllerUSBPort);
+		this.driverA_CommandController = new CommandPS4Controller(0);
+		this.driverB_CommandController = new CommandPS4Controller(1);
 		this.arm = ArmSubsystem.getInstance();
 		this.grabber = GrabberSubsystem.getInstance();
 		this.intake = IntakeSubsystem.getInstance();
@@ -76,6 +80,8 @@ public class RobotContainer {
 
 		this.driverA_R2.onTrue(this.intake.lowerIntakeCommand());
 		this.driverA_L2.onTrue(this.intake.raiseIntakeCommand());
+
+		this.driverA_CommandController.share().onTrue(new InstantCommand(this.swerve::zeroGyro));
 	}
 
 	private void setDefaultCommands() {
@@ -106,19 +112,6 @@ public class RobotContainer {
 	 */
 	public Command getAutoCommand() {
 		return this.comboxChooser.getSelected();
-	}
-
-	public static boolean shouldRobotMove() {
-		double translationXValue = driverA_Controller.getLeftX();
-		double translationYValue = driverA_Controller.getLeftY();
-		double rotationValue = driverA_Controller.getRightX();
-
-		return (translationXValue > RobotContainer.kJoystickDeadband
-				|| translationXValue < -RobotContainer.kJoystickDeadband
-				|| translationYValue > RobotContainer.kJoystickDeadband
-				|| translationYValue < -RobotContainer.kJoystickDeadband
-				|| rotationValue > RobotContainer.kJoystickDeadband
-				|| rotationValue < -RobotContainer.kJoystickDeadband);
 	}
 
 	public static boolean shoudlArmMove() {
