@@ -1,9 +1,10 @@
 
 package frc.robot.subsystems.grabber;
 
+import com.hamosad1657.lib.motors.HaCANSparkMax;
 import com.hamosad1657.lib.sensors.HaColorSensor;
-import edu.wpi.first.wpilibj.PneumaticsModuleType;
-import edu.wpi.first.wpilibj.Solenoid;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -21,39 +22,33 @@ public class GrabberSubsystem extends SubsystemBase {
 		return instance;
 	}
 
-	private final Solenoid grabberSolenoid;
+	private final HaCANSparkMax grabberMotor;
 	private final HaColorSensor colorSensor;
 
 	private GrabberSubsystem() {
 		this.colorSensor = new HaColorSensor(RobotMap.kColorSensorPort);
-		this.grabberSolenoid = new Solenoid(PneumaticsModuleType.REVPH, RobotMap.kGrabberSolenoidPort);
+		CANSparkMax motor = new CANSparkMax(RobotMap.kGrabberMotorID, MotorType.kBrushless);
+		motor.setSmartCurrentLimit(GrabberConstants.kMaxAmper);
+		this.grabberMotor = new HaCANSparkMax(motor);
 
 		ShuffleboardTab tab = Shuffleboard.getTab("Arm");
-		tab.addBoolean("Game Piece In Grabber", this::isGamePieceInRange);
 		tab.add("Color Sensor", this.colorSensor).withPosition(0, 2).withSize(3, 3);
+		tab.addBoolean("Game Piece In Grabber", this::isGamePieceInRange);
+		tab.add("Grabber Motor", this.grabberMotor);
 	}
 
 	/**
-	 * Set the value of the intake's left solenoid.
-	 * 
-	 * @param on - True will turn the solenoid output on. False will turn the solenoid output off.
+	 * Releases the game piece.
 	 */
-	public void setGrabberSolenoid(boolean on) {
-		this.grabberSolenoid.set(on);
+	public void releaseGamePiece() {
+		this.grabberMotor.set(-GrabberConstants.kCollectGamePieceSpeed);
 	}
 
 	/**
-	 * Toggles the grabber solenoid.
+	 * Releases the game piece.
 	 */
-	public void toggleGrabberSolenoid() {
-		this.grabberSolenoid.toggle();
-	}
-
-	/**
-	 * Toggles the grabber solenoid.
-	 */
-	public Command toggleGrabberSolenoidCommand() {
-		return new InstantCommand(() -> this.grabberSolenoid.toggle(), this);
+	public Command releaseGamePieceCommand() {
+		return new InstantCommand(this::releaseGamePiece, this);
 	}
 
 	/**
@@ -80,4 +75,19 @@ public class GrabberSubsystem extends SubsystemBase {
 				&& this.colorSensor.isObjectInProximityRange(GrabberConstants.kConeMinDistance,
 						GrabberConstants.kConeMaxDistance);
 	}
+
+	/**
+	 * Collects the game piece.
+	 */
+	private void collectGamePiece() {
+		this.grabberMotor.set(GrabberConstants.kCollectGamePieceSpeed);
+	}
+
+	/**
+	 * Collects the game piece.
+	 */
+	public Command collectGamePieceCommand() {
+		return new InstantCommand(this::collectGamePiece, this);
+	}
+
 }

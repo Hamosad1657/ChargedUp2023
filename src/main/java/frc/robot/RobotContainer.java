@@ -25,7 +25,7 @@ public class RobotContainer {
 
 	private final JoystickButton driverA_Share, driverA_R2, driverA_L2, driverA_PS, driverA_Circle, driverA_Cross,
 			driverA_Triangle;
-	private final JoystickButton driverB_Circle, driverB_Share, driverB_Options;
+	private final JoystickButton driverB_Circle, driverB_Share, driverB_Options, driverB_Cross;
 
 	private SwerveSubsystem swerve;
 	private GrabberSubsystem grabber;
@@ -54,7 +54,7 @@ public class RobotContainer {
 		this.driverB_Share = new JoystickButton(driverB_Controller, PS4Controller.Button.kShare.value);
 		this.driverB_Options = new JoystickButton(driverB_Controller, PS4Controller.Button.kOptions.value);
 		this.driverB_Circle = new JoystickButton(driverB_Controller, PS4Controller.Button.kCircle.value);
-
+		this.driverB_Cross = new JoystickButton(driverB_Controller, PS4Controller.Button.kCross.value);
 		this.configureButtonsBindings();
 		this.setDefaultCommands();
 		this.createPathsComboBox();
@@ -69,7 +69,8 @@ public class RobotContainer {
 		this.driverA_Triangle.onTrue(new InstantCommand(this.swerve::toggleSwerveSpeed));
 		this.driverA_PS.onTrue(new InstantCommand(this.swerve::modulesToZero, this.swerve));
 
-		this.driverB_Circle.onTrue(this.grabber.toggleGrabberSolenoidCommand());
+		this.driverB_Circle.whileTrue(this.grabber.releaseGamePieceCommand());
+		this.driverB_Cross.whileTrue(this.grabber.collectGamePieceCommand());
 
 		this.driverB_Share.onTrue(this.arm.homeCommand());
 		this.driverB_Options.onTrue(this.arm.resetLengthCANCoderPositionCommand());

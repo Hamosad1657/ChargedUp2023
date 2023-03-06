@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj.util.Color;
 
 public class GrabberConstants {
 
+	// TODO: re-check values.
 	public static final Color kConeMinColor = new Color(0.065, 0.52, 0.2675);
 	public static final Color kConeMaxColor = new Color(0.203, 0.60, 0.36);
 	public static final Color kCubeMinColor = new Color(0.25, 0.330, 0.216);
@@ -14,4 +15,7 @@ public class GrabberConstants {
 	public static final double kConeMaxDistance = 1950;
 	public static final double kCubeMinDistance = 0;
 	public static final double kCubeMaxDistance = 1965;
+	// TODO: find real values
+	public static final double kCollectGamePieceSpeed = 0.5;
+	public static final int kMaxAmper = 0;
 }
