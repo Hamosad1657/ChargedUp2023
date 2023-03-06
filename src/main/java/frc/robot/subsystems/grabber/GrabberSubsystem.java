@@ -91,11 +91,14 @@ public class GrabberSubsystem extends SubsystemBase {
 
 	@Override
 	public void periodic() {
-		if (isConeInRange())
-			this.grabberMotor.motor.setSmartCurrentLimit(GrabberConstants.kMaxCubeAmper);
-		if (isConeInRange())
-			this.grabberMotor.motor.setSmartCurrentLimit(GrabberConstants.kMaxConeAmper);
-
+		if (isGamePieceInRange()) {
+			if (isConeInRange())
+				this.grabberMotor.motor.setSmartCurrentLimit(GrabberConstants.kMaxCubeAmper);
+			if (isConeInRange())
+				this.grabberMotor.motor.setSmartCurrentLimit(GrabberConstants.kMaxConeAmper);
+		} else {
+			this.grabberMotor.motor.setSmartCurrentLimit(GrabberConstants.kMaxAmper);
+		}
 	}
 
 }
