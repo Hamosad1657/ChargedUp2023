@@ -28,6 +28,7 @@ public class GrabberSubsystem extends SubsystemBase {
 	private GrabberSubsystem() {
 		this.colorSensor = new HaColorSensor(RobotMap.kColorSensorPort);
 		CANSparkMax motor = new CANSparkMax(RobotMap.kGrabberMotorID, MotorType.kBrushless);
+		motor.setSmartCurrentLimit(GrabberConstants.kMaxAmper);
 		this.grabberMotor = new HaCANSparkMax(motor);
 
 		ShuffleboardTab tab = Shuffleboard.getTab("Arm");
@@ -87,18 +88,6 @@ public class GrabberSubsystem extends SubsystemBase {
 	 */
 	public Command collectGamePieceCommand() {
 		return new InstantCommand(this::collectGamePiece, this);
-	}
-
-	@Override
-	public void periodic() {
-		if (isGamePieceInRange()) {
-			if (isConeInRange())
-				this.grabberMotor.motor.setSmartCurrentLimit(GrabberConstants.kMaxCubeAmper);
-			if (isConeInRange())
-				this.grabberMotor.motor.setSmartCurrentLimit(GrabberConstants.kMaxConeAmper);
-		} else {
-			this.grabberMotor.motor.setSmartCurrentLimit(GrabberConstants.kMaxAmper);
-		}
 	}
 
 }

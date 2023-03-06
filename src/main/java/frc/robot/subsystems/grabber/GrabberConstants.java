@@ -17,8 +17,6 @@ public class GrabberConstants {
 	public static final double kCubeMaxDistance = 1965;
 	// TODO: find real values
 	public static final double kCollectGamePieceSpeed = 0.5;
-	public static final int kMaxAmper = 0;
-	public static final int kMaxCubeAmper = 0;
-	public static final int kMaxConeAmper = 0;
+	public static final int kMaxAmper = 10;
 
 }
