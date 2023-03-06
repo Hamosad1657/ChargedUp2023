@@ -162,16 +162,16 @@ public class RobotContainer {
 	 */
 	private void createTestCommand() {
 
-		comboxChooser.setDefaultOption("None", new InstantCommand());
-		comboxChooser.addOption("Arm High", this.arm.setStateCommand(ArmState.kHigh));
-		comboxChooser.addOption("Arm High", new InstantCommand());
-		comboxChooser.addOption("Arm High", new InstantCommand());
-		comboxChooser.addOption("Arm High", new InstantCommand());
-		comboxChooser.addOption("Arm High", new InstantCommand());
-		comboxChooser.addOption("Arm High", new InstantCommand());
-		comboxChooser.addOption("Arm High", new InstantCommand());
-		comboxChooser.addOption("Arm High", new InstantCommand());
-		comboxChooser.addOption("Arm High", new InstantCommand());
+		testComboxChooser.setDefaultOption("None", new InstantCommand());
+		testComboxChooser.addOption("Arm High", this.arm.setStateCommand(ArmState.kHigh));
+		// TODO: Uncomment when merging into develop when it already has the wanted arm states.
+		// testComboxChooser.addOption("Arm Mid", this.arm.setStateCommand(ArmState.kMid));
+		// testComboxChooser.addOption("Arm Low", this.arm.setStateCommand(ArmState.kLow));
+		// testComboxChooser.addOption("Arm Home", this.arm.setStateCommand(ArmState.kShelf));
+		// testComboxChooser.addOption("Shelf", this.arm.setStateCommand(ArmState.kHome));
+		testComboxChooser.addOption("Raise Intake", this.intake.raiseIntakeCommand());
+		testComboxChooser.addOption("Lower Intake", this.intake.lowerIntakeCommand());
+		// testComboxChooser.addOption("Toggle Grabber", this.grabber.toggleGrabberSolenoidCommand());
 
 		this.autoTab.add("Test Command Chooser", this.testComboxChooser).withWidget("ComboBox Chooser");
 	}
