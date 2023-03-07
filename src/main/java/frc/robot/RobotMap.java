@@ -42,7 +42,7 @@ public class RobotMap {
 	public static final int kTurretCANCoderID = 14;
 	public static final int kTurretMotorID = 24;
 	// TODO: Get the real motor ID
-	public static final int kGrabberMotorID = 0;
+	public static final int kGrabberMotorID = 26;
 
 	// Turret limit switches
 	public static final int kTurretCWLimitPort = 0;

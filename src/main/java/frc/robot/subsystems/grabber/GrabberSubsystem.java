@@ -3,6 +3,7 @@ package frc.robot.subsystems.grabber;
 
 import com.hamosad1657.lib.motors.HaCANSparkMax;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -26,6 +27,7 @@ public class GrabberSubsystem extends SubsystemBase {
 
 	private GrabberSubsystem() {
 		CANSparkMax motor = new CANSparkMax(RobotMap.kGrabberMotorID, MotorType.kBrushless);
+		motor.setIdleMode(IdleMode.kBrake);
 		motor.setSmartCurrentLimit(GrabberConstants.kMaxAmper);
 		this.motor = new HaCANSparkMax(motor);
 
@@ -37,10 +39,10 @@ public class GrabberSubsystem extends SubsystemBase {
 
 	public void onGrabberButtonPressed() {
 		if (this.isCollecting) {
-			this.motor.set(-GrabberConstants.kMotorSpeed);
+			this.motor.set(GrabberConstants.kMotorSpeed);
 			this.isCollecting = false;
 		} else {
-			this.motor.set(GrabberConstants.kMotorSpeed);
+			this.motor.set(-GrabberConstants.kMotorSpeed);
 			this.isCollecting = true;
 		}
 	}
@@ -57,7 +59,7 @@ public class GrabberSubsystem extends SubsystemBase {
 	}
 
 	public Command releaseCommand() {
-		return new RunCommand(() -> this.motor.set(-GrabberConstants.kMotorSpeed), this)
+		return new RunCommand(() -> this.motor.set(GrabberConstants.kMotorSpeed), this)
 				.withTimeout(GrabberConstants.kAutoReleaseTime).andThen(() -> this.motor.set(0), this);
 	}
 }
