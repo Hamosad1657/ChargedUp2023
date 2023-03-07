@@ -49,8 +49,8 @@ public class RobotMap {
 	public static final int kTurretCCWLimitPort = 1;
 
 	// Arm limit switches
-	public static final int kArmRetractLimitPort = 2;
-	public static final int kArmExtendLimitPort = 3;
+	public static final int kArmRetractLimitPort = 3;
+	public static final int kArmExtendLimitPort = 2;
 	public static final int kBottomArmAngleLimitport = 4;
 	public static final int kTopArmAngleLimitport = 5;
 }
