@@ -58,7 +58,6 @@ public class RobotContainer {
 		this.configureButtonsBindings();
 		this.setDefaultCommands();
 		this.createPathsComboBox();
-		this.comboxChooser.setDefaultOption("Arm & Mobility", this.swerve.getPathPlannerAutoCommand("Arm & Mobility"));
 	}
 
 	private void configureButtonsBindings() {
@@ -136,12 +135,10 @@ public class RobotContainer {
 	private void createPathsComboBox() {
 		ShuffleboardTab autoTab = Shuffleboard.getTab("Auto");
 		this.comboxChooser = new SendableChooser<Command>();
-		SwervePathConstants.kPaths.forEach(new BiConsumer<String, Command>() {
-			@Override
-			public void accept(String name, Command command) {
-				comboxChooser.addOption(name, command);
-			}
-		});
+
+		SwervePathConstants.kPaths.forEach((name, command) -> comboxChooser.addOption(name, command));
 		autoTab.add("Path Chooser", this.comboxChooser).withWidget("ComboBox Chooser");
+
+		this.comboxChooser.setDefaultOption("Arm & Mobility", this.swerve.getPathPlannerAutoCommand("Arm & Mobility"));
 	}
 }
