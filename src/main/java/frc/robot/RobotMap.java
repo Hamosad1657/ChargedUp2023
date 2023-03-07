@@ -41,16 +41,16 @@ public class RobotMap {
 	public static final int kArmAngleMotorID = 25;
 	public static final int kTurretCANCoderID = 14;
 	public static final int kTurretMotorID = 24;
-
-	public static final int kGrabberSolenoidPort = 0;
+	// TODO: Get the real motor ID
+	public static final int kGrabberMotorID = 26;
 
 	// Turret limit switches
 	public static final int kTurretCWLimitPort = 0;
 	public static final int kTurretCCWLimitPort = 1;
 
 	// Arm limit switches
-	public static final int kArmRetractLimitPort = 2;
-	public static final int kArmExtendLimitPort = 3;
+	public static final int kArmRetractLimitPort = 3;
+	public static final int kArmExtendLimitPort = 2;
 	public static final int kBottomArmAngleLimitport = 4;
 	public static final int kTopArmAngleLimitport = 5;
 }
