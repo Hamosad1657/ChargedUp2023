@@ -29,8 +29,8 @@ public class ArmConstants {
 	public static final double kArmLengthTolerance = 150.0;
 
 	// TODO: verify
-	public static final double kBottomAngleLimitDeg = 250.0;
-	public static final double kTopAngleLimitDeg = 170.0;
+	public static final double kBottomAngleLimitDeg = 36.5;
+	public static final double kTopAngleLimitDeg = 120.0;
 	public static final double kMinArmLengthDeg = 0;
 	public static final double kMaxArmLengthDeg = 0;
 
