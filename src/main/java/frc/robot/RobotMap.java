@@ -6,8 +6,8 @@ import edu.wpi.first.wpilibj.SerialPort;
 
 /** This class contains CAN IDs and port numbers. */
 public class RobotMap {
-	public static int kDriverAControllerUSBPort = 0;
-	public static int kDriverBControllerUSBPort = 1;
+	public static int kDriverA_ControllerUSBPort = 0;
+	public static int kDriverB_ControllerUSBPort = 1;
 	public static SerialPort.Port kNavXPort = SerialPort.Port.kUSB1;
 	public static final I2C.Port kColorSensorPort = I2C.Port.kMXP;
 
