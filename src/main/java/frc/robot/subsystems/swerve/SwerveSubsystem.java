@@ -451,14 +451,16 @@ public class SwerveSubsystem extends SubsystemBase {
 		return this.autoBuilder.fullAuto(pathGroup);
 	}
 
-	public Command crossLockWheelsCommand(DoubleSupplier translationXSupplier, DoubleSupplier translationSupplier,
-			DoubleSupplier rotationSupplier) {
+	public Command crossLockWheelsCommand() {
 		return new RunCommand(this::crossLockWheels, this)
-				.until(() -> this.shouldRobotMove(translationXSupplier.getAsDouble(), translationSupplier.getAsDouble(),
-						rotationSupplier.getAsDouble()));
+				.until(() -> this.shouldRobotMove());
 	}
 
-	public boolean shouldRobotMove(double translationXValue, double translationYValue, double rotationValue) {
+	public boolean shouldRobotMove() {
+		double translationXValue = RobotContainer.driverA_Controller.getLeftX();
+		double translationYValue = RobotContainer.driverA_Controller.getLeftY();
+		double rotationValue = RobotContainer.driverA_Controller.getRightX();
+
 		return (translationXValue > RobotContainer.kJoystickDeadband
 				|| translationXValue < -RobotContainer.kJoystickDeadband
 				|| translationYValue > RobotContainer.kJoystickDeadband

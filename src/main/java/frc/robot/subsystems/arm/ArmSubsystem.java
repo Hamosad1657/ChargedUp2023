@@ -402,11 +402,20 @@ public class ArmSubsystem extends SubsystemBase {
 			if (!interrupted) {
 				this.armLengthCANCoder.setPosition(0.0);
 			}
-		}, () -> (!this.retractLimit.get() && !this.bottomAngleLimit.get()) || RobotContainer.shoudlArmMove(), this);
+		}, () -> (!this.retractLimit.get() && !this.bottomAngleLimit.get()) || this.shoudlArmMove(), this);
 	}
 
 	public Command resetLengthCANCoderPositionCommand() {
 		return new InstantCommand(() -> this.armLengthCANCoder.setPosition(0.0));
+	}
+
+	public boolean shoudlArmMove() {
+		double lengthValue = (RobotContainer.driverB_Controller.getL2Axis() + 1.0)
+				- (RobotContainer.driverB_Controller.getR2Axis() + 1.0);
+		double angleValue = RobotContainer.driverB_Controller.getLeftY();
+
+		return (lengthValue > RobotContainer.kJoystickDeadband || lengthValue < -RobotContainer.kJoystickDeadband || angleValue > RobotContainer.kJoystickDeadband
+				|| angleValue < -RobotContainer.kJoystickDeadband);
 	}
 
 	@Override
