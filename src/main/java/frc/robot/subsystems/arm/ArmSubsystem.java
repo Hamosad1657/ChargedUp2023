@@ -5,7 +5,6 @@ import java.util.function.DoubleSupplier;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.sensors.AbsoluteSensorRange;
-import com.hamosad1657.lib.motors.HaCANSparkMax;
 import com.hamosad1657.lib.motors.HaTalonSRX;
 import com.hamosad1657.lib.sensors.HaCANCoder;
 import com.revrobotics.CANSparkMax;
@@ -40,7 +39,7 @@ public class ArmSubsystem extends SubsystemBase {
 	// Only used to keep the motors' objects - Use [armLengthMotor] for control.
 	private final WPI_TalonSRX lengthMotorA, lengthMotorB;
 
-	private final HaCANSparkMax angleMotor;
+	private final CANSparkMax angleMotor;
 	private final HaTalonSRX lengthMotor;
 	private final HaCANCoder angleCANCoder, lengthCANCoder;
 
@@ -54,11 +53,10 @@ public class ArmSubsystem extends SubsystemBase {
 
 	// Angle lowers when you go up
 	public ArmSubsystem() {
-		CANSparkMax angleMotor = new CANSparkMax(RobotMap.kArmAngleMotorID, MotorType.kBrushless);
-		angleMotor.setIdleMode(IdleMode.kBrake);
-		angleMotor.setInverted(true);
-		angleMotor.enableVoltageCompensation(12.0);
-		this.angleMotor = new HaCANSparkMax(angleMotor);
+		this.angleMotor = new CANSparkMax(RobotMap.kArmAngleMotorID, MotorType.kBrushless);
+		this.angleMotor.setIdleMode(IdleMode.kBrake);
+		this.angleMotor.setInverted(true);
+		this.angleMotor.enableVoltageCompensation(12.0);
 
 		this.angleCANCoder = new HaCANCoder(RobotMap.kArmAngleCANCoderID, ArmConstants.kAngleEncoderOffset);
 		this.angleCANCoder.setMeasurmentRange(AbsoluteSensorRange.Unsigned_0_to_360);
@@ -92,15 +90,14 @@ public class ArmSubsystem extends SubsystemBase {
 
 		ShuffleboardTab armTab = Shuffleboard.getTab("Arm");
 
-		armTab.add("Arm Angle Motor", this.angleMotor).withPosition(0, 0).withSize(2, 5);
-		armTab.add("Arm Length Motor", this.lengthMotor).withPosition(2, 0).withSize(2, 5);
-		armTab.add("Arm Angle CANCoder", this.angleCANCoder).withPosition(5, 0).withSize(2, 2);
-		armTab.add("Arm Length CANCoder", this.lengthCANCoder).withPosition(8, 0).withSize(2, 2);
+		armTab.add("Arm Length Motor", this.lengthMotor).withPosition(0, 0).withSize(2, 5);
+		armTab.add("Arm Angle CANCoder", this.angleCANCoder).withPosition(3, 0).withSize(2, 2);
+		armTab.add("Arm Length CANCoder", this.lengthCANCoder).withPosition(5, 0).withSize(2, 2);
 
-		armTab.addBoolean("Extend Limit", () -> !this.extendLimit.get()).withPosition(5, 2).withSize(2, 1);
-		armTab.addBoolean("Retract Limit", () -> !this.retractLimit.get()).withPosition(5, 3).withSize(2, 1);
-		armTab.addBoolean("Top Angle Limit", () -> !this.topAngleLimit.get()).withPosition(8, 2).withSize(2, 1);
-		armTab.addBoolean("Bottom Angle Limit", () -> !this.bottomAngleLimit.get()).withPosition(8, 3).withSize(2, 1);
+		armTab.addBoolean("Extend Limit", () -> !this.extendLimit.get()).withPosition(3, 2).withSize(2, 1);
+		armTab.addBoolean("Retract Limit", () -> !this.retractLimit.get()).withPosition(3, 3).withSize(2, 1);
+		armTab.addBoolean("Top Angle Limit", () -> !this.topAngleLimit.get()).withPosition(5, 2).withSize(2, 1);
+		armTab.addBoolean("Bottom Angle Limit", () -> !this.bottomAngleLimit.get()).withPosition(5, 3).withSize(2, 1);
 	}
 
 	public void resetLengthCANCoder() {
@@ -208,7 +205,7 @@ public class ArmSubsystem extends SubsystemBase {
 	 * @param forwardsOutputSupplier  - The output supplier for the arm's forwards extension.
 	 * @param backwardsOutputSupplier - The output supplier for the arm's backwards retraction.
 	 */
-	public Command openLoopTeleopArmCommand(DoubleSupplier angleOutputSupplier, DoubleSupplier forwardsOutputSupplier,
+	public Command openLoopTeleopCommand(DoubleSupplier angleOutputSupplier, DoubleSupplier forwardsOutputSupplier,
 			DoubleSupplier backwardsOutputSupplier, PS4Controller controller) {
 		return new RunCommand(() -> {
 			// Set angle motor
