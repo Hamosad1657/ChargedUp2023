@@ -49,7 +49,6 @@ public class ArmSubsystem extends SubsystemBase {
 	private final DigitalInput extendLimit, retractLimit, bottomAngleLimit, topAngleLimit;
 
 	private int currentStateIndex;
-	private boolean shouldOverrideLimits = false;
 
 	// Angle lowers when you go up
 	public ArmSubsystem() {
@@ -188,9 +187,9 @@ public class ArmSubsystem extends SubsystemBase {
 	 */
 	public void setLengthMotorWithLimits(double output) {
 		// The magnetic limit switches are normally true.
-		if (!this.shouldOverrideLimits && output < 0 && !this.extendLimit.get()) {
+		if (output < 0 && !this.extendLimit.get()) {
 			this.lengthMotor.set(0.0);
-		} else if (!this.shouldOverrideLimits && output > 0 && !this.retractLimit.get()) {
+		} else if (output > 0 && !this.retractLimit.get()) {
 			this.lengthMotor.set(0.0);
 		} else {
 			this.lengthMotor.set(output);
@@ -207,33 +206,28 @@ public class ArmSubsystem extends SubsystemBase {
 	public Command openLoopTeleopArmCommand(DoubleSupplier angleOutputSupplier, DoubleSupplier forwardsOutputSupplier,
 			DoubleSupplier backwardsOutputSupplier, PS4Controller controller) {
 		return new RunCommand(() -> {
-			if (controller.getL1ButtonPressed()) {
-				this.shouldOverrideLimits = true;
-			} else if (controller.getL1ButtonReleased()) {
-				this.shouldOverrideLimits = false;
-			}
-
 			// Set angle motor
 			double angleSupplierValue = angleOutputSupplier.getAsDouble();
 			this.setAngleMotorWithLimits(angleSupplierValue * angleSupplierValue * Math.signum(angleSupplierValue)
 					* ArmConstants.kAngleMotorMaxSpeed);
 
 			// Set length motors
-			this.setLengthMotorWithLimits((backwardsOutputSupplier.getAsDouble() - forwardsOutputSupplier.getAsDouble())
-					* ArmConstants.kLengthMotorMaxOutput * ArmConstants.kLengthMotorMaxOutput);
+			double lengthSupplierValue = backwardsOutputSupplier.getAsDouble() - forwardsOutputSupplier.getAsDouble();
+			this.setLengthMotorWithLimits(lengthSupplierValue * lengthSupplierValue * Math.signum(lengthSupplierValue)
+					* ArmConstants.kLengthMotorMaxOutput);
 		}, this);
 	}
 
 	public Command homeCommand() {
 		return new FunctionalCommand(() -> {
 		}, () -> {
-			if (this.getCurrentAngle() > 70.0) {
+			if (this.bottomAngleLimit.get()) {
 				this.setAngleMotorWithLimits(0.25);
 				return;
 			}
 
 			// The limits are normally true
-			if (this.getCurrentLength() > 150) {
+			if (this.retractLimit.get()) {
 				this.setLengthMotorWithLimits(0.85);
 				this.setAngleMotorWithLimits(0.0);
 			} else {
