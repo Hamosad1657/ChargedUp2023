@@ -46,8 +46,7 @@
         "names": [
           "WaitABit",
           "ToggleGrabber",
-          "WaitABitMore",
-          "ToggleGrabber"
+          "WaitABit"
         ],
         "executionBehavior": "sequential",
         "waitBehavior": "none",
@@ -56,15 +55,15 @@
     },
     {
       "anchorPoint": {
-        "x": 4.75,
+        "x": 4.15,
         "y": 4.75
       },
       "prevControl": {
-        "x": 3.481754296841928,
+        "x": 2.8817542968419283,
         "y": 4.742646685293372
       },
       "nextControl": {
-        "x": 6.0182457031580725,
+        "x": 5.418245703158073,
         "y": 4.757353314706628
       },
       "holonomicAngle": 0.0,
@@ -74,6 +73,7 @@
       "isStopPoint": true,
       "stopEvent": {
         "names": [
+          "ToggleGrabber",
           "HomeArm"
         ],
         "executionBehavior": "sequential",
@@ -83,12 +83,12 @@
     },
     {
       "anchorPoint": {
-        "x": 5.9,
-        "y": 4.75
+        "x": 6.4,
+        "y": 4.6
       },
       "prevControl": {
-        "x": 5.455320396844219,
-        "y": 4.75
+        "x": 5.955320396844219,
+        "y": 4.6
       },
       "nextControl": null,
       "holonomicAngle": 180.0,

@@ -199,23 +199,23 @@ public class SwerveSubsystem extends SubsystemBase {
 	/**
 	 * Drive the swerve.
 	 * 
-	 * @param translation   - A field-relative or robot-relative direction+speed to move in.
-	 * @param rotationRadPS - A rotation speed in RadPS. Open-loop
-	 * @param robotRelative - Whether the passed Translation2d is field-relative or robot-relative (true if robot
-	 *                      relative).
-	 * @param isOpenLoop    - Is the wheel speed controlled open-loop or closed-loop.
+	 * @param translation     - A field-relative or robot-relative direction+speed to move in.
+	 * @param rotationRadPS   - A rotation speed in RadPS. Open-loop
+	 * @param isRobotRelative - Whether the passed Translation2d is field-relative or robot-relative (true if robot
+	 *                        relative).
+	 * @param isOpenLoop      - Is the wheel speed controlled open-loop or closed-loop.
 	 */
-	public void teleopDrive(Translation2d translation, double rotationRadPS, boolean robotRelative,
+	public void teleopDrive(Translation2d translation, double rotationRadPS, boolean isRobotRelative,
 			boolean isOpenLoop) {
 		// Set the swerveModuleStates from the desired ChassisSpeeds using kinematics.
 		SwerveModuleState[] swerveModuleStates = SwerveConstants.kSwerveKinematics.toSwerveModuleStates(
-				// If field relative, convert to robot-relative ChassisSpeeds with gyro.
 				// If robot relative, just convert to ChassisSpeeds.
-				robotRelative
-						? ChassisSpeeds.fromFieldRelativeSpeeds(translation.getX(), translation.getY(),
-								this.calculateAngleCorrectionRadPS(rotationRadPS), this.getYaw())
-						: new ChassisSpeeds(translation.getX(), translation.getY(),
-								this.calculateAngleCorrectionRadPS(rotationRadPS)));
+				// If field relative, convert to robot-relative ChassisSpeeds with gyro.
+				isRobotRelative
+						? new ChassisSpeeds(translation.getX(), translation.getY(),
+								this.calculateAngleCorrectionRadPS(rotationRadPS))
+						: ChassisSpeeds.fromFieldRelativeSpeeds(translation.getX(), translation.getY(),
+								this.calculateAngleCorrectionRadPS(rotationRadPS), this.getYaw()));
 
 		// If any of the speeds are above the maximum, lower them all in the same ratio.
 		SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, SwerveConstants.kChassisMaxSpeedMPS);
@@ -306,6 +306,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
 	/** Set the odometry to a specific position. Units in meters and Rotation2d. */
 	public void resetOdometry(Pose2d pose) {
+		this.setGyro(pose.getRotation().getDegrees() + 180);
 		this.odometry.resetPosition(this.getYaw(), this.getModulesPositions(), pose);
 		Robot.print("Odometry reset to: " + Double.toString(this.getOdometryPose().getX())
 				+ Double.toString(this.getOdometryPose().getY()));

@@ -2,51 +2,22 @@
   "waypoints": [
     {
       "anchorPoint": {
-        "x": 2.275,
-        "y": 3.3
+        "x": 1.9,
+        "y": 2.8
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.2789204017519076,
-        "y": 3.3
+        "x": 2.331462821205576,
+        "y": 2.8
       },
       "holonomicAngle": 0.0,
       "isReversal": false,
       "velOverride": null,
-      "isLocked": true,
+      "isLocked": false,
       "isStopPoint": false,
       "stopEvent": {
         "names": [
-          "ArmHigh"
-        ],
-        "executionBehavior": "sequential",
-        "waitBehavior": "none",
-        "waitTime": 1.0
-      }
-    },
-    {
-      "anchorPoint": {
-        "x": 1.95,
-        "y": 3.3
-      },
-      "prevControl": {
-        "x": 1.683911191180157,
-        "y": 3.3
-      },
-      "nextControl": {
-        "x": 2.297857183619077,
-        "y": 3.3
-      },
-      "holonomicAngle": 0,
-      "isReversal": false,
-      "velOverride": null,
-      "isLocked": true,
-      "isStopPoint": true,
-      "stopEvent": {
-        "names": [
-          "WaitABit",
-          "ToggleGrabber",
-          "WaitABit"
+          "CloseIntake"
         ],
         "executionBehavior": "sequential",
         "waitBehavior": "none",
@@ -55,25 +26,24 @@
     },
     {
       "anchorPoint": {
-        "x": 2.9,
+        "x": 2.8,
         "y": 2.8
       },
       "prevControl": {
-        "x": 2.5859430775700956,
+        "x": 1.963692744052155,
         "y": 2.8
       },
       "nextControl": {
-        "x": 3.388759123333029,
+        "x": 3.6363072559478447,
         "y": 2.8
       },
       "holonomicAngle": 0,
       "isReversal": false,
       "velOverride": null,
-      "isLocked": true,
+      "isLocked": false,
       "isStopPoint": true,
       "stopEvent": {
         "names": [
-          "HomeArm",
           "OpenIntake",
           "WaitABit",
           "OpenIntake"
@@ -85,25 +55,22 @@
     },
     {
       "anchorPoint": {
-        "x": 4.35,
+        "x": 5.1,
         "y": 2.8
       },
       "prevControl": {
-        "x": 3.918537178794423,
-        "y": 2.8
+        "x": 4.773588180509694,
+        "y": 2.758248666497333
       },
       "nextControl": null,
-      "holonomicAngle": 0.0,
+      "holonomicAngle": 0,
       "isReversal": false,
       "velOverride": null,
-      "isLocked": true,
+      "isLocked": false,
       "isStopPoint": false,
       "stopEvent": {
-        "names": [
-          "CloseIntake",
-          "ToggleGrabber"
-        ],
-        "executionBehavior": "sequential",
+        "names": [],
+        "executionBehavior": "parallel",
         "waitBehavior": "none",
         "waitTime": 0
       }

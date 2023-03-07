@@ -1,6 +1,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.SerialPort;
 
 /** This class contains CAN IDs and port numbers. */
@@ -8,6 +9,7 @@ public class RobotMap {
 	public static int kDriverAControllerUSBPort = 0;
 	public static int kDriverBControllerUSBPort = 1;
 	public static SerialPort.Port kNavXPort = SerialPort.Port.kUSB1;
+	public static final I2C.Port kColorSensorPort = I2C.Port.kMXP;
 
 	// Front left module
 	public static final int kFrontLeftDriveMotorID = 15;
@@ -39,8 +41,8 @@ public class RobotMap {
 	public static final int kArmAngleMotorID = 25;
 	public static final int kTurretCANCoderID = 14;
 	public static final int kTurretMotorID = 24;
-
-	public static final int kGrabberSolenoidPort = 0;
+	// TODO: Get the real motor ID
+	public static final int kGrabberMotorID = 26;
 
 	// Turret limit switches
 	public static final int kTurretCWLimitPort = 0;
