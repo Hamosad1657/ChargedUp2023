@@ -71,10 +71,7 @@ public class RobotContainer {
 		this.driverB_CommandController.povRight().onTrue(new InstantCommand(() -> this.arm.setState(ArmState.kHome)));
 		this.driverB_CommandController.triangle().onTrue(new InstantCommand(() -> this.arm.setState(ArmState.kShelf)));
 
-		this.driverB_CommandController.square().whileTrue(this.arm.openLoopTeleopArmCommand(
-				() -> HaUnits.deadband(driverB_Controller.getLeftY(), kJoystickDeadband),
-				() -> HaUnits.deadband((driverB_Controller.getR2Axis() + 1.0), kJoystickDeadband),
-				() -> HaUnits.deadband((driverB_Controller.getL2Axis() + 1.0), kJoystickDeadband), driverB_Controller));
+		this.driverB_CommandController.square().whileTrue(arm.getToStateCommand());
 
 		this.driverB_CommandController.share().onTrue(this.arm.homeCommand());
 		this.driverB_CommandController.options().onTrue(new InstantCommand(() -> this.arm.resetLengthCANCoder()));
@@ -92,11 +89,11 @@ public class RobotContainer {
 		// this.turret.setDefaultCommand(this.turret.closedLoopTeleopTurretCommand(driverB_Controller::getRightX));
 
 		// Teleop arm open/close - R2 open, L2 close, left Y for angle
-		this.arm.setDefaultCommand(this.arm.getToStateCommand());
-		// this.arm.setDefaultCommand(this.arm.openLoopTeleopArmCommand(
-		// () -> HaUnits.deadband(driverB_Controller.getLeftY(), kJoystickDeadband),
-		// () -> HaUnits.deadband((driverB_Controller.getR2Axis() + 1.0), kJoystickDeadband),
-		// () -> HaUnits.deadband((driverB_Controller.getL2Axis() + 1.0), kJoystickDeadband), driverB_Controller));
+		// this.arm.setDefaultCommand(this.arm.getToStateCommand());
+		this.arm.setDefaultCommand(this.arm.openLoopTeleopArmCommand(
+				() -> HaUnits.deadband(driverB_Controller.getLeftY(), kJoystickDeadband),
+				() -> HaUnits.deadband((driverB_Controller.getR2Axis() + 1.0), kJoystickDeadband),
+				() -> HaUnits.deadband((driverB_Controller.getL2Axis() + 1.0), kJoystickDeadband), driverB_Controller));
 
 		// Keep intake up
 		this.intake.setDefaultCommand(this.intake.keepIntakeUpCommand());

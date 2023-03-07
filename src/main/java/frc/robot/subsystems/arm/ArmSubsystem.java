@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.RobotMap;
 import frc.robot.subsystems.arm.ArmConstants.ArmState;
@@ -44,6 +45,7 @@ public class ArmSubsystem extends SubsystemBase {
 	private final HaCANCoder angleCANCoder, lengthCANCoder;
 
 	private final ProfiledPIDController anglePIDController;
+	private final PIDController anglePIDControllerNoProfile;
 	private final PIDController lengthPIDController;
 
 	private final DigitalInput extendLimit, retractLimit, bottomAngleLimit, topAngleLimit;
@@ -73,6 +75,8 @@ public class ArmSubsystem extends SubsystemBase {
 		this.lengthCANCoder.setMeasurmentRange(AbsoluteSensorRange.Unsigned_0_to_360);
 		this.lengthCANCoder.setPosition(0.0);
 
+		this.anglePIDControllerNoProfile = ArmConstants.kArmAnglePIDGains.toPIDController();
+
 		this.anglePIDController = ArmConstants.kArmAnglePIDGains
 				.toProfiledPIDController(ArmConstants.kAnglePIDConstrains);
 		this.anglePIDController.setTolerance(ArmConstants.kArmAngleTolerance);
@@ -84,7 +88,6 @@ public class ArmSubsystem extends SubsystemBase {
 		this.topAngleLimit = new DigitalInput(RobotMap.kTopArmAngleLimitport);
 		this.extendLimit = new DigitalInput(RobotMap.kArmExtendLimitPort);
 		this.retractLimit = new DigitalInput(RobotMap.kArmRetractLimitPort);
-
 		this.currentStateIndex = 0;
 
 		ShuffleboardTab armTab = Shuffleboard.getTab("Arm");
@@ -140,7 +143,9 @@ public class ArmSubsystem extends SubsystemBase {
 	 * @return The output for the angle motor calculated by the PID in [-1.0, 1.0].
 	 */
 	public double calculateAngleMotorOutput() {
-		double output = -MathUtil.clamp(this.anglePIDController.calculate(this.getCurrentAngle()),
+		// double output = MathUtil.clamp(this.anglePIDControllerNoProfile.calculate(this.getCurrentAngle()),
+		// -ArmConstants.kAngleMotorMaxSpeed, ArmConstants.kAngleMotorMaxSpeed);
+		double output = MathUtil.clamp(this.anglePIDController.calculate(this.getCurrentAngle()),
 				-ArmConstants.kAngleMotorMaxSpeed, ArmConstants.kAngleMotorMaxSpeed);
 		return output;
 	}
@@ -240,10 +245,29 @@ public class ArmSubsystem extends SubsystemBase {
 			}
 
 		}, (interrupted) -> {
+			Robot.print("Finished homing arm");
 			if (!interrupted) {
 				this.lengthCANCoder.setPosition(0.0);
+				this.angleCANCoder.setPosition(0.0);
 			}
 		}, () -> (!this.retractLimit.get() && !this.bottomAngleLimit.get()) || this.shoudlArmMove(), this);
+	}
+
+	public Command setStateCommand(ArmState newState) {
+		return new FunctionalCommand(() -> {
+			this.setState(newState);
+		}, () -> {
+			this.setAngleMotorWithLimits(this.calculateAngleMotorOutput());
+			if (this.anglePIDController.atGoal()) {
+				this.setLengthMotorWithLimits(this.calculateLengthMotorOutput());
+			}
+		}, (interrupted) -> {
+			this.setAngleMotorWithLimits(0.0);
+			this.setLengthMotorWithLimits(0.0);
+		}, () -> {
+			return false;
+		}, this);
+
 	}
 
 	public boolean shoudlArmMove() {
