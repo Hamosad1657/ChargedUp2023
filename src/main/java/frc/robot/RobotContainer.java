@@ -33,10 +33,11 @@ public class RobotContainer {
 	private SendableChooser<Command> comboxChooser;
 
 	public RobotContainer() {
-		RobotContainer.driverA_Controller = new PS4Controller(RobotMap.kDriverAControllerUSBPort);
-		RobotContainer.driverB_Controller = new PS4Controller(RobotMap.kDriverBControllerUSBPort);
-		this.driverA_CommandController = new CommandPS4Controller(0);
-		this.driverB_CommandController = new CommandPS4Controller(1);
+		RobotContainer.driverA_Controller = new PS4Controller(RobotMap.kDriverA_ControllerUSBPort);
+		RobotContainer.driverB_Controller = new PS4Controller(RobotMap.kDriverB_ControllerUSBPort);
+		this.driverA_CommandController = new CommandPS4Controller(RobotMap.kDriverA_ControllerUSBPort);
+		this.driverB_CommandController = new CommandPS4Controller(RobotMap.kDriverB_ControllerUSBPort);
+
 		this.arm = ArmSubsystem.getInstance();
 		this.grabber = GrabberSubsystem.getInstance();
 		this.intake = IntakeSubsystem.getInstance();
@@ -51,21 +52,18 @@ public class RobotContainer {
 
 	private void configureButtonsBindings() {
 		this.driverA_CommandController.share().onTrue(new InstantCommand(this.swerve::zeroGyro));
-		this.driverA_CommandController.circle().onTrue(new InstantCommand(() -> this.swerve.resetEstimatedPose(new Pose2d())));
-		this.driverA_CommandController.circle().onTrue(new InstantCommand(this.swerve::resetOdometry));
 		this.driverA_CommandController.cross().onTrue(this.swerve.crossLockWheelsCommand());
 		this.driverA_CommandController.triangle().onTrue(new InstantCommand(this.swerve::toggleSwerveSpeed));
-		this.driverA_CommandController.PS().onTrue(new InstantCommand(this.swerve::modulesToZero, this.swerve));
-
-		this.driverB_CommandController.circle().onTrue(this.grabber.toggleGrabberSolenoidCommand());
-
-		this.driverB_CommandController.share().onTrue(this.arm.homeCommand());
-		this.driverB_CommandController.options().onTrue(this.arm.resetLengthCANCoderPositionCommand());
 
 		this.driverA_CommandController.R2().onTrue(this.intake.lowerIntakeCommand());
 		this.driverA_CommandController.L2().onTrue(this.intake.raiseIntakeCommand());
 
-		this.driverA_CommandController.share().onTrue(new InstantCommand(this.swerve::zeroGyro));
+		this.driverB_CommandController.circle()
+				.onTrue(new InstantCommand(this.grabber::onGrabberButtonPressed, this.grabber))
+				.onFalse(new InstantCommand(this.grabber::onGrabberButtonReleased, this.grabber));
+
+		this.driverB_CommandController.share().onTrue(this.arm.homeCommand());
+		this.driverB_CommandController.options().onTrue(this.arm.resetLengthCANCoderPositionCommand());
 	}
 
 	private void setDefaultCommands() {
