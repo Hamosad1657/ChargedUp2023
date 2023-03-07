@@ -73,11 +73,11 @@ public class HaCANSparkMax extends HaMotorController {
 
 	@Override
 	public void configPID(PIDGains pidGains) {
-		this.PIDController.setP(pidGains.p);
-		this.PIDController.setI(pidGains.i);
-		this.PIDController.setD(pidGains.d);
-		this.PIDController.setFF(pidGains.ff);
-		this.PIDController.setIZone(pidGains.iZone);
+		this.PIDController.setP(pidGains.kP);
+		this.PIDController.setI(pidGains.kI);
+		this.PIDController.setD(pidGains.kD);
+		this.PIDController.setFF(pidGains.kFF);
+		this.PIDController.setIZone(pidGains.kIZone);
 	}
 
 	@Override
