@@ -1,6 +1,7 @@
 
 package frc.robot;
 
+import com.hamosad1657.lib.math.HaUnits;
 import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -31,8 +32,8 @@ public class RobotContainer {
 	private SendableChooser<Command> comboxChooser;
 
 	public RobotContainer() {
-		RobotContainer.driverA_Controller = new PS4Controller(RobotMap.kDriverA_ControllerUSBPort);
-		RobotContainer.driverB_Controller = new PS4Controller(RobotMap.kDriverB_ControllerUSBPort);
+		driverA_Controller = new PS4Controller(RobotMap.kDriverA_ControllerUSBPort);
+		driverB_Controller = new PS4Controller(RobotMap.kDriverB_ControllerUSBPort);
 		this.driverA_CommandController = new CommandPS4Controller(RobotMap.kDriverA_ControllerUSBPort);
 		this.driverB_CommandController = new CommandPS4Controller(RobotMap.kDriverB_ControllerUSBPort);
 
@@ -70,7 +71,11 @@ public class RobotContainer {
 		this.driverB_CommandController.povRight().onTrue(new InstantCommand(() -> this.arm.setState(ArmState.kHome)));
 		this.driverB_CommandController.triangle().onTrue(new InstantCommand(() -> this.arm.setState(ArmState.kShelf)));
 
-		// below this is Mark's try to do CommandPS4Controller
+		this.driverB_CommandController.square().whileTrue(this.arm.openLoopTeleopArmCommand(
+				() -> HaUnits.deadband(driverB_Controller.getLeftY(), kJoystickDeadband),
+				() -> HaUnits.deadband((driverB_Controller.getR2Axis() + 1.0), kJoystickDeadband),
+				() -> HaUnits.deadband((driverB_Controller.getL2Axis() + 1.0), kJoystickDeadband), driverB_Controller));
+
 		this.driverB_CommandController.share().onTrue(this.arm.homeCommand());
 		this.driverB_CommandController.options().onTrue(new InstantCommand(() -> this.arm.resetLengthCANCoder()));
 	}
