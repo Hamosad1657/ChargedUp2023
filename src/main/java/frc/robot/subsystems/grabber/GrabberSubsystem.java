@@ -4,8 +4,6 @@ package frc.robot.subsystems.grabber;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -30,9 +28,6 @@ public class GrabberSubsystem extends SubsystemBase {
 		motor.setSmartCurrentLimit(GrabberConstants.kMaxAmper);
 
 		this.isCollecting = false;
-
-		ShuffleboardTab tab = Shuffleboard.getTab("Arm");
-		tab.add("Grabber Motor", this.motor);
 	}
 
 	public void onGrabberButtonPressed() {
