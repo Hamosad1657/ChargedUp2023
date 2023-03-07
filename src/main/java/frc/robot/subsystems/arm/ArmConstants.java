@@ -6,7 +6,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 
 public class ArmConstants {
-	public static final double kArmAngleSpeedRatio = 0.3;
+	public static final double kAngleMotorMaxSpeed = 0.3;
 	public static final double kArmLengthSpeedRatio = -0.6;
 
 	public static final double kAngleCANCoderOffsetDeg = 352.8;
@@ -44,7 +44,7 @@ public class ArmConstants {
 	public static final double kMinArmLengthDeg = 0;
 	public static final double kMaxArmLengthDeg = 0;
 
-	public static final double kMaxLengthMotorOutput = 0.7;
+	public static final double kLengthMotorMaxOutput = 0.7;
 
 	public static double maxLengthForAngle(double angle) {
 		// return (-0.434085 * angle * angle) + (96.3868 * angle) - 250.936;

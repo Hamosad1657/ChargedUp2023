@@ -2,16 +2,10 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.PS4Controller;
-import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import java.util.function.BiConsumer;
-import com.hamosad1657.lib.math.HaUnits;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.util.concurrent.Event;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
 import frc.robot.commands.swerve.paths.SwervePathConstants;
@@ -24,7 +18,6 @@ import frc.robot.subsystems.swerve.SwerveSubsystem;
 import frc.robot.subsystems.turret.TurretSubsystem;
 
 public class RobotContainer {
-
 	public static final double kJoystickDeadband = 0.075;
 
 	public static PS4Controller driverA_Controller, driverB_Controller;
@@ -42,11 +35,13 @@ public class RobotContainer {
 		RobotContainer.driverB_Controller = new PS4Controller(RobotMap.kDriverB_ControllerUSBPort);
 		this.driverA_CommandController = new CommandPS4Controller(RobotMap.kDriverA_ControllerUSBPort);
 		this.driverB_CommandController = new CommandPS4Controller(RobotMap.kDriverB_ControllerUSBPort);
+
 		this.arm = ArmSubsystem.getInstance();
 		this.grabber = GrabberSubsystem.getInstance();
 		this.intake = IntakeSubsystem.getInstance();
 		this.turret = TurretSubsystem.getInstance();
 		this.swerve = SwerveSubsystem.getInstance();
+
 		this.configureButtonsBindings();
 		this.setDefaultCommands();
 		this.createPathsComboBox();
@@ -63,22 +58,21 @@ public class RobotContainer {
 		this.driverB_CommandController.circle()
 				.onTrue(new InstantCommand(this.grabber::onGrabberButtonPressed, this.grabber))
 				.onFalse(new InstantCommand(this.grabber::onGrabberButtonReleased, this.grabber));
-		EventLoop buttonsLoop = CommandScheduler.getInstance().getDefaultButtonLoop();
-		// below there is a first option to use black controller POV
 
+		// Arm states - First option (up to move up, down to move down)
 		// driverB_Controller.povUp(buttonsLoop).ifHigh(this.arm::moveArmStateUp);
 		// driverB_Controller.povDown(buttonsLoop).ifHigh(this.arm::moveArmStateDown);
 
-		// below there is a second option to use black controller POV
-		driverB_Controller.povUp(buttonsLoop).ifHigh(() -> this.arm.setArmState(ArmState.kHigh));
-		driverB_Controller.povDown(buttonsLoop).ifHigh(() -> this.arm.setArmState(ArmState.kLow));
-		driverB_Controller.povLeft(buttonsLoop).ifHigh(() -> this.arm.setArmState(ArmState.kMid));
-		driverB_Controller.povRight(buttonsLoop).ifHigh(() -> this.arm.setArmState(ArmState.kHome));
-		this.driverA_Cross.onTrue(new InstantCommand(() -> this.arm.setArmState(ArmState.kShelf)));
+		// Arm states - Second option (button for each state)
+		this.driverB_CommandController.povUp().onTrue(new InstantCommand(() -> this.arm.setState(ArmState.kHigh)));
+		this.driverB_CommandController.povLeft().onTrue(new InstantCommand(() -> this.arm.setState(ArmState.kMid)));
+		this.driverB_CommandController.povDown().onTrue(new InstantCommand(() -> this.arm.setState(ArmState.kLow)));
+		this.driverB_CommandController.povRight().onTrue(new InstantCommand(() -> this.arm.setState(ArmState.kHome)));
+		this.driverB_CommandController.triangle().onTrue(new InstantCommand(() -> this.arm.setState(ArmState.kShelf)));
 
-		//below this is Mark's try to do CommandPS4Controller
+		// below this is Mark's try to do CommandPS4Controller
 		this.driverB_CommandController.share().onTrue(this.arm.homeCommand());
-		this.driverB_CommandController.options().onTrue(this.arm.resetLengthCANCoderPositionCommand());
+		this.driverB_CommandController.options().onTrue(new InstantCommand(() -> this.arm.resetLengthCANCoder()));
 	}
 
 	private void setDefaultCommands() {
@@ -93,10 +87,11 @@ public class RobotContainer {
 		// this.turret.setDefaultCommand(this.turret.closedLoopTeleopTurretCommand(driverB_Controller::getRightX));
 
 		// Teleop arm open/close - R2 open, L2 close, left Y for angle
-		this.arm.setDefaultCommand(this.arm.openLoopTeleopArmCommand(
-				() -> HaUnits.deadband(driverB_Controller.getLeftY(), kJoystickDeadband),
-				() -> HaUnits.deadband((driverB_Controller.getR2Axis() + 1.0), kJoystickDeadband),
-				() -> HaUnits.deadband((driverB_Controller.getL2Axis() + 1.0), kJoystickDeadband), driverB_Controller));
+		this.arm.setDefaultCommand(this.arm.getToStateCommand());
+		// this.arm.setDefaultCommand(this.arm.openLoopTeleopArmCommand(
+		// () -> HaUnits.deadband(driverB_Controller.getLeftY(), kJoystickDeadband),
+		// () -> HaUnits.deadband((driverB_Controller.getR2Axis() + 1.0), kJoystickDeadband),
+		// () -> HaUnits.deadband((driverB_Controller.getL2Axis() + 1.0), kJoystickDeadband), driverB_Controller));
 
 		// Keep intake up
 		this.intake.setDefaultCommand(this.intake.keepIntakeUpCommand());
