@@ -65,8 +65,8 @@ public final class SwervePathConstants {
 	public static void createCommands() {
 		SwervePathConstants.kPathCommandsMap.put("ArmHigh", arm.setStateCommand(ArmState.kHigh));
 		SwervePathConstants.kPathCommandsMap.put("HomeArm", arm.homeCommand().withTimeout(5.0));
-		SwervePathConstants.kPathCommandsMap.put("ReleaseGamePiece", grabber.releaseGamePieceCommand());
-		SwervePathConstants.kPathCommandsMap.put("CollectGamePiece", grabber.collectGamePieceCommand());
+		SwervePathConstants.kPathCommandsMap.put("ReleaseGamePiece", grabber.releaseCommand());
+		SwervePathConstants.kPathCommandsMap.put("CollectGamePiece", grabber.collectCommand());
 		SwervePathConstants.kPathCommandsMap.put("OpenIntake", intake.lowerIntakeCommand());
 		SwervePathConstants.kPathCommandsMap.put("CloseIntake", intake.raiseIntakeCommand());
 		SwervePathConstants.kPathCommandsMap.put("WaitABit", new WaitCommand(0.15));

@@ -69,8 +69,8 @@ public class RobotContainer {
 		this.driverA_Triangle.onTrue(new InstantCommand(this.swerve::toggleSwerveSpeed));
 		this.driverA_PS.onTrue(new InstantCommand(this.swerve::modulesToZero, this.swerve));
 
-		this.driverB_Circle.whileTrue(this.grabber.releaseGamePieceCommand());
-		this.driverB_Cross.whileTrue(this.grabber.collectGamePieceCommand());
+		this.driverB_Circle.onTrue(new InstantCommand(this.grabber::onGrabberButtonPressed, this.grabber));
+		this.driverB_Circle.onFalse(new InstantCommand(this.grabber::onGrabberButtonReleased, this.grabber));
 
 		this.driverB_Share.onTrue(this.arm.homeCommand());
 		this.driverB_Options.onTrue(this.arm.resetLengthCANCoderPositionCommand());
