@@ -59,9 +59,11 @@ public class ArmConstants {
 		return 2600.0;
 	}
 
+	public static final ArmState[] kArmStates = { ArmState.kHome, ArmState.kLow, ArmState.kMid, ArmState.kHigh };
+
 	public static enum ArmState {
 		// Uses the relativity of the encoders as setpoints
-		kHigh(83.0, 2100.0);
+		kHigh(83.0, 2100.0), kMid(0.0, 0.0), kLow(0.0, 0.0), kShelf(0.0, 0.0), kHome(0.0, 0.0);
 
 		public final double angleDeg;
 		public final double lengthDeg;

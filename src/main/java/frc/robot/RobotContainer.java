@@ -2,18 +2,23 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.PS4Controller;
+import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import java.util.function.BiConsumer;
 import com.hamosad1657.lib.math.HaUnits;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.util.concurrent.Event;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.swerve.paths.SwervePathConstants;
 import frc.robot.commands.swerve.teleop.TeleopDriveCommand;
 import frc.robot.subsystems.arm.ArmSubsystem;
+import frc.robot.subsystems.arm.ArmConstants.ArmState;
 import frc.robot.subsystems.grabber.GrabberSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
@@ -21,6 +26,7 @@ import frc.robot.subsystems.turret.TurretSubsystem;
 
 public class RobotContainer {
 	public static PS4Controller driverA_Controller, driverB_Controller;
+	public static CommandPS4Controller driverB_CommandController;
 	public static final double kJoystickDeadband = 0.075;
 
 	private final JoystickButton driverA_Share, driverA_R2, driverA_L2, driverA_PS, driverA_Circle, driverA_Cross,
@@ -37,13 +43,13 @@ public class RobotContainer {
 	public RobotContainer() {
 		driverA_Controller = new PS4Controller(RobotMap.kDriverAControllerUSBPort);
 		driverB_Controller = new PS4Controller(RobotMap.kDriverBControllerUSBPort);
+		driverB_CommandController = new CommandPS4Controller(RobotMap.kDriverBControllerUSBPort);
 
 		this.arm = ArmSubsystem.getInstance();
 		this.grabber = GrabberSubsystem.getInstance();
 		this.intake = IntakeSubsystem.getInstance();
 		this.turret = TurretSubsystem.getInstance();
 		this.swerve = SwerveSubsystem.getInstance();
-
 		this.driverA_Share = new JoystickButton(driverA_Controller, PS4Controller.Button.kShare.value);
 		this.driverA_R2 = new JoystickButton(driverA_Controller, PS4Controller.Button.kR2.value);
 		this.driverA_L2 = new JoystickButton(driverA_Controller, PS4Controller.Button.kL2.value);
@@ -73,6 +79,22 @@ public class RobotContainer {
 
 		this.driverB_Share.onTrue(this.arm.homeCommand());
 		this.driverB_Options.onTrue(this.arm.resetLengthCANCoderPositionCommand());
+
+		EventLoop buttonsLoop = CommandScheduler.getInstance().getDefaultButtonLoop();
+		// below there is a first option to use black controller POV
+
+		// driverB_Controller.povUp(buttonsLoop).ifHigh(this.arm::moveArmStateUp);
+		// driverB_Controller.povDown(buttonsLoop).ifHigh(this.arm::moveArmStateDown);
+
+		// below there is a second option to use black controller POV
+		driverB_Controller.povUp(buttonsLoop).ifHigh(() -> this.arm.setArmState(ArmState.kHigh));
+		driverB_Controller.povDown(buttonsLoop).ifHigh(() -> this.arm.setArmState(ArmState.kLow));
+		driverB_Controller.povLeft(buttonsLoop).ifHigh(() -> this.arm.setArmState(ArmState.kMid));
+		driverB_Controller.povRight(buttonsLoop).ifHigh(() -> this.arm.setArmState(ArmState.kHome));
+		this.driverA_Cross.onTrue(new InstantCommand(() -> this.arm.setArmState(ArmState.kShelf)));
+
+		//below this is Mark's try to do CommandPS4Controller
+		
 
 		this.driverA_R2.onTrue(this.intake.lowerIntakeCommand());
 		this.driverA_L2.onTrue(this.intake.raiseIntakeCommand());

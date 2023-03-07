@@ -1,6 +1,7 @@
 
 package frc.robot.subsystems.arm;
 
+import java.util.ArrayList;
 import java.util.function.DoubleSupplier;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
@@ -27,6 +28,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.arm.ArmConstants.ArmState;
 import frc.robot.RobotContainer;
 import frc.robot.RobotMap;
+import java.util.ArrayList;
 
 public class ArmSubsystem extends SubsystemBase {
 	private static ArmSubsystem instance;
@@ -51,6 +53,7 @@ public class ArmSubsystem extends SubsystemBase {
 	private final GenericEntry extendLimitEntry, retractLimitEntry, topAngleLimitEntry, bottomAngleLimitEntry,
 			angleMotorOutputEntry;
 	private ArmState currentState;
+	private int currentStateIndex;
 	private boolean shouldOverrideLimits = false;
 
 	// Angle lowers when you go up
@@ -86,6 +89,8 @@ public class ArmSubsystem extends SubsystemBase {
 		this.retractLimit = new DigitalInput(RobotMap.kArmRetractLimitPort);
 		this.bottomAngleLimit = new DigitalInput(RobotMap.kBottomArmAngleLimitport);
 		this.topAngleLimit = new DigitalInput(RobotMap.kTopArmAngleLimitport);
+
+		this.currentStateIndex = 0;
 
 		ShuffleboardTab armTab = Shuffleboard.getTab("Arm");
 		// armTab.add("Arm Angle Motor", this.armAngleMotor);
@@ -412,6 +417,25 @@ public class ArmSubsystem extends SubsystemBase {
 
 	public Command resetLengthCANCoderPositionCommand() {
 		return new InstantCommand(() -> this.armLengthCANCoder.setPosition(0.0));
+
+	}
+
+	public void moveArmStateUp() {
+		if (this.currentStateIndex < ArmConstants.kArmStates.length) {
+			this.currentStateIndex++;
+			this.currentState = ArmConstants.kArmStates[this.currentStateIndex];
+		}
+	}
+
+	public void moveArmStateDown() {
+		if (this.currentStateIndex > 0) {
+			this.currentStateIndex--;
+			this.currentState = ArmConstants.kArmStates[this.currentStateIndex];
+		}
+	}
+
+	public void setArmState(ArmState armState) {
+		this.currentState = armState;
 	}
 
 	@Override
