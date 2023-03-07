@@ -53,4 +53,6 @@ public class RobotMap {
 	public static final int kArmExtendLimitPort = 2;
 	public static final int kBottomArmAngleLimitport = 4;
 	public static final int kTopArmAngleLimitport = 5;
+	public static final int kIntakeRaiseLimitPort = 6;
+	public static final int kIntakeBottomLimitPort = 7;
 }
