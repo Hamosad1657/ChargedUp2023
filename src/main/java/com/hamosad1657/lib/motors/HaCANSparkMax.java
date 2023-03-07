@@ -232,4 +232,20 @@ public class HaCANSparkMax extends HaMotorController {
 		return this.controlRefrence;
 	}
 
+	/**
+	 * Sets the current limit in Amps.
+	 * 
+	 * The motor controller will reduce the controller voltage output to avoid surpassing this limit. This limit is
+	 * enabled by default and used for brushless only. This limit is highly recommended when using the NEO brushless
+	 * motor.
+	 * 
+	 * The NEO Brushless Motor has a low internal resistance, which can mean large current spikes that could be enough
+	 * to cause damage to the motor and controller. This current limit provides a smarter strategy to deal with high
+	 * current draws and keep the motor and controller operating in a safe region.
+	 * 
+	 * @param limit - The current limit in Amps.
+	 */
+	public void setSmartCurrentLimit(int limit) {
+		this.motor.setSmartCurrentLimit(limit);
+	}
 }
