@@ -38,7 +38,7 @@ public final class SwervePathConstants {
 	 * radians/second for every radian of error.
 	 */
 
-	public static final HaUnits.PIDGains kXControllerGains = new HaUnits.PIDGains(3.5, 0.0, 0.0);
+	public static final HaUnits.PIDGains kXControllerGains = new HaUnits.PIDGains(8.0, 0.0, 0.0);
 	public static final HaUnits.PIDGains kYControllerGains = kXControllerGains;
 	public static final HaUnits.PIDGains kRotationControllerGains = new HaUnits.PIDGains(-10.0, 0.0, 0.0);
 
