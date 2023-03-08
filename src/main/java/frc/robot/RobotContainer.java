@@ -90,7 +90,7 @@ public class RobotContainer {
 
 		// Teleop arm open/close - R2 open, L2 close, left Y for angle
 		// this.arm.setDefaultCommand(this.arm.getToStateCommand());
-		this.arm.setDefaultCommand(this.arm.openLoopTeleopArmCommand(
+		this.arm.setDefaultCommand(this.arm.openLoopTeleopCommand(
 				() -> HaUnits.deadband(driverB_Controller.getLeftY(), kJoystickDeadband),
 				() -> HaUnits.deadband((driverB_Controller.getR2Axis() + 1.0), kJoystickDeadband),
 				() -> HaUnits.deadband((driverB_Controller.getL2Axis() + 1.0), kJoystickDeadband), driverB_Controller));

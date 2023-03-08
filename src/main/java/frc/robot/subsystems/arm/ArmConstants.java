@@ -13,17 +13,13 @@ public class ArmConstants {
 	public static final double kLengthEncoderOffset = 0.0;
 
 	public static final PIDGains kArmAnglePIDGains = new PIDGains(0.02, 0.00001, 0.0);
-	// public static final PIDGains kArmAnglePIDGains = new PIDGains(0.05, 0.0, 0.0);
 	public static final double kArmAngleTolerance = 3.0;
 
 	public static final PIDGains kArmLengthPIDGains = new PIDGains(0.0028, 0.0003, 0.0);
-	// public static final PIDGains kArmLengthPIDGains = new PIDGains(0.0, 0.0, 0.0);
 	public static final double kArmLengthTolerance = 150.0;
 
 	public static final double kMaxAngleVelocityRadPS = Math.PI / 4.0;
 	public static final double kMaxAngleAccelerationRadPSSquared = kMaxAngleVelocityRadPS / 2.0;
-	public static final Constraints kAnglePIDConstrains = new TrapezoidProfile.Constraints(
-			ArmConstants.kMaxAngleVelocityRadPS, ArmConstants.kMaxAngleAccelerationRadPSSquared);
 
 	public static final ArmState[] kArmStates = { ArmState.kHome, ArmState.kLow, ArmState.kMid, ArmState.kHigh };
 

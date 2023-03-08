@@ -43,8 +43,7 @@ public class ArmSubsystem extends SubsystemBase {
 	private final HaTalonSRX lengthMotor;
 	private final HaCANCoder angleCANCoder, lengthCANCoder;
 
-	private final ProfiledPIDController anglePIDController;
-	private final PIDController anglePIDControllerNoProfile;
+	private final PIDController anglePIDController;
 	private final PIDController lengthPIDController;
 
 	private final DigitalInput extendLimit, retractLimit, bottomAngleLimit, topAngleLimit;
@@ -73,10 +72,7 @@ public class ArmSubsystem extends SubsystemBase {
 		this.lengthCANCoder.setMeasurmentRange(AbsoluteSensorRange.Unsigned_0_to_360);
 		this.lengthCANCoder.setPosition(0.0);
 
-		this.anglePIDControllerNoProfile = ArmConstants.kArmAnglePIDGains.toPIDController();
-
-		this.anglePIDController = ArmConstants.kArmAnglePIDGains
-				.toProfiledPIDController(ArmConstants.kAnglePIDConstrains);
+		this.anglePIDController = ArmConstants.kArmAnglePIDGains.toPIDController();
 		this.anglePIDController.setTolerance(ArmConstants.kArmAngleTolerance);
 
 		this.lengthPIDController = ArmConstants.kArmLengthPIDGains.toPIDController();
@@ -118,7 +114,7 @@ public class ArmSubsystem extends SubsystemBase {
 	 * @param newState - The new arm state.
 	 */
 	public void setState(ArmState newState) {
-		this.anglePIDController.setGoal(newState.angleDeg);
+		this.anglePIDController.setSetpoint(newState.angleDeg);
 		this.lengthPIDController.setSetpoint(newState.lengthDeg);
 	}
 
@@ -160,7 +156,7 @@ public class ArmSubsystem extends SubsystemBase {
 	 * @return If both the angle and length motors are at their setpoint.
 	 */
 	public boolean isAtSetpoint() {
-		return this.anglePIDController.atGoal() && this.lengthPIDController.atSetpoint();
+		return this.anglePIDController.atSetpoint() && this.lengthPIDController.atSetpoint();
 	}
 
 	public Command getToStateCommand() {
@@ -255,7 +251,7 @@ public class ArmSubsystem extends SubsystemBase {
 			this.setState(newState);
 		}, () -> {
 			this.setAngleMotorWithLimits(this.calculateAngleMotorOutput());
-			if (this.anglePIDController.atGoal()) {
+			if (this.anglePIDController.atSetpoint()) {
 				this.setLengthMotorWithLimits(this.calculateLengthMotorOutput());
 			}
 		}, (interrupted) -> {
