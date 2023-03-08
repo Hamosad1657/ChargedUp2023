@@ -81,11 +81,14 @@ public class RobotContainer {
 		// this.turret.setDefaultCommand(this.turret.closedLoopTeleopTurretCommand(driverB_Controller::getRightX));
 
 		// Teleop arm open/close - R2 open, L2 close, left Y for angle
-		// this.arm.setDefaultCommand(this.arm.getToStateCommand());
-		this.arm.setDefaultCommand(this.arm.openLoopTeleopCommand(
+		this.arm.setDefaultCommand(this.arm.closedLoopTeleopCommand(
 				() -> HaUnits.deadband(driverB_Controller.getLeftY(), kJoystickDeadband),
 				() -> HaUnits.deadband((driverB_Controller.getR2Axis() + 1.0), kJoystickDeadband),
-				() -> HaUnits.deadband((driverB_Controller.getL2Axis() + 1.0), kJoystickDeadband), driverB_Controller));
+				() -> HaUnits.deadband((driverB_Controller.getL2Axis() + 1.0), kJoystickDeadband)));
+		// this.arm.setDefaultCommand(this.arm.openLoopTeleopCommand(
+		// () -> HaUnits.deadband(driverB_Controller.getLeftY(), kJoystickDeadband),
+		// () -> HaUnits.deadband((driverB_Controller.getR2Axis() + 1.0), kJoystickDeadband),
+		// () -> HaUnits.deadband((driverB_Controller.getL2Axis() + 1.0), kJoystickDeadband)));
 
 		// Keep intake up
 		this.intake.setDefaultCommand(this.intake.keepIntakeUpCommand());

@@ -11,8 +11,8 @@ public class ArmConstants {
 	public static final double kAngleEncoderOffset = 0.0;
 	public static final double kLengthEncoderOffset = 0.0;
 
-	public static final double kHomingAngleOutput = -0.325;
-	public static final double kHomingLengthOutput = 0.95;
+	public static final double kHomingAngleOutput = -0.375;
+	public static final double kHomingLengthOutput = 1.0;
 
 	public static final PIDGains kAnglePIDGains = new PIDGains(0.02, 0.0, 0.0);
 	public static final double kAngleTolerance = 2.0;
@@ -24,6 +24,10 @@ public class ArmConstants {
 	public static final double kAngleMaxAccelerationDegPS = 200.0;
 	public static final Constraints kAnglePIDConstrains = new Constraints(kAngleMaxVelocityDegPS,
 			kAngleMaxAccelerationDegPS);
+
+	public static final double kAngleTeleopSetpointMultiplier = 1.25;
+	public static final double kAngleMaxSetpoint = 118.0;
+	public static final double kAngleMinSetpoint = 35.0;
 
 	public static final PIDGains kArmLengthPIDGains = new PIDGains(0.00125, 0.0, 0.0);
 	public static final double kLengthTolerance = 100.0;

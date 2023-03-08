@@ -14,14 +14,12 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.RobotMap;
 import frc.robot.subsystems.arm.ArmConstants.ArmState;
@@ -47,6 +45,9 @@ public class ArmSubsystem extends SubsystemBase {
 	private final PIDController lengthPIDController;
 
 	private final DigitalInput extendLimit, retractLimit, bottomAngleLimit, topAngleLimit;
+
+	private final double homeAngle;
+	private double teleopAngleSetpointDeg;
 
 	public ArmSubsystem() {
 		this.angleMotor = new CANSparkMax(RobotMap.kArmAngleMotorID, MotorType.kBrushless);
@@ -81,9 +82,11 @@ public class ArmSubsystem extends SubsystemBase {
 		this.extendLimit = new DigitalInput(RobotMap.kArmExtendLimitPort);
 		this.retractLimit = new DigitalInput(RobotMap.kArmRetractLimitPort);
 
+		this.teleopAngleSetpointDeg = this.homeAngle = this.getCurrentAngle();
+
 		ShuffleboardTab armTab = Shuffleboard.getTab("Arm");
 
-		armTab.add("Arm Length Motor", this.lengthMotor).withPosition(0, 0).withSize(2, 5);
+		armTab.add("Arm Length Motor", this.lengthMotor).withPosition(0, 0).withSize(2, 4);
 		armTab.add("Arm Angle CANCoder", this.angleCANCoder).withPosition(2, 0).withSize(2, 2);
 		armTab.add("Arm Length CANCoder", this.lengthCANCoder).withPosition(4, 0).withSize(2, 2);
 
@@ -92,9 +95,7 @@ public class ArmSubsystem extends SubsystemBase {
 		armTab.addBoolean("Top Angle Limit", () -> !this.topAngleLimit.get()).withPosition(4, 2).withSize(2, 1);
 		armTab.addBoolean("Bottom Angle Limit", () -> !this.bottomAngleLimit.get()).withPosition(4, 3).withSize(2, 1);
 
-		armTab.addDouble("Length Error", this.lengthPIDController::getPositionError);
-		armTab.addDouble("Current Length", this::getCurrentLength);
-		armTab.addDouble("Length Motor Output", this.lengthMotor::get);
+		armTab.addDouble("Angle Setpoint", () -> this.anglePIDController.getGoal().position);
 	}
 
 	public void resetLengthCANCoder() {
@@ -174,7 +175,19 @@ public class ArmSubsystem extends SubsystemBase {
 	 */
 	public void setState(ArmState newState) {
 		this.anglePIDController.setGoal(newState.angleDeg);
+		this.teleopAngleSetpointDeg = newState.angleDeg;
 		this.lengthPIDController.setSetpoint(newState.lengthDeg);
+	}
+
+	/**
+	 * Sets the setpoint of the arm and length motors to the new arm state.
+	 * 
+	 * @param newState - The new arm state.
+	 */
+	public void setState(double angleDeg, double lengthDeg) {
+		this.anglePIDController.setGoal(angleDeg);
+		this.teleopAngleSetpointDeg = angleDeg;
+		this.lengthPIDController.setSetpoint(lengthDeg);
 	}
 
 	public Command getToStateCommand(ArmState newState) {
@@ -195,10 +208,34 @@ public class ArmSubsystem extends SubsystemBase {
 	 * @param backwardsOutputSupplier - The output supplier for the arm's backwards retraction.
 	 */
 	public Command openLoopTeleopCommand(DoubleSupplier angleOutputSupplier, DoubleSupplier forwardsOutputSupplier,
-			DoubleSupplier backwardsOutputSupplier, PS4Controller controller) {
+			DoubleSupplier backwardsOutputSupplier) {
 		return new RunCommand(() -> {
 			// Set angle motor
 			this.setAngleMotorWithLimits(angleOutputSupplier.getAsDouble() * -ArmConstants.kAngleMotorMaxOutput);
+
+			// Set length motors
+			double lengthSupplierValue = backwardsOutputSupplier.getAsDouble() - forwardsOutputSupplier.getAsDouble();
+			this.setLengthMotorWithLimits(lengthSupplierValue * ArmConstants.kLengthMotorMaxOutput);
+		}, this);
+	}
+
+	/**
+	 * Returns a RunCommand to manually change the arm's state using 3 output suppliers.
+	 * 
+	 * @param angleOutputSupplier     - The output supplier for the angle motor.
+	 * @param forwardsOutputSupplier  - The output supplier for the arm's forwards extension.
+	 * @param backwardsOutputSupplier - The output supplier for the arm's backwards retraction.
+	 */
+	public Command closedLoopTeleopCommand(DoubleSupplier angleOutputSupplier, DoubleSupplier forwardsOutputSupplier,
+			DoubleSupplier backwardsOutputSupplier) {
+		return new RunCommand(() -> {
+			// Set angle motor
+			this.teleopAngleSetpointDeg += angleOutputSupplier.getAsDouble()
+					* -ArmConstants.kAngleTeleopSetpointMultiplier;
+			this.teleopAngleSetpointDeg = MathUtil.clamp(this.teleopAngleSetpointDeg, ArmConstants.kAngleMinSetpoint,
+					ArmConstants.kAngleMaxSetpoint);
+			this.anglePIDController.setGoal(this.teleopAngleSetpointDeg);
+			this.setAngleMotorWithLimits(this.calculateAngleMotorOutput());
 
 			// Set length motors
 			double lengthSupplierValue = backwardsOutputSupplier.getAsDouble() - forwardsOutputSupplier.getAsDouble();
@@ -217,17 +254,17 @@ public class ArmSubsystem extends SubsystemBase {
 				this.setLengthMotorWithLimits(0.0);
 				if (this.bottomAngleLimit.get()) {
 					this.setAngleMotorWithLimits(ArmConstants.kHomingAngleOutput);
-				} else {
-					this.angleMotor.set(0.0);
 				}
 			}
-
 		}, (interrupted) -> {
-			Robot.print("Finished homing arm");
 			if (!interrupted && !this.shoudlArmMove()) {
 				this.lengthCANCoder.setPosition(0.0);
 				this.angleCANCoder.setPosition(0.0);
+
+				this.setAngleMotorWithLimits(0.0);
+				this.setLengthMotorWithLimits(0.0);
 			}
+			this.teleopAngleSetpointDeg = this.getCurrentAngle();
 		}, () -> (!this.retractLimit.get() && !this.bottomAngleLimit.get()) || this.shoudlArmMove(), this);
 	}
 
