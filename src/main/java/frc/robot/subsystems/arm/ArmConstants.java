@@ -11,8 +11,8 @@ public class ArmConstants {
 	public static final double kAngleEncoderOffset = 0.0;
 	public static final double kLengthEncoderOffset = 0.0;
 
-	public static final double kHomingAngleOutput = -0.275;
-	public static final double kHomingLengthOutput = 0.85;
+	public static final double kHomingAngleOutput = -0.325;
+	public static final double kHomingLengthOutput = 0.95;
 
 	public static final PIDGains kAnglePIDGains = new PIDGains(0.02, 0.0, 0.0);
 	public static final double kAngleTolerance = 2.0;
@@ -26,11 +26,11 @@ public class ArmConstants {
 			kAngleMaxAccelerationDegPS);
 
 	public static final PIDGains kArmLengthPIDGains = new PIDGains(0.00125, 0.0, 0.0);
-	public static final double kLengthTolerance = 150.0;
+	public static final double kLengthTolerance = 100.0;
 
 	public static enum ArmState {
 		// Uses the relativity of the encoders as setpoints
-		kHigh(115.0, 2800.0), kMid(92.0, 900.0), kLowCone(50.0, 1000.0), kLowCube(41.5, 1700.0), kShelf(106.0, 100.0);
+		kHigh(117.0, 2800.0), kMid(94.0, 1000.0), kLowCone(52.0, 1100.0), kLowCube(41.5, 1700.0), kShelf(106.0, 100.0);
 
 		public final double angleDeg;
 		public final double lengthDeg;
