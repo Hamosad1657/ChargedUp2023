@@ -56,25 +56,17 @@ public class RobotContainer {
 		this.driverA_CommandController.R2().onTrue(this.intake.lowerIntakeCommand());
 		this.driverA_CommandController.L2().onTrue(this.intake.raiseIntakeCommand());
 
-		this.driverB_CommandController.circle()
-				.onTrue(new InstantCommand(this.grabber::onGrabberButtonPressed, this.grabber))
-				.onFalse(new InstantCommand(this.grabber::onGrabberButtonReleased, this.grabber));
-
-		// Arm states - First option (up to move up, down to move down)
-		// driverB_Controller.povUp(buttonsLoop).ifHigh(this.arm::moveArmStateUp);
-		// driverB_Controller.povDown(buttonsLoop).ifHigh(this.arm::moveArmStateDown);
-
-		// Arm states - Second option (button for each state)
-		this.driverB_CommandController.povUp().onTrue(new InstantCommand(() -> this.arm.setState(ArmState.kHigh)));
-		this.driverB_CommandController.povLeft().onTrue(new InstantCommand(() -> this.arm.setState(ArmState.kMid)));
-		this.driverB_CommandController.povDown().onTrue(new InstantCommand(() -> this.arm.setState(ArmState.kLow)));
-		this.driverB_CommandController.povRight().onTrue(new InstantCommand(() -> this.arm.setState(ArmState.kHome)));
-		this.driverB_CommandController.triangle().onTrue(new InstantCommand(() -> this.arm.setState(ArmState.kShelf)));
-
-		this.driverB_CommandController.square().whileTrue(arm.getToStateCommand());
-
+		this.driverB_CommandController.povUp().onTrue(this.arm.getToStateCommand(ArmState.kHigh));
+		this.driverB_CommandController.povLeft().onTrue(this.arm.getToStateCommand(ArmState.kMid));
+		this.driverB_CommandController.povRight().onTrue(this.arm.getToStateCommand(ArmState.kLowCone));
+		this.driverB_CommandController.povDown().onTrue(this.arm.getToStateCommand(ArmState.kLowCube));
+		this.driverB_CommandController.options().onTrue(this.arm.getToStateCommand(ArmState.kShelf));
 		this.driverB_CommandController.share().onTrue(this.arm.homeCommand());
-		this.driverB_CommandController.options().onTrue(new InstantCommand(() -> this.arm.resetLengthCANCoder()));
+
+		this.driverB_CommandController.cross().onTrue(this.grabber.collectCommand());
+		this.driverB_CommandController.triangle().onTrue(this.grabber.releaseCommand());
+
+		this.driverB_CommandController.PS().onTrue(new InstantCommand(this.arm::resetLengthCANCoder));
 	}
 
 	private void setDefaultCommands() {

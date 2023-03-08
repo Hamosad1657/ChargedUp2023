@@ -21,11 +21,9 @@ public class ArmConstants {
 	public static final double kMaxAngleVelocityRadPS = Math.PI / 4.0;
 	public static final double kMaxAngleAccelerationRadPSSquared = kMaxAngleVelocityRadPS / 2.0;
 
-	public static final ArmState[] kArmStates = { ArmState.kHome, ArmState.kLow, ArmState.kMid, ArmState.kHigh };
-
 	public static enum ArmState {
 		// Uses the relativity of the encoders as setpoints
-		kHigh(80.0, 245.0), kMid(62.0, 817.0), kLow(10.0, 1498.0), kShelf(74.0, 397.0), kHome(1.0, 0.0);
+		kHigh(80.0, 245.0), kMid(62.0, 817.0), kLowCone(10.0, 1498.0), kLowCube(0.0, 0.0), kShelf(74.0, 397.0);
 
 		public final double angleDeg;
 		public final double lengthDeg;
