@@ -182,7 +182,7 @@ public class HaCANCoder implements Sendable {
 		builder.setSmartDashboardType("HaCANCoder");
 
 		builder.addDoubleProperty("Abs Angle (Deg)", this::getAbsAngleDeg, null);
-		builder.addDoubleProperty("Accumulated angle (Deg)", this.cancoder::getPosition, null);
+		builder.addDoubleProperty("Accumulated angle (Deg)", this::getPositionDeg, null);
 		// builder.addDoubleProperty("Velocity RPM", this::getVelocityRPM, null);
 		// builder.addDoubleProperty("Velocity DegPS", this::getVelocityDegPS, null);
 		// builder.addDoubleProperty("Velocity RadPS", this::getVelocityRadPS, null);
