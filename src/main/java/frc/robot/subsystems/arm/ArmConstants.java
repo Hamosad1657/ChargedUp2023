@@ -18,17 +18,15 @@ public class ArmConstants {
 	public static final double kAngleTolerance = 2.0;
 	public static final double kAngleMotorMaxPIDOutput = 0.5;
 	public static final double kAngleDownOutputRatio = 0.5;
+	public static final double kLengthExtendMinAngle = 40.0;
 
 	public static final double kAngleMaxVelocityDegPS = 120.0;
 	public static final double kAngleMaxAccelerationDegPS = 200.0;
 	public static final Constraints kAnglePIDConstrains = new Constraints(kAngleMaxVelocityDegPS,
 			kAngleMaxAccelerationDegPS);
 
-	public static final PIDGains kArmLengthPIDGains = new PIDGains(0.0028, 0.0, 0.0);
+	public static final PIDGains kArmLengthPIDGains = new PIDGains(0.00125, 0.0, 0.0);
 	public static final double kLengthTolerance = 150.0;
-
-	public static final double kMaxAngleVelocityRadPS = Math.PI / 4.0;
-	public static final double kMaxAngleAccelerationRadPSSquared = kMaxAngleVelocityRadPS / 2.0;
 
 	public static enum ArmState {
 		// Uses the relativity of the encoders as setpoints

@@ -77,6 +77,10 @@ public class HaTalonSRX extends HaBaseTalon {
 		this(new WPI_TalonSRX(motorID), new PIDGains(), kWheelRadNone, FeedbackDevice.None, kMaxPossibleMotorCurrent);
 	}
 
+	public void setInverted(boolean inverted) {
+		this.motor.setInverted(inverted);
+	}
+
 	// TalonSRX takes encoder ticks per 100 ms as velocity setpoint.
 	@Override
 	public void set(double value, Velocity type) {

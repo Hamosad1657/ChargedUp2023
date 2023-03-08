@@ -63,7 +63,7 @@ public class ArmSubsystem extends SubsystemBase {
 		this.lengthMotorB = new WPI_TalonSRX(RobotMap.kArmLengthMotorBID);
 		this.lengthMotorB.setNeutralMode(NeutralMode.Brake);
 		this.lengthMotorB.follow(this.lengthMotorA);
-		this.lengthMotor = new HaTalonSRX(lengthMotorA);
+		this.lengthMotor = new HaTalonSRX(this.lengthMotorA);
 
 		this.lengthCANCoder = new HaCANCoder(RobotMap.kArmLengthCANCoderID, ArmConstants.kLengthEncoderOffset);
 		this.lengthCANCoder.setReversed(true);
@@ -180,8 +180,8 @@ public class ArmSubsystem extends SubsystemBase {
 	public Command getToStateCommand(ArmState newState) {
 		return new FunctionalCommand(() -> this.setState(newState), () -> {
 			this.setAngleMotorWithLimits(this.calculateAngleMotorOutput());
-			if (this.anglePIDController.atSetpoint()) {
-				// this.setLengthMotorWithLimits(this.calculateLengthMotorOutput());
+			if (this.getCurrentAngle() > ArmConstants.kLengthExtendMinAngle) {
+				this.setLengthMotorWithLimits(this.calculateLengthMotorOutput());
 			}
 		}, (interrupted) -> {
 		}, this::shoudlArmMove, this);
