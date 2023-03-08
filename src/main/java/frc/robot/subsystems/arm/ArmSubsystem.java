@@ -19,7 +19,6 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
@@ -44,7 +43,7 @@ public class ArmSubsystem extends SubsystemBase {
 	private final HaTalonSRX lengthMotor;
 	private final HaCANCoder angleCANCoder, lengthCANCoder;
 
-	private final PIDController anglePIDController;
+	private final ProfiledPIDController anglePIDController;
 	private final PIDController lengthPIDController;
 
 	private final DigitalInput extendLimit, retractLimit, bottomAngleLimit, topAngleLimit;
@@ -71,7 +70,7 @@ public class ArmSubsystem extends SubsystemBase {
 		this.lengthCANCoder.setMeasurmentRange(AbsoluteSensorRange.Unsigned_0_to_360);
 		this.lengthCANCoder.setPosition(0.0);
 
-		this.anglePIDController = ArmConstants.kAnglePIDGains.toPIDController();
+		this.anglePIDController = ArmConstants.kAnglePIDGains.toProfiledPIDController(ArmConstants.kAnglePIDConstrains);
 		this.anglePIDController.setTolerance(ArmConstants.kAngleTolerance);
 
 		this.lengthPIDController = ArmConstants.kArmLengthPIDGains.toPIDController();
@@ -93,8 +92,9 @@ public class ArmSubsystem extends SubsystemBase {
 		armTab.addBoolean("Top Angle Limit", () -> !this.topAngleLimit.get()).withPosition(4, 2).withSize(2, 1);
 		armTab.addBoolean("Bottom Angle Limit", () -> !this.bottomAngleLimit.get()).withPosition(4, 3).withSize(2, 1);
 
-		armTab.addDouble("Angle Error", this.anglePIDController::getPositionError);
-		armTab.addDouble("Current Angle", this::getCurrentAngle);
+		armTab.addDouble("Length Error", this.lengthPIDController::getPositionError);
+		armTab.addDouble("Current Length", this::getCurrentLength);
+		armTab.addDouble("Length Motor Output", this.lengthMotor::get);
 	}
 
 	public void resetLengthCANCoder() {
@@ -173,7 +173,7 @@ public class ArmSubsystem extends SubsystemBase {
 	 * @param newState - The new arm state.
 	 */
 	public void setState(ArmState newState) {
-		this.anglePIDController.setSetpoint(newState.angleDeg);
+		this.anglePIDController.setGoal(newState.angleDeg);
 		this.lengthPIDController.setSetpoint(newState.lengthDeg);
 	}
 
