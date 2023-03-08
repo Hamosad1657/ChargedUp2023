@@ -73,7 +73,6 @@ public class BalanceChassisCommand extends CommandBase {
 
 	@Override
 	public void end(boolean interrupted) {
-		this.chassis.crossLockWheels();
 		Robot.print("Finished Balance Chassis Command");
 	}
 
@@ -92,7 +91,7 @@ public class BalanceChassisCommand extends CommandBase {
 
 		case kPIDLimelight:
 		case kPIDNavX:
-			return this.isFinishedPID();
+			return false;
 
 		default:
 			return false;
@@ -118,7 +117,9 @@ public class BalanceChassisCommand extends CommandBase {
 	}
 
 	private void pidBalance(double currentAngle) {
-		double vxMeters = MathUtil.clamp(this.pid.calculate(currentAngle), -2.0, 2.0);
+		double vxMeters = MathUtil.clamp(this.pid.calculate(currentAngle), -BalanceChassisConstants.kDriveSpeedMPS,
+				BalanceChassisConstants.kDriveSpeedMPS);
+
 		this.chassis.autonomousDrive(new ChassisSpeeds(vxMeters, 0, 0), false, true);
 	}
 
