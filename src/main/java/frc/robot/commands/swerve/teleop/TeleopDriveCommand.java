@@ -14,7 +14,7 @@ public class TeleopDriveCommand extends CommandBase {
 	private SwerveSubsystem swerve;
 	private DoubleSupplier translationXSupplier, translationYSupplier;
 	private DoubleSupplier rotationSupplier;
-	private BooleanSupplier isRobotOrientedSupplier;
+	private BooleanSupplier isRobotRelativeSupplier;
 
 	public TeleopDriveCommand(SwerveSubsystem swerve, DoubleSupplier translationXSupplier,
 			DoubleSupplier translationYSupplier, DoubleSupplier rotationSupplier) {
@@ -30,7 +30,7 @@ public class TeleopDriveCommand extends CommandBase {
 		this.translationXSupplier = translationXSupplier;
 		this.translationYSupplier = translationYSupplier;
 		this.rotationSupplier = rotationSupplier;
-		this.isRobotOrientedSupplier = isRobotOrientedSupplier;
+		this.isRobotRelativeSupplier = isRobotOrientedSupplier;
 	}
 
 	@Override
@@ -50,11 +50,11 @@ public class TeleopDriveCommand extends CommandBase {
 		double rotationValue = MathUtil.applyDeadband(rotationSupplier.getAsDouble(), RobotContainer.kJoystickDeadband)
 				* this.swerve.currentSwerveRotationRatio;
 
-		boolean isRobotOriented = this.isRobotOrientedSupplier.getAsBoolean();
+		boolean isRobotRelative = this.isRobotRelativeSupplier.getAsBoolean();
 
 		// Drive :D
 		swerve.teleopDrive(
 				new Translation2d(translationXValue, translationYValue).times(SwerveConstants.kChassisMaxSpeedMPS),
-				rotationValue * SwerveConstants.kMaxAngularVelocityRadPS, !isRobotOriented, true);
+				rotationValue * SwerveConstants.kMaxAngularVelocityRadPS, isRobotRelative, true);
 	}
 }

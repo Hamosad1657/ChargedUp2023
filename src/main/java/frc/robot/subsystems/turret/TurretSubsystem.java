@@ -3,7 +3,6 @@ package frc.robot.subsystems.turret;
 
 import java.util.function.DoubleSupplier;
 import com.ctre.phoenix.sensors.AbsoluteSensorRange;
-import com.hamosad1657.lib.motors.HaCANSparkMax;
 import com.hamosad1657.lib.sensors.HaCANCoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
@@ -29,7 +28,7 @@ public class TurretSubsystem extends SubsystemBase {
 		return instace;
 	}
 
-	private HaCANSparkMax rotationMotor;
+	private CANSparkMax rotationMotor;
 	private HaCANCoder rotationEncoder;
 	private ShuffleboardTab turretTab;
 	private GenericEntry dio0Entry, dio1Entry;
@@ -42,7 +41,7 @@ public class TurretSubsystem extends SubsystemBase {
 	private DigitalInput rotationCWLimitSwitch;
 
 	private TurretSubsystem() {
-		this.rotationMotor = new HaCANSparkMax(new CANSparkMax(RobotMap.kTurretMotorID, MotorType.kBrushless));
+		this.rotationMotor = new CANSparkMax(RobotMap.kTurretMotorID, MotorType.kBrushless);
 		this.rotationMotor.setIdleMode(IdleMode.kBrake);
 		this.rotationEncoder = new HaCANCoder(RobotMap.kTurretCANCoderID, TurretConstants.kCANCoderOffsetDeg);
 		this.rotationEncoder.setMeasurmentRange(AbsoluteSensorRange.Signed_PlusMinus180);
@@ -50,8 +49,8 @@ public class TurretSubsystem extends SubsystemBase {
 		this.rotationCWLimitSwitch = new DigitalInput(RobotMap.kTurretCWLimitPort);
 		this.rotationPIDController = TurretConstants.kRotationPIDGains.toPIDController();
 		this.turretTab = Shuffleboard.getTab("Turret");
-		this.dio1Entry = this.turretTab.add("CCW Limit", false).withPosition(2, 1).withSize(1, 1).getEntry();
-		this.dio0Entry = this.turretTab.add("CW Limit", false).withPosition(2, 0).withSize(1, 1).getEntry();
+		this.dio1Entry = this.turretTab.add("CCW Limit", false).withPosition(0, 1).withSize(1, 1).getEntry();
+		this.dio0Entry = this.turretTab.add("CW Limit", false).withPosition(0, 0).withSize(1, 1).getEntry();
 		this.turretTab.add("Turret Encoder", this.rotationEncoder).withPosition(1, 0).withSize(2, 2);
 	}
 

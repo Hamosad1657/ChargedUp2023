@@ -77,6 +77,10 @@ public class HaTalonSRX extends HaBaseTalon {
 		this(new WPI_TalonSRX(motorID), new PIDGains(), kWheelRadNone, FeedbackDevice.None, kMaxPossibleMotorCurrent);
 	}
 
+	public void setInverted(boolean inverted) {
+		this.motor.setInverted(inverted);
+	}
+
 	// TalonSRX takes encoder ticks per 100 ms as velocity setpoint.
 	@Override
 	public void set(double value, Velocity type) {
@@ -241,15 +245,15 @@ public class HaTalonSRX extends HaBaseTalon {
 
 	@Override
 	public void configPID(PIDGains pidGains) {
-		this.p = pidGains.p;
+		this.p = pidGains.kP;
 		this.motor.config_kP(0, this.p);
-		this.i = pidGains.i;
+		this.i = pidGains.kI;
 		this.motor.config_kI(0, this.i);
-		this.d = pidGains.d;
+		this.d = pidGains.kD;
 		this.motor.config_kD(0, this.d);
-		this.ff = pidGains.ff;
+		this.ff = pidGains.kFF;
 		this.motor.config_kF(0, this.ff);
-		this.iZone = pidGains.iZone;
+		this.iZone = pidGains.kIZone;
 		this.motor.config_IntegralZone(0, this.iZone);
 	}
 
