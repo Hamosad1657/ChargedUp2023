@@ -3,9 +3,11 @@ package frc.robot.subsystems.arm;
 
 import java.util.function.DoubleSupplier;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import com.ctre.phoenix.motorcontrol.RemoteFeedbackDevice;
+import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
+import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.AbsoluteSensorRange;
-import com.hamosad1657.lib.motors.HaTalonSRX;
 import com.hamosad1657.lib.sensors.HaCANCoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
@@ -34,11 +36,8 @@ public class ArmSubsystem extends SubsystemBase {
 		return instance;
 	}
 
-	// Only used to keep the motors' objects - Use [armLengthMotor] for control.
-	private final WPI_TalonSRX lengthMotorA, lengthMotorB;
-
+	private final WPI_TalonFX lengthMotor;
 	private final CANSparkMax angleMotor;
-	private final HaTalonSRX lengthMotor;
 	private final HaCANCoder angleCANCoder, lengthCANCoder;
 
 	private final ProfiledPIDController anglePIDController;
@@ -58,17 +57,16 @@ public class ArmSubsystem extends SubsystemBase {
 		this.angleCANCoder.setMeasurmentRange(AbsoluteSensorRange.Unsigned_0_to_360);
 		this.angleCANCoder.setPosition(0.0);
 
-		this.lengthMotorA = new WPI_TalonSRX(RobotMap.kArmLengthMotorAID);
-		this.lengthMotorA.setNeutralMode(NeutralMode.Brake);
-		this.lengthMotorB = new WPI_TalonSRX(RobotMap.kArmLengthMotorBID);
-		this.lengthMotorB.setNeutralMode(NeutralMode.Brake);
-		this.lengthMotorB.follow(this.lengthMotorA);
-		this.lengthMotor = new HaTalonSRX(this.lengthMotorA);
-
 		this.lengthCANCoder = new HaCANCoder(RobotMap.kArmLengthCANCoderID, ArmConstants.kLengthEncoderOffset);
-		this.lengthCANCoder.setReversed(true);
+		this.lengthCANCoder.setReversed(false);
 		this.lengthCANCoder.setMeasurmentRange(AbsoluteSensorRange.Unsigned_0_to_360);
 		this.lengthCANCoder.setPosition(0.0);
+
+		this.lengthMotor = new WPI_TalonFX(RobotMap.kArmLengthMotorID);
+		this.lengthMotor.setNeutralMode(NeutralMode.Brake);
+		this.lengthMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 35.0, 40.0, 0.1));
+		this.lengthMotor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 30.0, 35.0, 0.1));
+		this.lengthMotor.configNeutralDeadband(0.1);
 
 		this.anglePIDController = ArmConstants.kAnglePIDGains.toProfiledPIDController(ArmConstants.kAnglePIDConstrains);
 		this.anglePIDController.setTolerance(ArmConstants.kAngleTolerance);

@@ -35,7 +35,7 @@ public class ArmConstants {
 	public static final double kAngleMaxSetpoint = 118.0;
 	public static final double kAngleMinSetpoint = 35.0;
 
-	public static final PIDGains kArmLengthPIDGains = new PIDGains(0.001, 0.0, 0.0);
+	public static final PIDGains kArmLengthPIDGains = new PIDGains(0.001, 0.00025, 0.0);
 	public static final double kLengthTolerance = 50.0;
 
 	public static enum ArmState {

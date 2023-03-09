@@ -31,8 +31,7 @@ public class RobotMap {
 
 	public static final int kTurretCANCoderID = 14;
 	public static final int kIntakeMotorID = 19;
-	public static final int kArmLengthMotorAID = 20;
-	public static final int kArmLengthMotorBID = 21;
+	public static final int kArmLengthMotorID = 20;
 	public static final int kArmLengthCANCoderID = 22;
 	public static final int kArmAngleCANCoderID = 23;
 	public static final int kTurretMotorID = 24;
