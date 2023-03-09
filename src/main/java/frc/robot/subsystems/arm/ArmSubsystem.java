@@ -187,7 +187,8 @@ public class ArmSubsystem extends SubsystemBase {
 	/**
 	 * Sets the setpoint of the arm and length motors to the new arm state.
 	 * 
-	 * @param newState - The new arm state.
+	 * @param angleDeg  - The new state's angle.
+	 * @param lengthDeg - The new state's length.
 	 */
 	public void setState(double angleDeg, double lengthDeg) {
 		this.anglePIDController.setGoal(angleDeg);
@@ -195,7 +196,7 @@ public class ArmSubsystem extends SubsystemBase {
 		this.lengthPIDController.setSetpoint(lengthDeg);
 	}
 
-	public Command getToStateCommand(ArmState newState) {
+	public Command getToStateCommand(ArmState newState, boolean endAtSetpoint) {
 		return new FunctionalCommand(() -> this.setState(newState), () -> {
 			this.setAngleMotorWithLimits(this.calculateAngleMotorOutput());
 			if (this.getCurrentAngle() > ArmConstants.kLengthExtendMinAngle) {
@@ -205,7 +206,11 @@ public class ArmSubsystem extends SubsystemBase {
 			if (!interrupted) {
 				this.teleopAngleSetpointDeg = this.getCurrentAngle();
 			}
-		}, this::shoudlArmMove, this);
+		}, () -> (endAtSetpoint ? this.anglePIDController.atGoal() : this.shoudlArmMove()), this);
+	}
+
+	public Command getToStateCommand(ArmState newState) {
+		return this.getToStateCommand(newState, false);
 	}
 
 	/**
@@ -269,10 +274,9 @@ public class ArmSubsystem extends SubsystemBase {
 			}
 		}, (interrupted) -> {
 			if (!(interrupted || this.shoudlArmMove())) {
-				this.lengthCANCoder.setPosition(0.0);
-				this.angleCANCoder.setPosition(0.0);
+				this.resetLengthCANCoder();
 			}
-			this.teleopAngleSetpointDeg = this.getCurrentAngle();
+			this.setState(this.getCurrentAngle() + 5.0, this.getCurrentLength());
 		}, () -> (!this.retractLimit.get() && !this.bottomAngleLimit.get()) || this.shoudlArmMove(), this)
 				.andThen(new RunCommand(() -> {
 					this.setAngleMotorWithLimits(ArmConstants.kHomingAngleOutput);

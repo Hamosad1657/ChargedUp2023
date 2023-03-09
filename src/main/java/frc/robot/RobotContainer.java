@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
 import frc.robot.commands.swerve.paths.SwervePathConstants;
 import frc.robot.commands.swerve.teleop.TeleopDriveCommand;
@@ -61,9 +62,12 @@ public class RobotContainer {
 		// Arm
 		this.driverB_CommandController.povUp().onTrue(this.arm.getToStateCommand(ArmState.kHigh));
 		this.driverB_CommandController.povLeft().onTrue(this.arm.getToStateCommand(ArmState.kMid));
-		this.driverB_CommandController.povRight().onTrue(this.arm.getToStateCommand(ArmState.kLowCone));
+		this.driverB_CommandController.povRight()
+				.onTrue(new SequentialCommandGroup(this.arm.getToStateCommand(ArmState.kLowCone, true),
+						this.grabber.collectCommand(), this.arm.getToStateCommand(ArmState.kLowConePickup)));
 		this.driverB_CommandController.povDown().onTrue(this.arm.getToStateCommand(ArmState.kLowCube));
 		this.driverB_CommandController.options().onTrue(this.arm.getToStateCommand(ArmState.kShelf));
+		this.driverB_CommandController.square().onTrue(this.arm.getToStateCommand(ArmState.kLowRaiseCone));
 		this.driverB_CommandController.share().onTrue(this.arm.homeCommand());
 		this.driverB_CommandController.PS().onTrue(new InstantCommand(this.arm::resetLengthCANCoder));
 
@@ -111,6 +115,7 @@ public class RobotContainer {
 		SwervePathConstants.kPaths.forEach((name, command) -> comboBoxChooser.addOption(name, command));
 		autoTab.add("Path Chooser", this.comboBoxChooser).withWidget("ComboBox Chooser");
 
-		this.comboBoxChooser.setDefaultOption("Arm & Mobility", this.swerve.getPathPlannerAutoCommand("Arm & Mobility"));
+		this.comboBoxChooser.setDefaultOption("Arm & Mobility",
+				this.swerve.getPathPlannerAutoCommand("Arm & Mobility"));
 	}
 }
