@@ -20,7 +20,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.RobotContainer;
 import frc.robot.RobotMap;
 import frc.robot.subsystems.arm.ArmConstants.ArmState;
@@ -203,9 +202,7 @@ public class ArmSubsystem extends SubsystemBase {
 				this.setLengthMotorWithLimits(this.calculateLengthMotorOutput());
 			}
 		}, (interrupted) -> {
-			if (!interrupted) {
-				this.teleopAngleSetpointDeg = this.getCurrentAngle();
-			}
+			this.teleopAngleSetpointDeg = this.getCurrentAngle();
 		}, () -> (endAtSetpoint ? this.anglePIDController.atGoal() : this.shoudlArmMove()), this);
 	}
 
@@ -258,6 +255,7 @@ public class ArmSubsystem extends SubsystemBase {
 
 	public Command homeCommand() {
 		return new FunctionalCommand(() -> {
+			this.setState(ArmConstants.kAngleMinSetpoint, 0.0);
 		}, () -> {
 			// The limits are normally true
 			if (this.retractLimit.get()) {
@@ -268,7 +266,7 @@ public class ArmSubsystem extends SubsystemBase {
 
 			if (this.bottomAngleLimit.get() && (this.getCurrentAngle() > ArmConstants.kHomingExtendedMinAngle
 					|| this.getCurrentLength() < ArmConstants.kHomingRetractedMaxLength)) {
-				this.setAngleMotorWithLimits(ArmConstants.kHomingAngleOutput);
+				this.setAngleMotorWithLimits(this.calculateAngleMotorOutput());
 			} else {
 				this.setAngleMotorWithLimits(0.0);
 			}
