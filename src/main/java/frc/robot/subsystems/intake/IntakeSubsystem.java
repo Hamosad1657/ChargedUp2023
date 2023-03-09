@@ -20,7 +20,7 @@ public class IntakeSubsystem extends SubsystemBase {
 		return instance;
 	}
 
-	private HaTalonSRX intakeMotor;
+	private final HaTalonSRX intakeMotor;
 	private boolean isIntakeOpen;
 
 	private IntakeSubsystem() {
@@ -29,22 +29,9 @@ public class IntakeSubsystem extends SubsystemBase {
 		this.isIntakeOpen = false;
 	}
 
-	/**
-	 * Toggles the intake's motors.
-	 */
-	public Command toggleIntake() {
-		if (this.isIntakeOpen) {
-			this.isIntakeOpen = false;
-			return this.raiseIntakeCommand();
-		} else {
-			this.isIntakeOpen = true;
-			return this.lowerIntakeCommand();
-		}
-	}
-
 	public Command lowerIntakeCommand() {
 		return new SequentialCommandGroup(
-				new InstantCommand(() -> this.intakeMotor.set(-IntakeConstants.kDeafultSpeed), this),
+				new InstantCommand(() -> this.intakeMotor.set(-IntakeConstants.kMotorDefaultOutput), this),
 				new WaitCommand(IntakeConstants.kLoweringWaitingTime), new InstantCommand(() -> {
 					this.intakeMotor.set(0.0);
 					this.isIntakeOpen = true;
@@ -54,7 +41,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
 	public Command raiseIntakeCommand() {
 		return new SequentialCommandGroup(
-				new InstantCommand(() -> this.intakeMotor.set(IntakeConstants.kDeafultSpeed), this),
+				new InstantCommand(() -> this.intakeMotor.set(IntakeConstants.kMotorDefaultOutput), this),
 				new WaitCommand(IntakeConstants.kRaisingWaitingTime), new InstantCommand(() -> {
 					this.intakeMotor.set(0.0);
 					this.isIntakeOpen = false;
@@ -63,7 +50,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
 	public Command keepIntakeUpCommand() {
 		return new InstantCommand(
-				() -> this.intakeMotor.set(this.isIntakeOpen ? 0.0 : IntakeConstants.kKeepInPlaceSpeed), this);
+				() -> this.intakeMotor.set(this.isIntakeOpen ? 0.0 : IntakeConstants.kKeepInPlaceOutput), this);
 	}
 
 	public void setIntakeMotor(double speedPercentOutput) {

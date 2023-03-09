@@ -46,7 +46,6 @@ public class ArmSubsystem extends SubsystemBase {
 
 	private final DigitalInput extendLimit, retractLimit, bottomAngleLimit, topAngleLimit;
 
-	private final double homeAngle;
 	private double teleopAngleSetpointDeg;
 
 	public ArmSubsystem() {
@@ -82,7 +81,7 @@ public class ArmSubsystem extends SubsystemBase {
 		this.extendLimit = new DigitalInput(RobotMap.kArmExtendLimitPort);
 		this.retractLimit = new DigitalInput(RobotMap.kArmRetractLimitPort);
 
-		this.teleopAngleSetpointDeg = this.homeAngle = this.getCurrentAngle();
+		this.teleopAngleSetpointDeg = this.getCurrentAngle();
 
 		ShuffleboardTab armTab = Shuffleboard.getTab("Arm");
 
@@ -95,7 +94,8 @@ public class ArmSubsystem extends SubsystemBase {
 		armTab.addBoolean("Top Angle Limit", () -> !this.topAngleLimit.get()).withPosition(4, 2).withSize(2, 1);
 		armTab.addBoolean("Bottom Angle Limit", () -> !this.bottomAngleLimit.get()).withPosition(4, 3).withSize(2, 1);
 
-		armTab.addDouble("Angle Setpoint", () -> this.anglePIDController.getGoal().position);
+		armTab.addDouble("Angle Setpoint", () -> this.anglePIDController.getGoal().position).withPosition(6, 0)
+				.withSize(2, 1);
 	}
 
 	public void resetLengthCANCoder() {

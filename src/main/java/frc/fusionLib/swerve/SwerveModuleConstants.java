@@ -42,9 +42,9 @@ public class SwerveModuleConstants {
 		CANCoderConfig = new CANCoderConfiguration();
 
 		/* Swerve Angle Motor Configurations */
-		SupplyCurrentLimitConfiguration angleSupplyLimit = new SupplyCurrentLimitConfiguration(
-				SwerveConstants.kSteerEnableCurrentLimit, SwerveConstants.kSteerContinuousCurrentLimit,
-				SwerveConstants.kSteerPeakCurrentLimit, SwerveConstants.kSteerPeakCurrentTimeSec);
+		SupplyCurrentLimitConfiguration angleSupplyLimit = new SupplyCurrentLimitConfiguration(true,
+				SwerveConstants.kSteerContinuousCurrentLimit, SwerveConstants.kSteerPeakCurrentLimit,
+				SwerveConstants.kSteerPeakCurrentTimeSec);
 
 		angleFXConfig.slot0.kP = SwerveConstants.kSteerP;
 		angleFXConfig.slot0.kI = SwerveConstants.kSteerI;
@@ -53,9 +53,9 @@ public class SwerveModuleConstants {
 		angleFXConfig.supplyCurrLimit = angleSupplyLimit;
 
 		/* Swerve Drive Motor Configuration */
-		SupplyCurrentLimitConfiguration driveSupplyLimit = new SupplyCurrentLimitConfiguration(
-				SwerveConstants.kDriveEnableCurrentLimit, SwerveConstants.kDriveContinuousCurrentLimit,
-				SwerveConstants.kDrivePeakCurrentLimit, SwerveConstants.kDrivePeakCurrentTimeSec);
+		SupplyCurrentLimitConfiguration driveSupplyLimit = new SupplyCurrentLimitConfiguration(true,
+				SwerveConstants.kDriveContinuousCurrentLimit, SwerveConstants.kDrivePeakCurrentLimit,
+				SwerveConstants.kDrivePeakCurrentTimeSec);
 
 		driveFXConfig.slot0.kP = SwerveConstants.kDriveP;
 		driveFXConfig.slot0.kI = SwerveConstants.kDriveI;

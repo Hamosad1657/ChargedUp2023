@@ -25,17 +25,17 @@ public class GrabberSubsystem extends SubsystemBase {
 	private GrabberSubsystem() {
 		this.motor = new CANSparkMax(RobotMap.kGrabberMotorID, MotorType.kBrushless);
 		motor.setIdleMode(IdleMode.kBrake);
-		motor.setSmartCurrentLimit(GrabberConstants.kMaxAmper);
+		motor.setSmartCurrentLimit(GrabberConstants.kMaxAmpere);
 
 		this.isCollecting = false;
 	}
 
 	public void onGrabberButtonPressed() {
 		if (this.isCollecting) {
-			this.motor.set(GrabberConstants.kMotorSpeed);
+			this.motor.set(GrabberConstants.kMotorDefaultOutput);
 			this.isCollecting = false;
 		} else {
-			this.motor.set(-GrabberConstants.kMotorSpeed);
+			this.motor.set(-GrabberConstants.kMotorDefaultOutput);
 			this.isCollecting = true;
 		}
 	}
@@ -47,12 +47,12 @@ public class GrabberSubsystem extends SubsystemBase {
 	}
 
 	public Command collectCommand() {
-		return new RunCommand(() -> this.motor.set(-GrabberConstants.kMotorSpeed), this)
-				.withTimeout(GrabberConstants.AutoCollectTime);
+		return new RunCommand(() -> this.motor.set(-GrabberConstants.kMotorDefaultOutput), this)
+				.withTimeout(GrabberConstants.kAutoCollectTime);
 	}
 
 	public Command releaseCommand() {
-		return new RunCommand(() -> this.motor.set(GrabberConstants.kMotorSpeed), this)
+		return new RunCommand(() -> this.motor.set(GrabberConstants.kMotorDefaultOutput), this)
 				.withTimeout(GrabberConstants.kAutoReleaseTime).andThen(() -> this.motor.set(0), this);
 	}
 }
