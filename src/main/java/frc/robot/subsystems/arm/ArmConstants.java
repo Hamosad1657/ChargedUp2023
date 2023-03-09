@@ -11,10 +11,15 @@ public class ArmConstants {
 	public static final double kAngleEncoderOffset = 0.0;
 	public static final double kLengthEncoderOffset = 0.0;
 
-	public static final double kHomingAngleOutput = -0.375;
+	public static final double kHomingAngleOutput = -0.15;
 	public static final double kHomingLengthOutput = 1.0;
+	public static final double kHomingDownWaitTime = 0.25;
+	/** For homing - The max arm's length that still counts as retracted. */
+	public static final double kHomingRetractedMaxLength = 300.0;
+	/** For homing - The lowest angle the arm can go to when it's extended. */
+	public static final double kHomingExtendedMinAngle = 80.0;
 
-	public static final PIDGains kAnglePIDGains = new PIDGains(0.02, 0.0, 0.0);
+	public static final PIDGains kAnglePIDGains = new PIDGains(0.0195, 0.0, 0.0);
 	public static final double kAngleTolerance = 2.0;
 	public static final double kAngleMotorMaxPIDOutput = 0.5;
 	public static final double kAngleDownOutputRatio = 0.5;

@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.RobotContainer;
 import frc.robot.RobotMap;
 import frc.robot.subsystems.arm.ArmConstants.ArmState;
@@ -110,6 +111,10 @@ public class ArmSubsystem extends SubsystemBase {
 		return this.angleCANCoder.getAbsAngleDeg();
 	}
 
+	public void resetTeleopAngleSetpoint() {
+		this.teleopAngleSetpointDeg = this.getCurrentAngle();
+	}
+
 	/**
 	 * @param output - The output of the angle motor in [-1.0, 1.0]. Positive output: arm goes up, negative output: arm
 	 *               goes down. Doesn't slow near the limits.
@@ -197,6 +202,9 @@ public class ArmSubsystem extends SubsystemBase {
 				this.setLengthMotorWithLimits(this.calculateLengthMotorOutput());
 			}
 		}, (interrupted) -> {
+			if (!interrupted) {
+				this.teleopAngleSetpointDeg = this.getCurrentAngle();
+			}
 		}, this::shoudlArmMove, this);
 	}
 
@@ -249,23 +257,26 @@ public class ArmSubsystem extends SubsystemBase {
 			// The limits are normally true
 			if (this.retractLimit.get()) {
 				this.setLengthMotorWithLimits(ArmConstants.kHomingLengthOutput);
-				this.setAngleMotorWithLimits(0.0);
 			} else {
 				this.setLengthMotorWithLimits(0.0);
-				if (this.bottomAngleLimit.get()) {
-					this.setAngleMotorWithLimits(ArmConstants.kHomingAngleOutput);
-				}
+			}
+
+			if (this.bottomAngleLimit.get() && (this.getCurrentAngle() > ArmConstants.kHomingExtendedMinAngle
+					|| this.getCurrentLength() < ArmConstants.kHomingRetractedMaxLength)) {
+				this.setAngleMotorWithLimits(ArmConstants.kHomingAngleOutput);
+			} else {
+				this.setAngleMotorWithLimits(0.0);
 			}
 		}, (interrupted) -> {
-			if (!interrupted && !this.shoudlArmMove()) {
+			if (!(interrupted || this.shoudlArmMove())) {
 				this.lengthCANCoder.setPosition(0.0);
 				this.angleCANCoder.setPosition(0.0);
-
-				this.setAngleMotorWithLimits(0.0);
-				this.setLengthMotorWithLimits(0.0);
 			}
 			this.teleopAngleSetpointDeg = this.getCurrentAngle();
-		}, () -> (!this.retractLimit.get() && !this.bottomAngleLimit.get()) || this.shoudlArmMove(), this);
+		}, () -> (!this.retractLimit.get() && !this.bottomAngleLimit.get()) || this.shoudlArmMove(), this)
+				.andThen(new RunCommand(() -> {
+					this.setAngleMotorWithLimits(ArmConstants.kHomingAngleOutput);
+				}, this).until(this::shoudlArmMove));
 	}
 
 	public boolean shoudlArmMove() {
