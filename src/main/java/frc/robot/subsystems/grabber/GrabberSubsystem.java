@@ -1,12 +1,9 @@
 
 package frc.robot.subsystems.grabber;
 
-import com.hamosad1657.lib.motors.HaCANSparkMax;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -22,27 +19,23 @@ public class GrabberSubsystem extends SubsystemBase {
 		return instance;
 	}
 
-	private final HaCANSparkMax motor;
+	private final CANSparkMax motor;
 	private boolean isCollecting;
 
 	private GrabberSubsystem() {
-		CANSparkMax motor = new CANSparkMax(RobotMap.kGrabberMotorID, MotorType.kBrushless);
+		this.motor = new CANSparkMax(RobotMap.kGrabberMotorID, MotorType.kBrushless);
 		motor.setIdleMode(IdleMode.kBrake);
-		motor.setSmartCurrentLimit(GrabberConstants.kMaxAmper);
-		this.motor = new HaCANSparkMax(motor);
+		motor.setSmartCurrentLimit(GrabberConstants.kMaxAmpere);
 
 		this.isCollecting = false;
-
-		ShuffleboardTab tab = Shuffleboard.getTab("Arm");
-		tab.add("Grabber Motor", this.motor);
 	}
 
 	public void onGrabberButtonPressed() {
 		if (this.isCollecting) {
-			this.motor.set(GrabberConstants.kMotorSpeed);
+			this.motor.set(GrabberConstants.kMotorDefaultOutput);
 			this.isCollecting = false;
 		} else {
-			this.motor.set(-GrabberConstants.kMotorSpeed);
+			this.motor.set(-GrabberConstants.kMotorDefaultOutput);
 			this.isCollecting = true;
 		}
 	}
@@ -54,12 +47,12 @@ public class GrabberSubsystem extends SubsystemBase {
 	}
 
 	public Command collectCommand() {
-		return new RunCommand(() -> this.motor.set(-GrabberConstants.kMotorSpeed), this)
-				.withTimeout(GrabberConstants.AutoCollectTime);
+		return new RunCommand(() -> this.motor.set(-GrabberConstants.kMotorDefaultOutput), this)
+				.withTimeout(GrabberConstants.kAutoCollectTime);
 	}
 
 	public Command releaseCommand() {
-		return new RunCommand(() -> this.motor.set(GrabberConstants.kMotorSpeed), this)
+		return new RunCommand(() -> this.motor.set(GrabberConstants.kMotorDefaultOutput), this)
 				.withTimeout(GrabberConstants.kAutoReleaseTime).andThen(() -> this.motor.set(0), this);
 	}
 }

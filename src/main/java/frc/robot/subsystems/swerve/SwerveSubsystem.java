@@ -1,31 +1,35 @@
 
 package frc.robot.subsystems.swerve;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.stream.Stream;
+import com.hamosad1657.lib.sensors.HaNavX;
+import com.pathplanner.lib.PathPlanner;
+import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.auto.SwerveAutoBuilder;
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.filter.SlewRateLimiter;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
-import edu.wpi.first.math.filter.SlewRateLimiter;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.GenericEntry;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -35,17 +39,6 @@ import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.RobotMap;
 import frc.robot.commands.swerve.paths.SwervePathConstants;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
-import java.util.function.DoubleSupplier;
-import java.util.stream.Stream;
-import com.hamosad1657.lib.sensors.HaNavX;
-import com.hamosad1657.lib.vision.limelight.Limelight;
-import com.hamosad1657.lib.vision.limelight.LimelightConstants;
-import com.pathplanner.lib.PathPlanner;
-import com.pathplanner.lib.PathPlannerTrajectory;
-import com.pathplanner.lib.auto.SwerveAutoBuilder;
 
 public class SwerveSubsystem extends SubsystemBase {
 	private static SwerveSubsystem instance;
@@ -58,19 +51,6 @@ public class SwerveSubsystem extends SubsystemBase {
 		return instance;
 	}
 
-	private final SlewRateLimiter speedModeRateLimiter;
-	private final Timer angleControlTimer;
-	/** A PIDController for fixing the robot angle skew. */
-	private final Field2d field;
-	private final PIDController anglePIDController;
-	private final ShuffleboardTab swerveTab, odometryTab;
-	private final ShuffleboardLayout frontLeftModuleList, frontRightModuleList, backLeftModuleList, backRightModuleList,
-			odometryList;
-	private final GenericEntry frontLeftAngle, frontLeftSetpoint, frontRightAngle, frontRightSetpoint, backLeftAngle,
-			backLeftSetpoint, backRightAngle, backRightSetpoint, frontLeftSpeed, frontRightSpeed, backLeftSpeed,
-			backRightSpeed, frontLeftError, frontRightError, backLeftError, backRightError, anglePIDRunningEntry,
-			estimatorXEntry, estimatorYEntry, odometryXEntry, odometryYEntry, limelightXEntry, limelightYEntry,
-			teleopAngleErrorEntry;
 	/**
 	 * An array of 4 SwerveModule objects (by 364), ordered:
 	 * <ul>
@@ -81,32 +61,64 @@ public class SwerveSubsystem extends SubsystemBase {
 	 * </ul>
 	 */
 	private final SwerveModule[] modules;
-	private final SwerveDriveOdometry odometry;
-	private final SwerveDrivePoseEstimator poseEstimator;
 	private final HaNavX gyro;
+	private final SwerveDriveOdometry odometry;
+	private final SlewRateLimiter speedModeRateLimiter;
+	private final SwerveAutoBuilder autoBuilder;
+
+	/** A PIDController for fixing the robot angle skew. */
+	private final PIDController anglePIDController;
+	private final Timer angleControlTimer;
+
+	private final ShuffleboardTab swerveTab, odometryTab;
+	private final ShuffleboardLayout frontLeftModuleList, frontRightModuleList, backLeftModuleList, backRightModuleList,
+			odometryList;
+	private final Field2d field;
+	private final GenericEntry frontLeftAngle, frontLeftSetpoint, frontRightAngle, frontRightSetpoint, backLeftAngle,
+			backLeftSetpoint, backRightAngle, backRightSetpoint, frontLeftSpeed, frontRightSpeed, backLeftSpeed,
+			backRightSpeed, frontLeftError, frontRightError, backLeftError, backRightError, anglePIDRunningEntry,
+			odometryXEntry, odometryYEntry, teleopAngleErrorEntry;
 
 	private double teleopAngleSetpointRad;
 	private boolean isRobotAngleCorrectionEnabled = false, runAngleCorrection = false;
-	public double currentSwerveTranslateRatio = SwerveConstants.kSwerveTranslateRatioFast;
-	public double currentSwerveRotationRatio = SwerveConstants.kSwerveRotationRatioFast;
-
-	public double filteredTranslationRatio = SwerveConstants.kSwerveTranslateRatioFast;
-
-	private final SwerveAutoBuilder autoBuilder;
+	public double currentSwerveTranslateRatio = SwerveConstants.kSwerveTranslateRatioFast,
+			filteredTranslationRatio = SwerveConstants.kSwerveTranslateRatioFast,
+			currentSwerveRotationRatio = SwerveConstants.kSwerveRotationRatioFast;
 
 	private SwerveSubsystem() {
-		this.gyro = new HaNavX(RobotMap.kNavXPort);
-
-		this.modules = new SwerveModule[] { new SwerveModule(0, SwerveConstants.FrontLeftModule.constants),
+		this.modules = new SwerveModule[] {
+				new SwerveModule(0, SwerveConstants.FrontLeftModule.constants),
 				new SwerveModule(1, SwerveConstants.FrontRightModule.constants),
 				new SwerveModule(2, SwerveConstants.BackLeftModule.constants),
-				new SwerveModule(3, SwerveConstants.BackRightModule.constants) };
-		this.angleControlTimer = new Timer();
-		this.angleControlTimer.start();
+				new SwerveModule(3, SwerveConstants.BackRightModule.constants)
+		};
+		this.gyro = new HaNavX(RobotMap.kNavXPort);
+		this.odometry = new SwerveDriveOdometry(SwerveConstants.kSwerveKinematics, this.getYaw(),
+				this.getModulesPositions(), SwervePathConstants.kStartPose);
+		this.speedModeRateLimiter = new SlewRateLimiter(SwerveConstants.kSpeedModeRateLimit);
+
+		// Create the AutoBuilder. This only needs to be created once when robot code starts, not every time you want to
+		// create an auto command.
+		this.autoBuilder = new SwerveAutoBuilder(
+				// Pose2d supplier
+				this::getOdometryPose,
+				// Pose2d consumer, used to reset odometry at the beginning of auto
+				this::resetOdometry, SwerveConstants.kSwerveKinematics,
+				// PID constants to correct for translation and rotation error
+				SwervePathConstants.kXControllerGains.toPathPlannerPIDConstants(),
+				SwervePathConstants.kRotationControllerGains.toPathPlannerPIDConstants(),
+				// Module states consumer used to output to the drive subsystem
+				this::setModuleStates, SwervePathConstants.kPathCommandsMap,
+				// Should the path be automatically mirrored depending on alliance color. Optional, defaults to true
+				true,
+				// The drive subsystem. Used to properly set the requirements of path following commands
+				this);
 
 		this.anglePIDController = SwerveConstants.kRobotAnglePIDGains.toPIDController();
 		this.anglePIDController.enableContinuousInput(-Math.PI, Math.PI);
 		this.anglePIDController.setTolerance(SwerveConstants.kRobotAngleToleranceRad);
+		this.angleControlTimer = new Timer();
+		this.angleControlTimer.start();
 
 		this.swerveTab = Shuffleboard.getTab("Swerve");
 		this.odometryTab = Shuffleboard.getTab("Odometry");
@@ -149,52 +161,20 @@ public class SwerveSubsystem extends SubsystemBase {
 
 		this.odometryList = this.odometryTab.getLayout("Odometry", BuiltInLayouts.kList).withPosition(0, 0).withSize(2,
 				4);
-		this.estimatorXEntry = this.odometryList.add("Estimator X", 0.0).getEntry();
-		this.estimatorYEntry = this.odometryList.add("Estimator Y", -1657).withWidget(BuiltInWidgets.kTextView)
-				.getEntry();
 		this.odometryXEntry = this.odometryList.add("Odometry X", -1657).withWidget(BuiltInWidgets.kTextView)
 				.getEntry();
 		this.odometryYEntry = this.odometryList.add("Odometry Y", -1657).withWidget(BuiltInWidgets.kTextView)
 				.getEntry();
-		this.limelightXEntry = this.odometryList.add("Limelight X", -1657).withWidget(BuiltInWidgets.kTextView)
-				.getEntry();
-		this.limelightYEntry = this.odometryList.add("Limelight Y", -1657).withWidget(BuiltInWidgets.kTextView)
-				.getEntry();
 
-		this.speedModeRateLimiter = new SlewRateLimiter(SwerveConstants.kSpeedModeRateLimit);
+		SwervePathConstants.createCommands();
+		this.createPaths();
 
 		/*
 		 * By pausing init for a second before setting module offsets, we avoid a bug with inverting motors. See
 		 * https://github.com/Team364/BaseFalconSwerve/issues/8 for more info.
 		 */
-		Timer.delay(1.0);
+		Timer.delay(0.1);
 		this.resetModulesToAbsolute();
-
-		this.odometry = new SwerveDriveOdometry(SwerveConstants.kSwerveKinematics, this.getYaw(),
-				this.getModulesPositions(), SwervePathConstants.kStartPose);
-
-		this.poseEstimator = new SwerveDrivePoseEstimator(SwerveConstants.kSwerveKinematics, this.getYaw(),
-				this.getModulesPositions(), SwervePathConstants.kStartPose);
-
-		// Create the AutoBuilder. This only needs to be created once when robot code starts, not every time you want to
-		// create an auto command.
-		this.autoBuilder = new SwerveAutoBuilder(
-				// Pose2d supplier
-				this::getOdometryPose,
-				// Pose2d consumer, used to reset odometry at the beginning of auto
-				this::resetOdometry, SwerveConstants.kSwerveKinematics,
-				// PID constants to correct for translation and rotation error
-				SwervePathConstants.kXControllerGains.toPathPlannerPIDConstants(),
-				SwervePathConstants.kRotationControllerGains.toPathPlannerPIDConstants(),
-				// Module states consumer used to output to the drive subsystem
-				this::setModuleStates, SwervePathConstants.kPathCommandsMap,
-				// Should the path be automatically mirrored depending on alliance color. Optional, defaults to true
-				true,
-				// The drive subsystem. Used to properly set the requirements of path following commands
-				this);
-
-		SwervePathConstants.createCommands();
-		this.createPaths();
 	}
 
 	/**
@@ -274,28 +254,6 @@ public class SwerveSubsystem extends SubsystemBase {
 		for (SwerveModule module : this.modules) {
 			module.setState(desiredStates[module.moduleNumber], false);
 		}
-	}
-
-	/**
-	 * @return The robot's position on the field as measured by the pose estimator, which uses both vision and odometry.
-	 *         Units in meters and Rotation2d.
-	 */
-	public Pose2d getEstimatedPose() {
-		return this.poseEstimator.getEstimatedPosition();
-	}
-
-	/**
-	 * Resets the estimated robot position on the field.
-	 * <p>
-	 * ONLY CALL IF:
-	 * <p>
-	 * It's the first auto path and you're passing the path start pose, or if you know where the robot is with 100%
-	 * confidence.
-	 * 
-	 * @param newPose - Position on the field. Units in meters and Rotation2d.
-	 */
-	public void resetEstimatedPose(Pose2d newPose) {
-		this.poseEstimator.resetPosition(this.getYaw(), this.getModulesPositions(), newPose);
 	}
 
 	/**
@@ -425,7 +383,7 @@ public class SwerveSubsystem extends SubsystemBase {
 	 * @return Is the robot within the position tolerance.
 	 */
 	public boolean withinPositionTolerance(Translation2d desiredPose, Pose2d tolerance) {
-		Pose2d currentPose = this.getEstimatedPose();
+		Pose2d currentPose = this.getOdometryPose();
 		double xError = desiredPose.getX() - currentPose.getX();
 		double yError = desiredPose.getY() - currentPose.getY();
 		double angleError = desiredPose.getAngle().getDegrees() - currentPose.getRotation().getDegrees();
@@ -440,7 +398,7 @@ public class SwerveSubsystem extends SubsystemBase {
 	 * @return Is the robot within the position tolerance.
 	 */
 	public boolean withinPositionTolerance(Pose2d desiredPose, Pose2d tolerance) {
-		Pose2d error = desiredPose.relativeTo(this.getEstimatedPose());
+		Pose2d error = desiredPose.relativeTo(this.getOdometryPose());
 		return Math.abs(error.getX()) < tolerance.getX() && Math.abs(error.getY()) < tolerance.getY()
 				&& Math.abs(error.getRotation().getDegrees()) < tolerance.getRotation().getDegrees();
 	}
@@ -452,8 +410,7 @@ public class SwerveSubsystem extends SubsystemBase {
 	}
 
 	public Command crossLockWheelsCommand() {
-		return new RunCommand(this::crossLockWheels, this)
-				.until(() -> this.shouldRobotMove());
+		return new RunCommand(this::crossLockWheels, this).until(() -> this.shouldRobotMove());
 	}
 
 	public boolean shouldRobotMove() {
@@ -536,22 +493,7 @@ public class SwerveSubsystem extends SubsystemBase {
 		this.filteredTranslationRatio = this.speedModeRateLimiter.calculate(currentSwerveTranslateRatio);
 
 		this.odometry.update(this.getYaw(), this.getModulesPositions());
-		this.field.setRobotPose(this.getEstimatedPose());
-
-		if (Limelight.hasTargets(LimelightConstants.kLimelightName)) {
-			// Set robot pose depending on alliance
-			Pose3d robotPose3d = (DriverStation.getAlliance() == Alliance.Blue)
-					? Limelight.getBotpose_wpiBlue(LimelightConstants.kLimelightName)
-					: Limelight.getBotpose_wpiBlue(LimelightConstants.kLimelightName);
-			if (robotPose3d != null) {
-				Pose2d robotPose = new Pose2d(robotPose3d.getX(), robotPose3d.getY(), this.getYaw());
-				this.poseEstimator.addVisionMeasurement(robotPose, Timer.getFPGATimestamp());
-
-				this.limelightXEntry.setDouble(robotPose.getX());
-				this.limelightYEntry.setDouble(robotPose.getY());
-			}
-		}
-		this.poseEstimator.updateWithTime(Timer.getFPGATimestamp(), this.getYaw(), this.getModulesPositions());
+		this.field.setRobotPose(this.getOdometryPose());
 
 		for (SwerveModule mod : modules) {
 			SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Cancoder", mod.getCanCoder().getDegrees());
@@ -584,10 +526,7 @@ public class SwerveSubsystem extends SubsystemBase {
 		this.backRightSpeed.setDouble(this.modules[3].getModuleState().speedMetersPerSecond);
 		this.backRightError
 				.setDouble(this.modules[3].getDesiredAngle().getDegrees() - this.modules[3].getAngle().getDegrees());
-		this.estimatorXEntry.setDouble(this.getEstimatedPose().getX());
-		this.estimatorYEntry.setDouble(this.getEstimatedPose().getY());
 		this.odometryXEntry.setDouble(this.getOdometryPose().getX());
 		this.odometryYEntry.setDouble(this.getOdometryPose().getY());
 	}
-
 }

@@ -12,9 +12,9 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 
 public class HaCANCoder implements Sendable {
 	private final WPI_CANCoder cancoder;
+	private int direction = 1;
 	private CANCoderSimCollection simCANCoder;
-	private double simAngleDeg = 0;
-	private double simVelocityDegPS = 0;
+	private double simAngleDeg = 0, simVelocityDegPS = 0;
 
 	/**
 	 * @param CanId
@@ -60,6 +60,17 @@ public class HaCANCoder implements Sendable {
 	}
 
 	/**
+	 * Reverses the relative accumulated angle.
+	 */
+	public void setReversed(boolean reversed) {
+		if (reversed) {
+			this.direction = -1;
+		} else {
+			this.direction = 1;
+		}
+	}
+
+	/**
 	 * @param measurmentRange 0-360 or cartisan
 	 */
 	public void setMeasurmentRange(AbsoluteSensorRange measurmentRange) {
@@ -75,7 +86,7 @@ public class HaCANCoder implements Sendable {
 	}
 
 	public double getPositionDeg() {
-		return this.cancoder.getPosition();
+		return this.cancoder.getPosition() * direction;
 	}
 
 	public double getPositionRad() {
@@ -171,7 +182,7 @@ public class HaCANCoder implements Sendable {
 		builder.setSmartDashboardType("HaCANCoder");
 
 		builder.addDoubleProperty("Abs Angle (Deg)", this::getAbsAngleDeg, null);
-		builder.addDoubleProperty("Accumulated angle (Deg)", this.cancoder::getPosition, null);
+		builder.addDoubleProperty("Accumulated angle (Deg)", this::getPositionDeg, null);
 		// builder.addDoubleProperty("Velocity RPM", this::getVelocityRPM, null);
 		// builder.addDoubleProperty("Velocity DegPS", this::getVelocityDegPS, null);
 		// builder.addDoubleProperty("Velocity RadPS", this::getVelocityRadPS, null);

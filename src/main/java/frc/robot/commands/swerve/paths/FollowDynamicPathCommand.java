@@ -4,8 +4,8 @@ package frc.robot.commands.swerve.paths;
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
-import com.pathplanner.lib.PathPoint;
 import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
+import com.pathplanner.lib.PathPoint;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -52,7 +52,7 @@ public class FollowDynamicPathCommand extends CommandBase {
 
 	@Override
 	public void initialize() {
-		Pose2d startPose = this.swerve.getEstimatedPose();
+		Pose2d startPose = this.swerve.getOdometryPose();
 
 		/*
 		 * Heading is the angle of the point from which you arrive or leave, Holonomic rotation is the robot's angle
@@ -82,11 +82,11 @@ public class FollowDynamicPathCommand extends CommandBase {
 		// given time.
 		// Get the desired state by sampling the path for the current time.
 		double currentTime = this.timer.get();
-		PathPlannerState desiredState = (PathPlannerState) this.trajectory.sample(currentTime);
+		PathPlannerState desiredState = (PathPlannerState)this.trajectory.sample(currentTime);
 
 		// Calculate the desired field-relative ChassisSpeeds using the current position
 		// and desired state.
-		Pose2d currentPose = this.swerve.getEstimatedPose();
+		Pose2d currentPose = this.swerve.getOdometryPose();
 		ChassisSpeeds fieldRelativeSpeeds = this.driveController.calculate(currentPose, desiredState);
 
 		// Drive
