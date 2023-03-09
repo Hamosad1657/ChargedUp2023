@@ -262,19 +262,17 @@ public class ArmSubsystem extends SubsystemBase {
 				this.setLengthMotorWithLimits(ArmConstants.kHomingLengthOutput);
 			} else {
 				this.setLengthMotorWithLimits(0.0);
-			}
-
-			if (this.bottomAngleLimit.get() && (this.getCurrentAngle() > ArmConstants.kHomingExtendedMinAngle
-					|| this.getCurrentLength() < ArmConstants.kHomingRetractedMaxLength)) {
-				this.setAngleMotorWithLimits(this.calculateAngleMotorOutput());
-			} else {
-				this.setAngleMotorWithLimits(0.0);
+				if (this.bottomAngleLimit.get()) {
+					this.setAngleMotorWithLimits(this.calculateAngleMotorOutput() * ArmConstants.kHomingAnglePIDRatio);
+				} else {
+					this.setAngleMotorWithLimits(0.0);
+				}
 			}
 		}, (interrupted) -> {
 			if (!(interrupted || this.shoudlArmMove())) {
 				this.resetLengthCANCoder();
 			}
-			this.setState(this.getCurrentAngle() + 5.0, this.getCurrentLength());
+			this.setState(this.getCurrentAngle(), this.getCurrentLength());
 		}, () -> (!this.retractLimit.get() && !this.bottomAngleLimit.get()) || this.shoudlArmMove(), this)
 				.andThen(new RunCommand(() -> {
 					this.setAngleMotorWithLimits(ArmConstants.kHomingAngleOutput);
