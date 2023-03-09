@@ -48,6 +48,8 @@ public class RobotMap {
 	public static final int kArmRetractLimitPort = 3;
 	public static final int kBottomArmAngleLimitport = 4;
 	public static final int kTopArmAngleLimitport = 5;
+
+	// Intake limit switches
 	public static final int kIntakeRaiseLimitPort = 6;
-	public static final int kIntakeBottomLimitPort = 7;
+	public static final int kIntakeLowerLimitPort = 7;
 }
