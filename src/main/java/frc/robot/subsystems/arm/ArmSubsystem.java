@@ -19,11 +19,14 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
 import frc.robot.RobotMap;
 import frc.robot.subsystems.arm.ArmConstants.ArmState;
+import frc.robot.subsystems.grabber.GrabberSubsystem;
 
 public class ArmSubsystem extends SubsystemBase {
 	private static ArmSubsystem instance;
@@ -176,17 +179,6 @@ public class ArmSubsystem extends SubsystemBase {
 	/**
 	 * Sets the setpoint of the arm and length motors to the new arm state.
 	 * 
-	 * @param newState - The new arm state.
-	 */
-	public void setState(ArmState newState) {
-		this.anglePIDController.setGoal(newState.angleDeg);
-		this.teleopAngleSetpointDeg = newState.angleDeg;
-		this.lengthPIDController.setSetpoint(newState.lengthDeg);
-	}
-
-	/**
-	 * Sets the setpoint of the arm and length motors to the new arm state.
-	 * 
 	 * @param angleDeg  - The new state's angle.
 	 * @param lengthDeg - The new state's length.
 	 */
@@ -194,6 +186,19 @@ public class ArmSubsystem extends SubsystemBase {
 		this.anglePIDController.setGoal(angleDeg);
 		this.teleopAngleSetpointDeg = angleDeg;
 		this.lengthPIDController.setSetpoint(lengthDeg);
+	}
+
+	/**
+	 * Sets the setpoint of the arm and length motors to the new arm state.
+	 * 
+	 * @param newState - The new arm state.
+	 */
+	public void setState(ArmState newState) {
+		this.setState(newState.angleDeg, newState.lengthDeg);
+	}
+
+	public Command setStateCommand(ArmState newState) {
+		return new InstantCommand(() -> this.setState(newState));
 	}
 
 	public Command getToStateCommand(ArmState newState, boolean endAtSetpoint) {
@@ -307,6 +312,11 @@ public class ArmSubsystem extends SubsystemBase {
 				.andThen(new RunCommand(() -> {
 					this.setAngleMotorWithLimits(ArmConstants.kHomingAngleOutput);
 				}, this).until(this::shoudlArmMove));
+	}
+
+	public Command pickupConeCommand() {
+		return new SequentialCommandGroup(this.getToStateCommand(ArmState.kLowCone, true),
+				GrabberSubsystem.getInstance().collectCommand(), this.getToStateCommand(ArmState.kLowConePickup));
 	}
 
 	public boolean shoudlArmMove() {

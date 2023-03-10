@@ -8,7 +8,6 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
 import frc.robot.commands.swerve.paths.SwervePathConstants;
 import frc.robot.commands.swerve.teleop.TeleopDriveCommand;
@@ -63,13 +62,11 @@ public class RobotContainer {
 		// Arm
 		this.driverB_CommandController.povUp().onTrue(this.arm.getToStateCommand(ArmState.kHigh));
 		this.driverB_CommandController.povLeft().onTrue(this.arm.getToStateCommand(ArmState.kMid));
-		this.driverB_CommandController.povRight()
-				.onTrue(new SequentialCommandGroup(this.arm.getToStateCommand(ArmState.kLowCone, true),
-						this.grabber.collectCommand(), this.arm.getToStateCommand(ArmState.kLowConePickup)));
+		this.driverB_CommandController.povRight().onTrue(this.arm.pickupConeCommand());
 		this.driverB_CommandController.povDown().onTrue(this.arm.getToStateCommand(ArmState.kLowCube));
 		this.driverB_CommandController.options().onTrue(this.arm.getToStateCommand(ArmState.kShelf));
 		this.driverB_CommandController.square().onTrue(this.arm.getToStateCommand(ArmState.kLowRaiseCone));
-		this.driverB_CommandController.circle().onTrue(this.arm.getToStateCommand(ArmState.kConeDropoff));
+		this.driverB_CommandController.circle().onTrue(this.arm.getToStateCommand(ArmState.kLowConeDropoff));
 		this.driverB_CommandController.share().onTrue(this.arm.homeCommand());
 
 		// Grabber
@@ -87,11 +84,14 @@ public class RobotContainer {
 		// All of the actions are detailed in the DRIVING_INSTRUCTIONS.md file.
 
 		// Swerve teleop driving - Left stick for X and Y movement, right X for rotation.
-		this.swerve.setDefaultCommand(new TeleopDriveCommand(this.swerve, driverA_Controller::getLeftY,
-				driverA_Controller::getLeftX, driverA_Controller::getRightX));
+		this.swerve.setDefaultCommand(new TeleopDriveCommand(this.swerve,
+				() -> HaUnits.deadband(driverA_Controller.getLeftY(), kJoystickDeadband),
+				() -> HaUnits.deadband(driverA_Controller.getLeftX(), kJoystickDeadband),
+				() -> HaUnits.deadband(driverA_Controller.getRightX(), kJoystickDeadband)));
 
 		// Turret teleop control - Right X for rotation.
-		this.turret.setDefaultCommand(this.turret.closedLoopTeleopCommand(driverB_Controller::getRightX));
+		this.turret.setDefaultCommand(this.turret
+				.closedLoopTeleopCommand(() -> HaUnits.deadband(driverB_Controller.getRightX(), kJoystickDeadband)));
 
 		// Teleop arm control - R2 for extending, L2 for retracting, left Y for angle.
 		this.arm.setDefaultCommand(this.arm.closedLoopTeleopCommand(

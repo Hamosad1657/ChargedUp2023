@@ -10,20 +10,18 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-import frc.robot.subsystems.arm.ArmSubsystem;
 import frc.robot.subsystems.arm.ArmConstants.ArmState;
+import frc.robot.subsystems.arm.ArmSubsystem;
 import frc.robot.subsystems.grabber.GrabberSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
+import frc.robot.subsystems.turret.TurretConstants;
+import frc.robot.subsystems.turret.TurretSubsystem;
 
 public final class SwervePathConstants {
 	/**
 	 * The start position of the first auto path. Should match real life because apriltags.
 	 */
-	private static final ArmSubsystem arm = ArmSubsystem.getInstance();
-	private static final GrabberSubsystem grabber = GrabberSubsystem.getInstance();
-	private static final IntakeSubsystem intake = IntakeSubsystem.getInstance();
 	public static final Pose2d kStartPose = new Pose2d(0, 0, new Rotation2d());
 
 	public static final double kMaxSpeedMPS = 2.0;
@@ -64,13 +62,45 @@ public final class SwervePathConstants {
 	public static final HashMap<String, Command> kPaths = new HashMap<String, Command>();
 
 	public static void createCommands() {
-		SwervePathConstants.kPathCommandsMap.put("ArmHigh", new InstantCommand(() -> arm.setState(ArmState.kHigh)));
-		SwervePathConstants.kPathCommandsMap.put("HomeArm", arm.homeCommand().withTimeout(5.0));
-		SwervePathConstants.kPathCommandsMap.put("ReleaseGamePiece", grabber.releaseCommand());
-		SwervePathConstants.kPathCommandsMap.put("CollectGamePiece", grabber.collectCommand());
-		SwervePathConstants.kPathCommandsMap.put("OpenIntake", intake.lowerIntakeCommand());
-		SwervePathConstants.kPathCommandsMap.put("CloseIntake", intake.raiseIntakeCommand());
+		ArmSubsystem arm = ArmSubsystem.getInstance();
+		GrabberSubsystem grabber = GrabberSubsystem.getInstance();
+		IntakeSubsystem intake = IntakeSubsystem.getInstance();
+		TurretSubsystem turret = TurretSubsystem.getInstance();
+
+		// Wait a bit
 		SwervePathConstants.kPathCommandsMap.put("WaitABit", new WaitCommand(0.15));
 		SwervePathConstants.kPathCommandsMap.put("WaitABitMore", new WaitCommand(0.35));
+
+		// Turret
+		SwervePathConstants.kPathCommandsMap.put("RotateTurretBack",
+				turret.setSetpointCommand(TurretConstants.kBackRotationSetpoint));
+		SwervePathConstants.kPathCommandsMap.put("RotateTurretFront",
+				turret.setSetpointCommand(TurretConstants.kFrontRotationSetpoint));
+
+		// Arm
+		SwervePathConstants.kPathCommandsMap.put("HomeArm", arm.homeCommand().withTimeout(5.0));
+
+		// Grabber
+		SwervePathConstants.kPathCommandsMap.put("CollectGamePiece", grabber.collectCommand());
+		SwervePathConstants.kPathCommandsMap.put("ReleaseGamePiece", grabber.releaseCommand());
+
+		// Intake
+		SwervePathConstants.kPathCommandsMap.put("OpenIntake", intake.lowerIntakeCommand());
+		SwervePathConstants.kPathCommandsMap.put("CloseIntake", intake.raiseIntakeCommand());
+
+		// Pickups
+		SwervePathConstants.kPathCommandsMap.put("PickupCone", arm.pickupConeCommand());
+		SwervePathConstants.kPathCommandsMap.put("PickupCube",
+				arm.setStateCommand(ArmState.kLowCube).andThen(grabber.collectCommand()));
+
+		// Dropoffs
+		SwervePathConstants.kPathCommandsMap.put("DropoffLowCone",
+				arm.setStateCommand(ArmState.kLowConeDropoff).andThen(grabber.releaseCommand()));
+		SwervePathConstants.kPathCommandsMap.put("DropoffLowCube",
+				arm.setStateCommand(ArmState.kLowCube).andThen(grabber.releaseCommand()));
+		SwervePathConstants.kPathCommandsMap.put("DropoffMid",
+				arm.setStateCommand(ArmState.kMid).andThen(grabber.releaseCommand()));
+		SwervePathConstants.kPathCommandsMap.put("DropoffHigh",
+				arm.setStateCommand(ArmState.kHigh).andThen(grabber.releaseCommand()));
 	}
 }

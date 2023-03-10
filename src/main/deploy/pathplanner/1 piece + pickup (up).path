@@ -2,25 +2,23 @@
   "waypoints": [
     {
       "anchorPoint": {
-        "x": 1.904335387618144,
-        "y": 4.398063357530224
+        "x": 1.8952671238675813,
+        "y": 4.416199885031349
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.9381174551822786,
-        "y": 4.887749600060604
+        "x": 2.9199809276811535,
+        "y": 4.688247797548227
       },
-      "holonomicAngle": -179.34893961977056,
+      "holonomicAngle": -89.169684513742,
       "isReversal": false,
       "velOverride": null,
       "isLocked": false,
       "isStopPoint": false,
       "stopEvent": {
         "names": [
-          "OpenIntake",
-          "WaitABit",
-          "CloseIntake",
-          "LowCube"
+          "CollectGamePiece",
+          "ArmHigh"
         ],
         "executionBehavior": "sequential",
         "waitBehavior": "none",
@@ -33,11 +31,11 @@
         "y": 4.597565160042601
       },
       "prevControl": {
-        "x": 5.39561693158474,
-        "y": 4.724520852550477
+        "x": 5.350275612831927,
+        "y": 4.651974742545977
       },
       "nextControl": null,
-      "holonomicAngle": 90.0,
+      "holonomicAngle": -90.0,
       "isReversal": false,
       "velOverride": null,
       "isLocked": false,
@@ -50,5 +48,13 @@
       }
     }
   ],
-  "markers": []
+  "markers": [
+    {
+      "position": 0.33636363636363636,
+      "names": [
+        "RotateTurretBack",
+        "LowCube"
+      ]
+    }
+  ]
 }
