@@ -44,6 +44,7 @@ public class ArmSubsystem extends SubsystemBase {
 
 	private final DigitalInput extendLimit, retractLimit, bottomAngleLimit, topAngleLimit;
 
+	private boolean angleAtGoal = false;
 	private double teleopAngleSetpointDeg;
 
 	public ArmSubsystem() {
@@ -147,8 +148,8 @@ public class ArmSubsystem extends SubsystemBase {
 	 * @return The output for the angle motor calculated by the PID in [-1.0, 1.0].
 	 */
 	public double calculateAngleMotorOutput() {
-		double output = MathUtil.clamp(this.anglePIDController.calculate(this.getCurrentAngle()),
-				-ArmConstants.kAngleMotorMaxPIDOutput, ArmConstants.kAngleMotorMaxPIDOutput);
+		double output = this.anglePIDController.calculate(this.getCurrentAngle());
+		output = MathUtil.clamp(output, -ArmConstants.kAngleMotorMaxPIDOutput, ArmConstants.kAngleMotorMaxPIDOutput);
 
 		if (output < 0.0) {
 			output *= ArmConstants.kAngleDownOutputRatio;
@@ -161,9 +162,8 @@ public class ArmSubsystem extends SubsystemBase {
 	 * @return The output for the length motor calculated by the PID in [-1.0, 1.0].
 	 */
 	public double calculateLengthMotorOutput() {
-		double output = -MathUtil.clamp(this.lengthPIDController.calculate(this.getCurrentLength()),
-				-ArmConstants.kLengthMotorMaxOutput, ArmConstants.kLengthMotorMaxOutput);
-		return output;
+		double output = -this.lengthPIDController.calculate(this.getCurrentLength());
+		return MathUtil.clamp(output, -ArmConstants.kLengthMotorMaxOutput, ArmConstants.kLengthMotorMaxOutput);
 	}
 
 	/**
@@ -197,24 +197,47 @@ public class ArmSubsystem extends SubsystemBase {
 	}
 
 	public Command getToStateCommand(ArmState newState, boolean endAtSetpoint) {
-		return new FunctionalCommand(() -> this.setState(newState), () -> {
+		return new FunctionalCommand(() -> {
+			this.angleAtGoal = false;
+			this.setState(newState);
+		}, () -> {
 			this.setAngleMotorWithLimits(this.calculateAngleMotorOutput());
 			if (this.anglePIDController.atGoal()) {
-				this.setAngleMotorWithLimits(0.0);
+				this.angleAtGoal = true;
+			}
 
-				if (this.lengthPIDController.atSetpoint()) {
-					this.setLengthMotorWithLimits(0.0);
-				} else {
-					this.setLengthMotorWithLimits(this.calculateLengthMotorOutput());
-				}
+			if (this.angleAtGoal) {
+				this.setLengthMotorWithLimits(this.calculateLengthMotorOutput());
 			}
 		}, (interrupted) -> {
 			this.teleopAngleSetpointDeg = this.getCurrentAngle();
-		}, () -> (endAtSetpoint ? this.anglePIDController.atGoal() : this.shoudlArmMove()), this);
+			this.setLengthMotorWithLimits(0.0);
+		}, () -> (endAtSetpoint ? (this.anglePIDController.atGoal() && this.lengthPIDController.atSetpoint())
+				: this.shoudlArmMove()), this);
 	}
 
 	public Command getToStateCommand(ArmState newState) {
 		return this.getToStateCommand(newState, false);
+	}
+
+	public Command getToStateAutoCommand(ArmState newState, boolean endAtSetpoint) {
+		return new FunctionalCommand(() -> {
+			this.setState(newState);
+		}, () -> {
+			this.setAngleMotorWithLimits(this.calculateAngleMotorOutput());
+
+			if (this.getCurrentAngle() > ArmConstants.kLengthExtendMinAngle) {
+				this.setLengthMotorWithLimits(this.calculateLengthMotorOutput());
+			}
+		}, (interrupted) -> {
+			this.teleopAngleSetpointDeg = this.getCurrentAngle();
+			this.setLengthMotorWithLimits(0.0);
+		}, () -> (endAtSetpoint ? (this.anglePIDController.atGoal() && this.lengthPIDController.atSetpoint())
+				: this.shoudlArmMove()), this);
+	}
+
+	public Command getToStateAutoCommand(ArmState newState) {
+		return this.getToStateAutoCommand(newState, false);
 	}
 
 	/**
