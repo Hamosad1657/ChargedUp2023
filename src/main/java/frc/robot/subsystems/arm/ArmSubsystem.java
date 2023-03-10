@@ -79,7 +79,8 @@ public class ArmSubsystem extends SubsystemBase {
 		this.extendLimit = new DigitalInput(RobotMap.kArmExtendLimitPort);
 		this.retractLimit = new DigitalInput(RobotMap.kArmRetractLimitPort);
 
-		this.teleopAngleSetpointDeg = this.getCurrentAngle();
+		this.teleopAngleSetpointDeg = ArmConstants.kAngleMinSetpoint;
+		this.setState(this.teleopAngleSetpointDeg, 0.0);
 
 		ShuffleboardTab armTab = Shuffleboard.getTab("Arm");
 

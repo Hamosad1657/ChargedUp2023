@@ -25,8 +25,8 @@ public class ArmConstants {
 	public static final double kAngleDownOutputRatio = 0.5;
 	public static final double kLengthExtendMinAngle = 40.0;
 
-	public static final double kAngleMaxVelocityDegPS = 120.0;
-	public static final double kAngleMaxAccelerationDegPS = 180.0;
+	public static final double kAngleMaxVelocityDegPS = 90.0;
+	public static final double kAngleMaxAccelerationDegPS = 120.0;
 	public static final Constraints kAnglePIDConstrains = new Constraints(kAngleMaxVelocityDegPS,
 			kAngleMaxAccelerationDegPS);
 
@@ -45,9 +45,9 @@ public class ArmConstants {
 		public final double angleDeg;
 		public final double lengthDeg;
 
-		ArmState(double angleDeg, double armLength) {
+		ArmState(double angleDeg, double lengthDeg) {
 			this.angleDeg = angleDeg;
-			this.lengthDeg = armLength;
+			this.lengthDeg = lengthDeg;
 		}
 	}
 }
