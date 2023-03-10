@@ -148,8 +148,8 @@ public class ArmSubsystem extends SubsystemBase {
 	 * @return The output for the angle motor calculated by the PID in [-1.0, 1.0].
 	 */
 	public double calculateAngleMotorOutput() {
-		double output = MathUtil.clamp(this.anglePIDController.calculate(this.getCurrentAngle()),
-				-ArmConstants.kAngleMotorMaxPIDOutput, ArmConstants.kAngleMotorMaxPIDOutput);
+		double output = this.anglePIDController.calculate(this.getCurrentAngle());
+		output = MathUtil.clamp(output, -ArmConstants.kAngleMotorMaxPIDOutput, ArmConstants.kAngleMotorMaxPIDOutput);
 
 		if (output < 0.0) {
 			output *= ArmConstants.kAngleDownOutputRatio;
@@ -162,9 +162,8 @@ public class ArmSubsystem extends SubsystemBase {
 	 * @return The output for the length motor calculated by the PID in [-1.0, 1.0].
 	 */
 	public double calculateLengthMotorOutput() {
-		double output = -MathUtil.clamp(this.lengthPIDController.calculate(this.getCurrentLength()),
-				-ArmConstants.kLengthMotorMaxOutput, ArmConstants.kLengthMotorMaxOutput);
-		return output;
+		double output = -this.lengthPIDController.calculate(this.getCurrentLength());
+		return MathUtil.clamp(output, -ArmConstants.kLengthMotorMaxOutput, ArmConstants.kLengthMotorMaxOutput);
 	}
 
 	/**
