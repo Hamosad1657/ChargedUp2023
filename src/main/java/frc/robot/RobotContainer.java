@@ -84,7 +84,7 @@ public class RobotContainer {
 				driverA_Controller::getLeftX, driverA_Controller::getRightX));
 
 		// Turret teleop control - Right X for rotation.
-		this.turret.setDefaultCommand(this.turret.openLoopTeleopTurretCommand(driverB_Controller::getRightX));
+		this.turret.setDefaultCommand(this.turret.closedLoopTeleopCommand(driverB_Controller::getRightX));
 
 		// Teleop arm control - R2 for extending, L2 for retracting, left Y for angle.
 		this.arm.setDefaultCommand(this.arm.closedLoopTeleopCommand(

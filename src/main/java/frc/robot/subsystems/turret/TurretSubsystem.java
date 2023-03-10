@@ -7,6 +7,8 @@ import com.hamosad1657.lib.sensors.HaCANCoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -25,26 +27,36 @@ public class TurretSubsystem extends SubsystemBase {
 		return instace;
 	}
 
-	private CANSparkMax rotationMotor;
-	private HaCANCoder rotationEncoder;
+	private final CANSparkMax rotationMotor;
+	private final HaCANCoder rotationEncoder;
+	private final PIDController rotationController;
 
 	/** Clock-Wise. Normally false. */
-	private DigitalInput rotationCWLimitSwitch;
+	private final DigitalInput rotationCWLimitSwitch;
 	/** Counter-Clock-Wise. Normally false. */
-	private DigitalInput rotationCCWLimitSwitch;
+	private final DigitalInput rotationCCWLimitSwitch;
 
 	private TurretSubsystem() {
 		this.rotationMotor = new CANSparkMax(RobotMap.kTurretMotorID, MotorType.kBrushless);
 		this.rotationMotor.setIdleMode(IdleMode.kBrake);
+
 		this.rotationEncoder = new HaCANCoder(RobotMap.kTurretCANCoderID, TurretConstants.kCANCoderOffsetDeg);
-		this.rotationEncoder.setMeasurmentRange(AbsoluteSensorRange.Signed_PlusMinus180);
+		this.rotationEncoder.setMeasurmentRange(AbsoluteSensorRange.Unsigned_0_to_360);
+
+		this.rotationController = TurretConstants.kRotationPIDGains.toPIDController();
+		this.rotationController.setSetpoint(this.getCurrentAngle());
+
 		this.rotationCCWLimitSwitch = new DigitalInput(RobotMap.kTurretCCWLimitPort);
 		this.rotationCWLimitSwitch = new DigitalInput(RobotMap.kTurretCWLimitPort);
 
 		ShuffleboardTab turretTab = Shuffleboard.getTab("Turret");
-		turretTab.add("CW Limit", this.rotationCWLimitSwitch).withPosition(0, 0).withSize(1, 1);
-		turretTab.add("CCW Limit", this.rotationCCWLimitSwitch).withPosition(0, 1).withSize(1, 1);
-		turretTab.add("Rotation CANCoder", this.rotationEncoder).withPosition(1, 0).withSize(2, 2);
+		turretTab.addBoolean("CW Limit", () -> !this.rotationCWLimitSwitch.get()).withPosition(0, 0).withSize(1, 1);
+		turretTab.addBoolean("CCW Limit", () -> !this.rotationCCWLimitSwitch.get()).withPosition(1, 0).withSize(1, 1);
+		turretTab.add("Rotation CANCoder", this.rotationEncoder).withPosition(0, 1).withSize(2, 2);
+		turretTab.addDouble("Rotation", this.rotationEncoder::getAbsAngleDeg).withWidget("Gyro").withPosition(2, 0)
+				.withSize(2, 2);
+		turretTab.addDouble("Rotation Setpoint", this.rotationController::getSetpoint).withWidget("Gyro")
+				.withPosition(4, 0).withSize(2, 2);
 	}
 
 	/**
@@ -54,23 +66,48 @@ public class TurretSubsystem extends SubsystemBase {
 		this.rotationMotor.set(output);
 	}
 
-	public double getAngle() {
+	public double getCurrentAngle() {
 		return this.rotationEncoder.getAbsAngleDeg();
+	}
+
+	public double calculateRotationMotorOutput() {
+		double output = this.rotationController.calculate(this.getCurrentAngle());
+		return MathUtil.clamp(output, -TurretConstants.kMotorMaxOutput, TurretConstants.kMotorMaxOutput);
+	}
+
+	private boolean isAtCWLimit() {
+		return !this.rotationCWLimitSwitch.get() || this.getCurrentAngle() < TurretConstants.kRotationMinAngle;
+	}
+
+	private boolean isAtCCWLimit() {
+		return !this.rotationCCWLimitSwitch.get() || this.getCurrentAngle() > TurretConstants.kRotationMaxAngle;
 	}
 
 	/**
 	 * @param output - Positive output for CW rotation, Negative output for CCW rotation.
 	 */
 	public void rotateWithLimits(double output) {
-		if ((output < 0.0 && !this.rotationCWLimitSwitch.get())
-				|| (output > 0.0 && !this.rotationCCWLimitSwitch.get())) {
+		if ((output < 0.0 && this.isAtCWLimit()) || (output > 0.0 && this.isAtCCWLimit())) {
 			this.setRotationMotor(0.0);
 		} else {
-			this.setRotationMotor(output * TurretConstants.kRotationMaxOutput);
+			this.setRotationMotor(output);
 		}
 	}
 
-	public Command openLoopTeleopTurretCommand(DoubleSupplier speedSupplier) {
-		return new RunCommand(() -> this.rotateWithLimits(speedSupplier.getAsDouble()), this);
+	public Command openLoopTeleopCommand(DoubleSupplier outputSupplier) {
+		return new RunCommand(() -> {
+			this.rotateWithLimits(outputSupplier.getAsDouble() * TurretConstants.kMotorMaxOutput);
+		}, this);
+	}
+
+	public Command closedLoopTeleopCommand(DoubleSupplier outputSupplier) {
+		return new RunCommand(() -> {
+			double newSetpoint = this.rotationController.getSetpoint()
+					+ outputSupplier.getAsDouble() * TurretConstants.kRotationTeleopSetpointMultiplier;
+			this.rotationController.setSetpoint(
+					MathUtil.clamp(newSetpoint, TurretConstants.kRotationMinAngle, TurretConstants.kRotationMaxAngle));
+
+			this.rotationMotor.set(this.calculateRotationMotorOutput());
+		}, this);
 	}
 }
