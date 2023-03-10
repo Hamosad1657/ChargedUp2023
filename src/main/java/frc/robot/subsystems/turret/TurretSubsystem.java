@@ -94,6 +94,10 @@ public class TurretSubsystem extends SubsystemBase {
 		}
 	}
 
+	public void setSetpoint(double rotation) {
+		this.rotationController.setSetpoint(rotation);
+	}
+
 	public Command openLoopTeleopCommand(DoubleSupplier outputSupplier) {
 		return new RunCommand(() -> {
 			this.rotateWithLimits(outputSupplier.getAsDouble() * TurretConstants.kMotorMaxOutput);

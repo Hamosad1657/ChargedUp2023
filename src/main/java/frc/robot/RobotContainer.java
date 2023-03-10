@@ -17,6 +17,7 @@ import frc.robot.subsystems.arm.ArmSubsystem;
 import frc.robot.subsystems.grabber.GrabberSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
+import frc.robot.subsystems.turret.TurretConstants;
 import frc.robot.subsystems.turret.TurretSubsystem;
 
 public class RobotContainer {
@@ -70,11 +71,16 @@ public class RobotContainer {
 		this.driverB_CommandController.square().onTrue(this.arm.getToStateCommand(ArmState.kLowRaiseCone));
 		this.driverB_CommandController.circle().onTrue(this.arm.getToStateCommand(ArmState.kConeDropoff));
 		this.driverB_CommandController.share().onTrue(this.arm.homeCommand());
-		this.driverB_CommandController.PS().onTrue(new InstantCommand(this.arm::resetLengthCANCoder));
 
 		// Grabber
 		this.driverB_CommandController.cross().onTrue(this.grabber.collectCommand());
 		this.driverB_CommandController.triangle().onTrue(this.grabber.releaseCommand());
+
+		// Turret
+		this.driverB_CommandController.R1()
+				.onTrue(new InstantCommand(() -> this.turret.setSetpoint(TurretConstants.kFrontRotationSetpoint)));
+		this.driverB_CommandController.L1()
+				.onTrue(new InstantCommand(() -> this.turret.setSetpoint(TurretConstants.kBackRotationSetpoint)));
 	}
 
 	private void setDefaultCommands() {
