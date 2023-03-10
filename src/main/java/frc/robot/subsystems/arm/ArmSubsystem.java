@@ -221,6 +221,26 @@ public class ArmSubsystem extends SubsystemBase {
 		return this.getToStateCommand(newState, false);
 	}
 
+	public Command getToStateAutoCommand(ArmState newState, boolean endAtSetpoint) {
+		return new FunctionalCommand(() -> {
+			this.setState(newState);
+		}, () -> {
+			this.setAngleMotorWithLimits(this.calculateAngleMotorOutput());
+
+			if (this.getCurrentAngle() > ArmConstants.kLengthExtendMinAngle) {
+				this.setLengthMotorWithLimits(this.calculateLengthMotorOutput());
+			}
+		}, (interrupted) -> {
+			this.teleopAngleSetpointDeg = this.getCurrentAngle();
+			this.setLengthMotorWithLimits(0.0);
+		}, () -> (endAtSetpoint ? (this.anglePIDController.atGoal() && this.lengthPIDController.atSetpoint())
+				: this.shoudlArmMove()), this);
+	}
+
+	public Command getToStateAutoCommand(ArmState newState) {
+		return this.getToStateAutoCommand(newState, false);
+	}
+
 	/**
 	 * Returns a RunCommand to manually control the arm's length and angle using 3 output suppliers.
 	 * 
