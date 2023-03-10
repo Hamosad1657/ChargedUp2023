@@ -7,8 +7,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.9199809276811535,
-        "y": 4.688247797548227
+        "x": 2.5572503776586504,
+        "y": 4.724520852550477
       },
       "holonomicAngle": -89.169684513742,
       "isReversal": false,
@@ -18,7 +18,8 @@
       "stopEvent": {
         "names": [
           "CollectGamePiece",
-          "ArmHigh"
+          "DropoffHigh",
+          "HomeArm"
         ],
         "executionBehavior": "sequential",
         "waitBehavior": "none",
@@ -27,12 +28,62 @@
     },
     {
       "anchorPoint": {
-        "x": 6.47474031790169,
+        "x": 6.65,
         "y": 4.597565160042601
       },
       "prevControl": {
-        "x": 5.350275612831927,
+        "x": 5.524219703665121,
+        "y": 4.597565160042601
+      },
+      "nextControl": {
+        "x": 7.662845263232427,
+        "y": 4.597565160042601
+      },
+      "holonomicAngle": -90.0,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [],
+        "executionBehavior": "parallel",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 2.811161762674403,
+        "y": 4.642906478795414
+      },
+      "prevControl": {
+        "x": 3.8993534127419136,
         "y": 4.651974742545977
+      },
+      "nextControl": {
+        "x": 2.267009267879003,
+        "y": 4.638371874672119
+      },
+      "holonomicAngle": -90.0,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [],
+        "executionBehavior": "parallel",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 1.904335387618144,
+        "y": 3.85
+      },
+      "prevControl": {
+        "x": 2.0857006626293955,
+        "y": 4.5845293637955695
       },
       "nextControl": null,
       "holonomicAngle": -90.0,
@@ -50,10 +101,10 @@
   ],
   "markers": [
     {
-      "position": 0.33636363636363636,
+      "position": 0.15,
       "names": [
         "RotateTurretBack",
-        "LowCube"
+        "PickupCube"
       ]
     }
   ]

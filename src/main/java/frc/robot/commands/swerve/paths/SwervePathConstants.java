@@ -78,7 +78,7 @@ public final class SwervePathConstants {
 				turret.setSetpointCommand(TurretConstants.kFrontRotationSetpoint));
 
 		// Arm
-		SwervePathConstants.kPathCommandsMap.put("HomeArm", arm.homeCommand().withTimeout(5.0));
+		SwervePathConstants.kPathCommandsMap.put("HomeArm", arm.autoHomeCommand().withTimeout(4.0));
 
 		// Grabber
 		SwervePathConstants.kPathCommandsMap.put("CollectGamePiece", grabber.collectCommand());
@@ -91,16 +91,16 @@ public final class SwervePathConstants {
 		// Pickups
 		SwervePathConstants.kPathCommandsMap.put("PickupCone", arm.pickupConeCommand());
 		SwervePathConstants.kPathCommandsMap.put("PickupCube",
-				arm.setStateCommand(ArmState.kLowCube).andThen(grabber.collectCommand()));
+				arm.getToStateCommand(ArmState.kLowCube, true).andThen(grabber.collectCommand()));
 
 		// Dropoffs
 		SwervePathConstants.kPathCommandsMap.put("DropoffLowCone",
-				arm.setStateCommand(ArmState.kLowConeDropoff).andThen(grabber.releaseCommand()));
+				arm.getToStateCommand(ArmState.kLowConeDropoff, true).andThen(grabber.releaseCommand()));
 		SwervePathConstants.kPathCommandsMap.put("DropoffLowCube",
-				arm.setStateCommand(ArmState.kLowCube).andThen(grabber.releaseCommand()));
+				arm.getToStateCommand(ArmState.kLowCube, true).andThen(grabber.releaseCommand()));
 		SwervePathConstants.kPathCommandsMap.put("DropoffMid",
-				arm.setStateCommand(ArmState.kMid).andThen(grabber.releaseCommand()));
+				arm.getToStateCommand(ArmState.kMid, true).andThen(grabber.releaseCommand()));
 		SwervePathConstants.kPathCommandsMap.put("DropoffHigh",
-				arm.setStateCommand(ArmState.kHigh).andThen(grabber.releaseCommand()));
+				arm.getToStateCommand(ArmState.kHigh, true).andThen(grabber.releaseCommand()));
 	}
 }

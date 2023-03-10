@@ -217,32 +217,12 @@ public class ArmSubsystem extends SubsystemBase {
 		}, (interrupted) -> {
 			this.teleopAngleSetpointDeg = this.getCurrentAngle();
 			this.setLengthMotorWithLimits(0.0);
-		}, () -> (endAtSetpoint ? (this.anglePIDController.atGoal() && this.lengthPIDController.atSetpoint())
-				: this.shoudlArmMove()), this);
+		}, () -> (endAtSetpoint ? (this.angleAtGoal && this.lengthPIDController.atSetpoint()) : this.shoudlArmMove()),
+				this);
 	}
 
 	public Command getToStateCommand(ArmState newState) {
 		return this.getToStateCommand(newState, false);
-	}
-
-	public Command getToStateAutoCommand(ArmState newState, boolean endAtSetpoint) {
-		return new FunctionalCommand(() -> {
-			this.setState(newState);
-		}, () -> {
-			this.setAngleMotorWithLimits(this.calculateAngleMotorOutput());
-
-			if (this.getCurrentAngle() > ArmConstants.kLengthExtendMinAngle) {
-				this.setLengthMotorWithLimits(this.calculateLengthMotorOutput());
-			}
-		}, (interrupted) -> {
-			this.teleopAngleSetpointDeg = this.getCurrentAngle();
-			this.setLengthMotorWithLimits(0.0);
-		}, () -> (endAtSetpoint ? (this.anglePIDController.atGoal() && this.lengthPIDController.atSetpoint())
-				: this.shoudlArmMove()), this);
-	}
-
-	public Command getToStateAutoCommand(ArmState newState) {
-		return this.getToStateAutoCommand(newState, false);
 	}
 
 	/**
@@ -289,6 +269,12 @@ public class ArmSubsystem extends SubsystemBase {
 	}
 
 	public Command homeCommand() {
+		return this.autoHomeCommand().andThen(new RunCommand(() -> {
+			this.setAngleMotorWithLimits(ArmConstants.kHomingAngleOutput);
+		}, this).until(this::shoudlArmMove));
+	}
+
+	public Command autoHomeCommand() {
 		return new FunctionalCommand(() -> {
 			this.setState(ArmConstants.kAngleMinSetpoint, 0.0);
 		}, () -> {
@@ -308,10 +294,7 @@ public class ArmSubsystem extends SubsystemBase {
 				this.resetLengthCANCoder();
 			}
 			this.setState(this.getCurrentAngle(), this.getCurrentLength());
-		}, () -> (!this.retractLimit.get() && !this.bottomAngleLimit.get()) || this.shoudlArmMove(), this)
-				.andThen(new RunCommand(() -> {
-					this.setAngleMotorWithLimits(ArmConstants.kHomingAngleOutput);
-				}, this).until(this::shoudlArmMove));
+		}, () -> (!this.retractLimit.get() && !this.bottomAngleLimit.get()) || this.shoudlArmMove(), this);
 	}
 
 	public Command pickupConeCommand() {
