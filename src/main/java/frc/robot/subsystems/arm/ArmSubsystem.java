@@ -3,7 +3,6 @@ package frc.robot.subsystems.arm;
 
 import java.util.function.DoubleSupplier;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.RemoteFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
@@ -45,6 +44,7 @@ public class ArmSubsystem extends SubsystemBase {
 
 	private final DigitalInput extendLimit, retractLimit, bottomAngleLimit, topAngleLimit;
 
+	private boolean angleAtGoal = false;
 	private double teleopAngleSetpointDeg;
 
 	public ArmSubsystem() {
@@ -92,8 +92,11 @@ public class ArmSubsystem extends SubsystemBase {
 		armTab.addBoolean("Top Angle Limit", () -> !this.topAngleLimit.get()).withPosition(4, 2).withSize(2, 1);
 		armTab.addBoolean("Bottom Angle Limit", () -> !this.bottomAngleLimit.get()).withPosition(4, 3).withSize(2, 1);
 
-		armTab.addDouble("Angle Setpoint", () -> this.anglePIDController.getGoal().position).withPosition(6, 0)
-				.withSize(2, 1);
+		armTab.addDouble("Angle Goal", () -> this.anglePIDController.getGoal().position).withPosition(6, 0).withSize(2,
+				1);
+		armTab.addDouble("Length Setpoint", this.lengthPIDController::getSetpoint).withPosition(6, 1).withSize(2, 1);
+		armTab.addBoolean("Angle At Goal", this.anglePIDController::atGoal).withPosition(6, 2).withSize(2, 1);
+		armTab.addBoolean("Length At Setpoint", this.lengthPIDController::atSetpoint).withPosition(6, 3).withSize(2, 1);
 	}
 
 	public void resetLengthCANCoder() {
@@ -194,14 +197,23 @@ public class ArmSubsystem extends SubsystemBase {
 	}
 
 	public Command getToStateCommand(ArmState newState, boolean endAtSetpoint) {
-		return new FunctionalCommand(() -> this.setState(newState), () -> {
+		return new FunctionalCommand(() -> {
+			this.angleAtGoal = false;
+			this.setState(newState);
+		}, () -> {
 			this.setAngleMotorWithLimits(this.calculateAngleMotorOutput());
-			if (this.getCurrentAngle() > ArmConstants.kLengthExtendMinAngle) {
+			if (this.anglePIDController.atGoal()) {
+				this.angleAtGoal = true;
+			}
+
+			if (this.angleAtGoal) {
 				this.setLengthMotorWithLimits(this.calculateLengthMotorOutput());
 			}
 		}, (interrupted) -> {
 			this.teleopAngleSetpointDeg = this.getCurrentAngle();
-		}, () -> (endAtSetpoint ? this.anglePIDController.atGoal() : this.shoudlArmMove()), this);
+			this.setLengthMotorWithLimits(0.0);
+		}, () -> (endAtSetpoint ? (this.anglePIDController.atGoal() && this.lengthPIDController.atSetpoint())
+				: this.shoudlArmMove()), this);
 	}
 
 	public Command getToStateCommand(ArmState newState) {
