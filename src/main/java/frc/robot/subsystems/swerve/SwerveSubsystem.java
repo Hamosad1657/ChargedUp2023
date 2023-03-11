@@ -411,10 +411,10 @@ public class SwerveSubsystem extends SubsystemBase {
 	}
 
 	public Command crossLockWheelsCommand() {
-		return new RunCommand(this::crossLockWheels, this).until(() -> this.shouldRobotMove());
+		return new RunCommand(this::crossLockWheels, this).until(() -> this.joysticksMoved());
 	}
 
-	public boolean shouldRobotMove() {
+	public boolean joysticksMoved() {
 		double translationXValue = RobotContainer.driverA_Controller.getLeftX();
 		double translationYValue = RobotContainer.driverA_Controller.getLeftY();
 		double rotationValue = RobotContainer.driverA_Controller.getRightX();
