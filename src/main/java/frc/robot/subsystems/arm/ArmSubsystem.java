@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.RobotContainer;
 import frc.robot.RobotMap;
 import frc.robot.subsystems.arm.ArmConstants.ArmState;
@@ -252,10 +253,10 @@ public class ArmSubsystem extends SubsystemBase {
 	}
 
 	public Command homeCommand() {
-		return this.autoHomeCommand().andThen(new RunCommand(() -> {
+		return this.autoHomeCommand().andThen(new InstantCommand(() -> {
 			this.setAngleMotorWithLimits(ArmConstants.kHomingAngleOutput);
 			this.setLengthMotorWithLimits(ArmConstants.kHomingLengthKeepRetractedOutput);
-		}, this).until(this::joysticksMoved));
+		}, this).andThen(new WaitUntilCommand(this::joysticksMoved)));
 	}
 
 	public Command autoHomeCommand() {

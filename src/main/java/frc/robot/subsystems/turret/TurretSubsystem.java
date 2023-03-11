@@ -47,6 +47,7 @@ public class TurretSubsystem extends SubsystemBase {
 
 		this.rotationController = TurretConstants.kRotationPIDGains.toPIDController();
 		this.rotationController.setSetpoint(this.getCurrentAngle());
+		this.rotationController.setTolerance(TurretConstants.kRotationTolerance);
 
 		this.rotationCCWLimitSwitch = new DigitalInput(RobotMap.kTurretCCWLimitPort);
 		this.rotationCWLimitSwitch = new DigitalInput(RobotMap.kTurretCWLimitPort);
@@ -59,6 +60,7 @@ public class TurretSubsystem extends SubsystemBase {
 				.withSize(2, 2);
 		turretTab.addDouble("Rotation Setpoint", this.rotationController::getSetpoint).withWidget("Gyro")
 				.withPosition(4, 0).withSize(2, 2);
+		turretTab.addBoolean("At Rotation Setpoint", this::isAtSetpoint).withSize(2, 1).withPosition(2, 2);
 	}
 
 	/**
@@ -106,7 +108,7 @@ public class TurretSubsystem extends SubsystemBase {
 
 	public Command setSetpointCommand(double rotation) {
 		return new InstantCommand(() -> this.setSetpoint(rotation))
-				.andThen(ArmSubsystem.getInstance().homeCommand().repeatedly().until(this::isAtSetpoint));
+				.andThen(ArmSubsystem.getInstance().homeCommand().until(this::isAtSetpoint));
 	}
 
 	public Command openLoopTeleopCommand(DoubleSupplier outputSupplier) {

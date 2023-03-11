@@ -5,6 +5,7 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotMap;
@@ -47,8 +48,7 @@ public class GrabberSubsystem extends SubsystemBase {
 	}
 
 	public Command collectCommand() {
-		return new RunCommand(() -> this.motor.set(-GrabberConstants.kMotorDefaultOutput), this)
-				.withTimeout(GrabberConstants.kAutoCollectTime);
+		return new InstantCommand(() -> this.motor.set(-GrabberConstants.kMotorDefaultOutput), this);
 	}
 
 	public Command releaseCommand() {

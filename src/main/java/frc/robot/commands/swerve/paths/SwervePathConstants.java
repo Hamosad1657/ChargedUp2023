@@ -95,7 +95,7 @@ public final class SwervePathConstants {
 		// Pickups
 		SwervePathConstants.kPathCommandsMap.put("PickupCone", arm.pickupConeCommand());
 		SwervePathConstants.kPathCommandsMap.put("PickupCube",
-				arm.getToStateCommand(ArmState.kLowCube, true).andThen(grabber.collectCommand()));
+				grabber.collectCommand().andThen(arm.getToStateCommand(ArmState.kLowCube, true)));
 
 		// Dropoffs
 		SwervePathConstants.kPathCommandsMap.put("DropoffLowCone",
@@ -106,5 +106,10 @@ public final class SwervePathConstants {
 				arm.getToStateCommand(ArmState.kMid, true).andThen(grabber.releaseCommand()));
 		SwervePathConstants.kPathCommandsMap.put("DropoffHigh",
 				arm.getToStateCommand(ArmState.kHigh, true).andThen(grabber.releaseCommand()));
+
+		// Turret & Pickups
+		SwervePathConstants.kPathCommandsMap.put("RotateTurretBackPickupCube",
+				turret.setSetpointCommand(TurretConstants.kBackRotationSetpoint).andThen(grabber.collectCommand())
+						.andThen(arm.getToStateCommand(ArmState.kLowCube, true)));
 	}
 }

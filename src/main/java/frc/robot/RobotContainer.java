@@ -122,7 +122,7 @@ public class RobotContainer {
 		this.comboBoxChooser = new SendableChooser<Command>();
 
 		SwervePathConstants.kPaths.forEach((name, command) -> comboBoxChooser.addOption(name, command));
-		autoTab.add("Path Chooser", this.comboBoxChooser).withWidget("ComboBox Chooser");
+		autoTab.add("Path Chooser", this.comboBoxChooser).withWidget("ComboBox Chooser").withSize(3, 2);
 
 		this.comboBoxChooser.setDefaultOption("Arm & Mobility",
 				this.swerve.getPathPlannerAutoCommand("Arm & Mobility"));

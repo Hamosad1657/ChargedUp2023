@@ -266,9 +266,10 @@ public class SwerveSubsystem extends SubsystemBase {
 
 	/** Set the odometry to a specific position. Units in meters and Rotation2d. */
 	public void resetOdometry(Pose2d pose) {
-		this.setGyro(pose.getRotation().getDegrees() + 180);
+		this.setGyro(pose.getRotation().getDegrees() + 90.0);
+		Robot.print("Gyro reset to: " + Double.toString(this.getYaw().getDegrees()));
 		this.odometry.resetPosition(this.getYaw(), this.getModulesPositions(), pose);
-		Robot.print("Odometry reset to: " + Double.toString(this.getOdometryPose().getX())
+		Robot.print("Odometry reset to: " + Double.toString(this.getOdometryPose().getX()) + " | "
 				+ Double.toString(this.getOdometryPose().getY()));
 	}
 
