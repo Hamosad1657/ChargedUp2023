@@ -67,8 +67,8 @@ public class ArmSubsystem extends SubsystemBase {
 
 		this.lengthMotor = new WPI_TalonFX(RobotMap.kArmLengthMotorID);
 		this.lengthMotor.setNeutralMode(NeutralMode.Brake);
-		this.lengthMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 35.0, 40.0, 0.1));
-		this.lengthMotor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 30.0, 40.0, 0.2));
+		this.lengthMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 35.0, 40.0, 0.25));
+		this.lengthMotor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 35.0, 40.0, 0.25));
 		this.lengthMotor.configNeutralDeadband(0.1);
 
 		this.anglePIDController = ArmConstants.kAnglePIDGains.toProfiledPIDController(ArmConstants.kAnglePIDConstrains);
@@ -283,8 +283,11 @@ public class ArmSubsystem extends SubsystemBase {
 	}
 
 	public Command autoHomeCommand() {
-		return new RunCommand(() -> this.setAngleMotorWithLimits(-ArmConstants.kHomingAngleOutput), this)
-				.until(() -> this.getCurrentAngle() > ArmConstants.kLengthRetractMinAngle)
+		return new RunCommand(() -> {
+			if (this.getCurrentAngle() < ArmConstants.kLengthRetractMinAngle) {
+				this.setAngleMotorWithLimits(-ArmConstants.kHomingAngleOutput);
+			}
+		}, this).until(() -> this.getCurrentAngle() > ArmConstants.kLengthRetractMinAngle)
 				.andThen(new RunCommand(() -> {
 					// The limits are normally true
 					if (this.retractLimit.get()) {
