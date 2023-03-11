@@ -2,13 +2,13 @@
   "waypoints": [
     {
       "anchorPoint": {
-        "x": 1.8861988601170188,
-        "y": 4.851476545058354
+        "x": 1.922471915119269,
+        "y": 3.84
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.475636003903587,
-        "y": 4.73358911630104
+        "x": 1.8952671238675813,
+        "y": 5.132592721325794
       },
       "holonomicAngle": -90.0,
       "isReversal": false,
@@ -19,6 +19,7 @@
         "names": [
           "CollectGamePiece",
           "DropoffHigh",
+          "WaitABit",
           "HomeArm"
         ],
         "executionBehavior": "sequential",
@@ -28,16 +29,16 @@
     },
     {
       "anchorPoint": {
-        "x": 6.65,
-        "y": 4.597565160042601
+        "x": 6.6,
+        "y": 4.6
       },
       "prevControl": {
-        "x": 5.524219703665121,
-        "y": 4.597565160042601
+        "x": 6.602511352277525,
+        "y": 4.71543773136046
       },
       "nextControl": {
-        "x": 7.662845263232427,
-        "y": 4.597565160042601
+        "x": 6.565422955407315,
+        "y": 3.0106190036941483
       },
       "holonomicAngle": -90.0,
       "isReversal": false,
@@ -53,37 +54,12 @@
     },
     {
       "anchorPoint": {
-        "x": 2.811161762674403,
-        "y": 4.642906478795414
+        "x": 3.6907833464789737,
+        "y": 3.35
       },
       "prevControl": {
-        "x": 3.8992349203009105,
-        "y": 4.661348396721287
-      },
-      "nextControl": {
-        "x": 2.27613420139121,
-        "y": 4.633838215044851
-      },
-      "holonomicAngle": -90.0,
-      "isReversal": false,
-      "velOverride": null,
-      "isLocked": false,
-      "isStopPoint": false,
-      "stopEvent": {
-        "names": [],
-        "executionBehavior": "parallel",
-        "waitBehavior": "none",
-        "waitTime": 0
-      }
-    },
-    {
-      "anchorPoint": {
-        "x": 1.8952671238675813,
-        "y": 4.325517247525723
-      },
-      "prevControl": {
-        "x": 1.722970112606892,
-        "y": 4.252971137521223
+        "x": 4.216742644011601,
+        "y": 3.35
       },
       "nextControl": null,
       "holonomicAngle": -90.0,
@@ -92,9 +68,7 @@
       "isLocked": false,
       "isStopPoint": false,
       "stopEvent": {
-        "names": [
-          "ReleaseGamePiece"
-        ],
+        "names": [],
         "executionBehavior": "parallel",
         "waitBehavior": "none",
         "waitTime": 0
@@ -102,21 +76,20 @@
     }
   ],
   "maxVelocity": null,
-  "maxAcceleration": 4.0,
+  "maxAcceleration": 6.0,
   "isReversed": null,
   "markers": [
     {
-      "position": 0.15,
+      "position": 0.12727272727272726,
       "names": [
         "RotateTurretBack",
         "PickupCube"
       ]
     },
     {
-      "position": 1.0363636363636364,
+      "position": 1.3454545454545443,
       "names": [
-        "RotateTurretFront",
-        "ArmHigh"
+        "HomeArm"
       ]
     }
   ]

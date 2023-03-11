@@ -38,6 +38,7 @@ import frc.fusionLib.swerve.SwerveModule;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.RobotMap;
+import frc.robot.commands.swerve.chargestation.BalanceChassisCommand;
 import frc.robot.commands.swerve.paths.SwervePathConstants;
 
 public class SwerveSubsystem extends SubsystemBase {
@@ -474,8 +475,9 @@ public class SwerveSubsystem extends SubsystemBase {
 	 * The function for putting paths inside the chooser
 	 */
 	private void createPaths() {
-		SwervePathConstants.kPaths.putIfAbsent("Mobility & Station", new SequentialCommandGroup(
-				this.getPathPlannerAutoCommand("Mobility & Station"), this.crossLockWheelsCommand()));
+		SwervePathConstants.kPaths.putIfAbsent("New Path",
+				new SequentialCommandGroup(this.getPathPlannerAutoCommand("New Path"), new BalanceChassisCommand(this),
+						this.crossLockWheelsCommand()));
 
 		try (Stream<Path> paths = Files.walk(Filesystem.getDeployDirectory().toPath().resolve("pathplanner/"))) {
 			paths.filter(Files::isRegularFile).forEach((path) -> {

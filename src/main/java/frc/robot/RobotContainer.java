@@ -85,8 +85,9 @@ public class RobotContainer {
 
 		// Swerve teleop driving - Left stick for X and Y movement, right X for rotation.
 		this.swerve.setDefaultCommand(new TeleopDriveCommand(this.swerve,
+				() -> HaUnits.deadband(-driverA_Controller.getLeftX(), kJoystickDeadband),
 				() -> HaUnits.deadband(driverA_Controller.getLeftY(), kJoystickDeadband),
-				() -> HaUnits.deadband(driverA_Controller.getLeftX(), kJoystickDeadband),
+
 				() -> HaUnits.deadband(driverA_Controller.getRightX(), kJoystickDeadband)));
 
 		// Turret teleop control - Right X for rotation.

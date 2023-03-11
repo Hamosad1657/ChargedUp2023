@@ -48,7 +48,6 @@ public class ArmSubsystem extends SubsystemBase {
 	private final DigitalInput extendLimit, retractLimit, bottomAngleLimit, topAngleLimit;
 
 	private boolean angleAtGoal = false;
-	private double teleopAngleSetpointDeg;
 
 	public ArmSubsystem() {
 		this.angleMotor = new CANSparkMax(RobotMap.kArmAngleMotorID, MotorType.kBrushless);
@@ -82,12 +81,11 @@ public class ArmSubsystem extends SubsystemBase {
 		this.extendLimit = new DigitalInput(RobotMap.kArmExtendLimitPort);
 		this.retractLimit = new DigitalInput(RobotMap.kArmRetractLimitPort);
 
-		this.teleopAngleSetpointDeg = ArmConstants.kAngleMinSetpoint;
-		this.setState(this.teleopAngleSetpointDeg, 0.0);
+		this.setState(ArmConstants.kAngleMinSetpoint, 0.0);
 
 		ShuffleboardTab armTab = Shuffleboard.getTab("Arm");
 
-		armTab.add("Arm Length Motor", this.lengthMotor).withPosition(0, 0).withSize(2, 4);
+		armTab.add("Arm Length Motor", this.lengthMotor).withPosition(0, 0).withSize(2, 2);
 		armTab.add("Arm Angle CANCoder", this.angleCANCoder).withPosition(2, 0).withSize(2, 2);
 		armTab.add("Arm Length CANCoder", this.lengthCANCoder).withPosition(4, 0).withSize(2, 2);
 
@@ -115,10 +113,6 @@ public class ArmSubsystem extends SubsystemBase {
 		return this.angleCANCoder.getAbsAngleDeg();
 	}
 
-	public void resetTeleopAngleSetpoint() {
-		this.teleopAngleSetpointDeg = this.getCurrentAngle();
-	}
-
 	/**
 	 * @param output - The output of the angle motor in [-1.0, 1.0]. Positive output: arm goes up, negative output: arm
 	 *               goes down. Doesn't slow near the limits.
@@ -138,9 +132,7 @@ public class ArmSubsystem extends SubsystemBase {
 	 */
 	public void setLengthMotorWithLimits(double output) {
 		// The magnetic limit switches are normally true.
-		if (output < 0.0 && !this.extendLimit.get()) {
-			this.lengthMotor.set(0.0);
-		} else if (output > 0.0 && !this.retractLimit.get()) {
+		if ((output < 0.0 && !this.extendLimit.get()) || (output > 0.0 && !this.retractLimit.get())) {
 			this.lengthMotor.set(0.0);
 		} else {
 			this.lengthMotor.set(output);
@@ -170,13 +162,6 @@ public class ArmSubsystem extends SubsystemBase {
 	}
 
 	/**
-	 * @return If both the angle and length motors are at their setpoint.
-	 */
-	public boolean isAtSetpoint() {
-		return this.anglePIDController.atSetpoint() && this.lengthPIDController.atSetpoint();
-	}
-
-	/**
 	 * Sets the setpoint of the arm and length motors to the new arm state.
 	 * 
 	 * @param angleDeg  - The new state's angle.
@@ -184,7 +169,6 @@ public class ArmSubsystem extends SubsystemBase {
 	 */
 	public void setState(double angleDeg, double lengthDeg) {
 		this.anglePIDController.setGoal(angleDeg);
-		this.teleopAngleSetpointDeg = angleDeg;
 		this.lengthPIDController.setSetpoint(lengthDeg);
 	}
 
@@ -215,7 +199,6 @@ public class ArmSubsystem extends SubsystemBase {
 				this.setLengthMotorWithLimits(this.calculateLengthMotorOutput());
 			}
 		}, (interrupted) -> {
-			this.teleopAngleSetpointDeg = this.getCurrentAngle();
 			this.setLengthMotorWithLimits(0.0);
 		}, () -> (endAtSetpoint ? (this.angleAtGoal && this.lengthPIDController.atSetpoint()) : this.shoudlArmMove()),
 				this);
@@ -255,11 +238,11 @@ public class ArmSubsystem extends SubsystemBase {
 			DoubleSupplier backwardsOutputSupplier) {
 		return new RunCommand(() -> {
 			// Set angle motor
-			this.teleopAngleSetpointDeg += angleOutputSupplier.getAsDouble()
-					* -ArmConstants.kAngleTeleopSetpointMultiplier;
-			this.teleopAngleSetpointDeg = MathUtil.clamp(this.teleopAngleSetpointDeg, ArmConstants.kAngleMinSetpoint,
+			double newAngleSetpoint = this.anglePIDController.getGoal().position
+					+ angleOutputSupplier.getAsDouble() * -ArmConstants.kAngleTeleopSetpointMultiplier;
+			newAngleSetpoint = MathUtil.clamp(newAngleSetpoint, ArmConstants.kAngleMinSetpoint,
 					ArmConstants.kAngleMaxSetpoint);
-			this.anglePIDController.setGoal(this.teleopAngleSetpointDeg);
+			this.anglePIDController.setGoal(newAngleSetpoint);
 			this.setAngleMotorWithLimits(this.calculateAngleMotorOutput());
 
 			// Set length motors
