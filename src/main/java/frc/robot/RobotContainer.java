@@ -64,7 +64,8 @@ public class RobotContainer {
 		this.driverB_CommandController.povLeft().onTrue(this.arm.getToStateCommand(ArmState.kMid));
 		this.driverB_CommandController.povRight().onTrue(this.arm.pickupConeCommand());
 		this.driverB_CommandController.povDown().onTrue(this.arm.getToStateCommand(ArmState.kLowCube));
-		this.driverB_CommandController.options().onTrue(this.arm.getToStateCommand(ArmState.kShelf));
+		this.driverB_CommandController.options()
+				.onTrue(this.grabber.collectCommand().alongWith(this.arm.getToStateCommand(ArmState.kShelf)));
 		this.driverB_CommandController.square().onTrue(this.arm.getToStateCommand(ArmState.kLowRaiseCone));
 		this.driverB_CommandController.circle().onTrue(this.arm.getToStateCommand(ArmState.kLowConeDropoff));
 		this.driverB_CommandController.share().onTrue(this.arm.homeCommand());
