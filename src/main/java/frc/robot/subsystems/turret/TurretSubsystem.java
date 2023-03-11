@@ -16,8 +16,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.RobotMap;
-import frc.robot.subsystems.arm.ArmSubsystem;
 
 public class TurretSubsystem extends SubsystemBase {
 	private static TurretSubsystem instace;
@@ -107,8 +107,7 @@ public class TurretSubsystem extends SubsystemBase {
 	}
 
 	public Command setSetpointCommand(double rotation) {
-		return new InstantCommand(() -> this.setSetpoint(rotation))
-				.andThen(ArmSubsystem.getInstance().homeCommand().until(this::isAtSetpoint));
+		return new InstantCommand(() -> this.setSetpoint(rotation)).andThen(new WaitUntilCommand(this::isAtSetpoint));
 	}
 
 	public Command openLoopTeleopCommand(DoubleSupplier outputSupplier) {

@@ -48,7 +48,7 @@ public class ArmSubsystem extends SubsystemBase {
 
 	private final DigitalInput extendLimit, retractLimit, bottomAngleLimit, topAngleLimit;
 
-	private boolean angleAtGoal = false;
+	private boolean angleAtGoal, lengthAtGoal;
 
 	public ArmSubsystem() {
 		this.angleMotor = new CANSparkMax(RobotMap.kArmAngleMotorID, MotorType.kBrushless);
@@ -68,7 +68,7 @@ public class ArmSubsystem extends SubsystemBase {
 		this.lengthMotor = new WPI_TalonFX(RobotMap.kArmLengthMotorID);
 		this.lengthMotor.setNeutralMode(NeutralMode.Brake);
 		this.lengthMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 35.0, 40.0, 0.1));
-		this.lengthMotor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 30.0, 35.0, 0.1));
+		this.lengthMotor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 30.0, 40.0, 0.2));
 		this.lengthMotor.configNeutralDeadband(0.1);
 
 		this.anglePIDController = ArmConstants.kAnglePIDGains.toProfiledPIDController(ArmConstants.kAnglePIDConstrains);
@@ -206,6 +206,29 @@ public class ArmSubsystem extends SubsystemBase {
 	}
 
 	public Command getToStateCommand(ArmState newState) {
+		return this.getToStateCommand(newState, false);
+	}
+
+	public Command getToStateLengthFirstCommand(ArmState newState, boolean endAtSetpoint) {
+		return new FunctionalCommand(() -> {
+			this.lengthAtGoal = false;
+			this.setState(newState);
+		}, () -> {
+			this.setLengthMotorWithLimits(this.calculateLengthMotorOutput());
+			if (this.lengthPIDController.atSetpoint()) {
+				this.lengthAtGoal = true;
+			}
+
+			if (this.lengthAtGoal) {
+				this.setAngleMotorWithLimits(this.calculateAngleMotorOutput());
+			}
+		}, (interrupted) -> {
+			this.setLengthMotorWithLimits(0.0);
+		}, () -> (endAtSetpoint ? (this.lengthAtGoal && this.anglePIDController.atGoal()) : this.joysticksMoved()),
+				this);
+	}
+
+	public Command getToStateLengthFirstCommand(ArmState newState) {
 		return this.getToStateCommand(newState, false);
 	}
 
