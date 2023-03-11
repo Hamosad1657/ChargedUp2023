@@ -28,10 +28,10 @@ public class BalanceChassisCommand extends CommandBase {
 
 	@Override
 	public void execute() {
-		double vxMeters = MathUtil.clamp(this.balanceController.calculate(this.swerve.getPitch().getDegrees()),
+		double vyMeters = MathUtil.clamp(this.balanceController.calculate(this.swerve.getPitch().getDegrees()),
 				-BalanceChassisConstants.kDriveSpeedMPS, BalanceChassisConstants.kDriveSpeedMPS);
 
-		this.swerve.autonomousDrive(new ChassisSpeeds(0, vxMeters, 0), false, true);
+		this.swerve.autonomousDrive(new ChassisSpeeds(0, vyMeters, 0), false, true);
 	}
 
 	@Override
