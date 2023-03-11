@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.RobotMap;
+import frc.robot.subsystems.arm.ArmSubsystem;
 
 public class TurretSubsystem extends SubsystemBase {
 	private static TurretSubsystem instace;
@@ -78,6 +79,10 @@ public class TurretSubsystem extends SubsystemBase {
 		return this.rotationController.atSetpoint();
 	}
 
+	public boolean isAtSetpoint(double tolerance) {
+		return Math.abs(this.rotationController.getPositionError()) < tolerance;
+	}
+
 	public double calculateRotationMotorOutput() {
 		double output = this.rotationController.calculate(this.getCurrentAngle());
 		return MathUtil.clamp(output, -TurretConstants.kMotorMaxOutput, TurretConstants.kMotorMaxOutput);
@@ -106,8 +111,10 @@ public class TurretSubsystem extends SubsystemBase {
 		this.rotationController.setSetpoint(rotation);
 	}
 
-	public Command setSetpointCommand(double rotation) {
-		return new InstantCommand(() -> this.setSetpoint(rotation)).andThen(new WaitUntilCommand(this::isAtSetpoint));
+	public Command getToSetpointCommand(double rotation) {
+		return ArmSubsystem.getInstance().autoHomeCommand()
+				.alongWith(new InstantCommand(() -> this.setSetpoint(rotation)).andThen(
+						new WaitUntilCommand(() -> this.isAtSetpoint(TurretConstants.kAutoRotationTolerance))));
 	}
 
 	public Command openLoopTeleopCommand(DoubleSupplier outputSupplier) {

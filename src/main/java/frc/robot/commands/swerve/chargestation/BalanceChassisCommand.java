@@ -10,12 +10,12 @@ import frc.robot.subsystems.swerve.SwerveSubsystem;
 
 public class BalanceChassisCommand extends CommandBase {
 	private SwerveSubsystem swerve;
-	private PIDController pid;
+	private PIDController balanceController;
 
 	public BalanceChassisCommand(SwerveSubsystem swerve) {
-		this.pid = BalanceChassisConstants.kPIDGains.toPIDController();
-		this.pid.setSetpoint(BalanceChassisConstants.kGroundAngle);
-		this.pid.setTolerance(BalanceChassisConstants.kTolerance);
+		this.balanceController = BalanceChassisConstants.kPIDGains.toPIDController();
+		this.balanceController.setSetpoint(BalanceChassisConstants.kGroundAngle);
+		this.balanceController.setTolerance(BalanceChassisConstants.kTolerance);
 
 		this.swerve = swerve;
 		this.addRequirements(this.swerve);
@@ -28,10 +28,10 @@ public class BalanceChassisCommand extends CommandBase {
 
 	@Override
 	public void execute() {
-		double vxMeters = MathUtil.clamp(this.pid.calculate(this.swerve.getRoll().getDegrees()),
+		double vxMeters = MathUtil.clamp(this.balanceController.calculate(this.swerve.getPitch().getDegrees()),
 				-BalanceChassisConstants.kDriveSpeedMPS, BalanceChassisConstants.kDriveSpeedMPS);
 
-		this.swerve.autonomousDrive(new ChassisSpeeds(vxMeters, 0, 0), false, true);
+		this.swerve.autonomousDrive(new ChassisSpeeds(0, vxMeters, 0), false, true);
 	}
 
 	@Override
@@ -41,6 +41,6 @@ public class BalanceChassisCommand extends CommandBase {
 
 	@Override
 	public boolean isFinished() {
-		return this.pid.atSetpoint();
+		return false;
 	}
 }

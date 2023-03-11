@@ -266,7 +266,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
 	/** Set the odometry to a specific position. Units in meters and Rotation2d. */
 	public void resetOdometry(Pose2d pose) {
-		this.setGyro(pose.getRotation().getDegrees() + 180.0);
+		this.setGyro(pose.getRotation().getDegrees() + 90.0);
 		Robot.print("Gyro reset to: " + Double.toString(this.getYaw().getDegrees()));
 		this.odometry.resetPosition(this.getYaw(), this.getModulesPositions(), pose);
 		Robot.print("Odometry reset to: " + Double.toString(this.getOdometryPose().getX()) + " | "
@@ -476,9 +476,9 @@ public class SwerveSubsystem extends SubsystemBase {
 	 * The function for putting paths inside the chooser
 	 */
 	private void createPaths() {
-		SwervePathConstants.kPaths.putIfAbsent("New Path",
-				new SequentialCommandGroup(this.getPathPlannerAutoCommand("New Path"), new BalanceChassisCommand(this),
-						this.crossLockWheelsCommand()));
+		SwervePathConstants.kPaths.put("New New New Path",
+				new SequentialCommandGroup(this.getPathPlannerAutoCommand("New New New Path"),
+						new BalanceChassisCommand(this), this.crossLockWheelsCommand()));
 
 		try (Stream<Path> paths = Files.walk(Filesystem.getDeployDirectory().toPath().resolve("pathplanner/"))) {
 			paths.filter(Files::isRegularFile).forEach((path) -> {

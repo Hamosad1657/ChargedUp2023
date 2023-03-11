@@ -283,26 +283,32 @@ public class ArmSubsystem extends SubsystemBase {
 	}
 
 	public Command autoHomeCommand() {
-		return new FunctionalCommand(() -> {
-			this.setState(ArmConstants.kAngleMinSetpoint, 0.0);
-		}, () -> {
-			// The limits are normally true
-			if (this.retractLimit.get()) {
-				this.setLengthMotorWithLimits(ArmConstants.kHomingLengthOutput);
-			} else {
-				this.setLengthMotorWithLimits(0.0);
-				if (this.bottomAngleLimit.get()) {
-					this.setAngleMotorWithLimits(this.calculateAngleMotorOutput() * ArmConstants.kHomingAnglePIDRatio);
-				} else {
-					this.setAngleMotorWithLimits(0.0);
-				}
-			}
-		}, (interrupted) -> {
-			if (!(interrupted || this.joysticksMoved())) {
-				this.resetLengthCANCoder();
-			}
-			this.setState(this.getCurrentAngle(), this.getCurrentLength());
-		}, () -> (!this.retractLimit.get() && !this.bottomAngleLimit.get()) || this.joysticksMoved(), this);
+		return new RunCommand(() -> this.setAngleMotorWithLimits(-ArmConstants.kHomingAngleOutput), this)
+				.until(() -> this.getCurrentAngle() > ArmConstants.kLengthRetractMinAngle)
+				.andThen(new RunCommand(() -> {
+					// The limits are normally true
+					if (this.retractLimit.get()) {
+						this.setLengthMotorWithLimits(ArmConstants.kHomingLengthOutput);
+						this.setAngleMotorWithLimits(0.0);
+						return;
+					}
+
+					this.setLengthMotorWithLimits(0.0);
+					if (this.bottomAngleLimit.get()) {
+						this.setState(ArmConstants.kAngleMinSetpoint, 0.0);
+						this.setAngleMotorWithLimits(
+								this.calculateAngleMotorOutput() * ArmConstants.kHomingAnglePIDRatio);
+					} else {
+						this.setAngleMotorWithLimits(0.0);
+					}
+				}, this).until(
+						() -> (!this.retractLimit.get() && !this.bottomAngleLimit.get()) || this.joysticksMoved())
+						.finallyDo((interrupted) -> {
+							if (!(interrupted || this.joysticksMoved())) {
+								this.resetLengthCANCoder();
+							}
+							this.setState(this.getCurrentAngle(), this.getCurrentLength());
+						}));
 	}
 
 	public Command pickupConeCommand() {

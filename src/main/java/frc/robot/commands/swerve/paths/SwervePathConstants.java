@@ -73,9 +73,9 @@ public final class SwervePathConstants {
 
 		// Turret
 		SwervePathConstants.kPathCommandsMap.put("RotateTurretBack",
-				turret.setSetpointCommand(TurretConstants.kBackRotationSetpoint));
+				turret.getToSetpointCommand(TurretConstants.kBackRotationSetpoint));
 		SwervePathConstants.kPathCommandsMap.put("RotateTurretFront",
-				turret.setSetpointCommand(TurretConstants.kFrontRotationSetpoint));
+				turret.getToSetpointCommand(TurretConstants.kFrontRotationSetpoint));
 
 		// Arm
 		SwervePathConstants.kPathCommandsMap.put("HomeArm", arm.autoHomeCommand().withTimeout(4.0));
@@ -111,7 +111,7 @@ public final class SwervePathConstants {
 
 		// Turret & Pickups
 		SwervePathConstants.kPathCommandsMap.put("RotateTurretBackPickupCube",
-				turret.setSetpointCommand(TurretConstants.kBackRotationSetpoint)
+				turret.getToSetpointCommand(TurretConstants.kBackRotationSetpoint)
 						.andThen(arm.getToStateCommand(ArmState.kLowCube, true)).andThen(grabber.collectCommand()));
 	}
 }
