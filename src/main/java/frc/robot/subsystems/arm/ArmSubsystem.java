@@ -200,7 +200,7 @@ public class ArmSubsystem extends SubsystemBase {
 			}
 		}, (interrupted) -> {
 			this.setLengthMotorWithLimits(0.0);
-		}, () -> (endAtSetpoint ? (this.angleAtGoal && this.lengthPIDController.atSetpoint()) : this.shoudlArmMove()),
+		}, () -> (endAtSetpoint ? (this.angleAtGoal && this.lengthPIDController.atSetpoint()) : this.joysticksMoved()),
 				this);
 	}
 
@@ -254,7 +254,8 @@ public class ArmSubsystem extends SubsystemBase {
 	public Command homeCommand() {
 		return this.autoHomeCommand().andThen(new RunCommand(() -> {
 			this.setAngleMotorWithLimits(ArmConstants.kHomingAngleOutput);
-		}, this).until(this::shoudlArmMove));
+			this.setLengthMotorWithLimits(ArmConstants.kHomingLengthKeepRetractedOutput);
+		}, this).until(this::joysticksMoved));
 	}
 
 	public Command autoHomeCommand() {
@@ -273,11 +274,11 @@ public class ArmSubsystem extends SubsystemBase {
 				}
 			}
 		}, (interrupted) -> {
-			if (!(interrupted || this.shoudlArmMove())) {
+			if (!(interrupted || this.joysticksMoved())) {
 				this.resetLengthCANCoder();
 			}
 			this.setState(this.getCurrentAngle(), this.getCurrentLength());
-		}, () -> (!this.retractLimit.get() && !this.bottomAngleLimit.get()) || this.shoudlArmMove(), this);
+		}, () -> (!this.retractLimit.get() && !this.bottomAngleLimit.get()) || this.joysticksMoved(), this);
 	}
 
 	public Command pickupConeCommand() {
@@ -285,7 +286,7 @@ public class ArmSubsystem extends SubsystemBase {
 				GrabberSubsystem.getInstance().collectCommand(), this.getToStateCommand(ArmState.kLowConePickup));
 	}
 
-	public boolean shoudlArmMove() {
+	public boolean joysticksMoved() {
 		double lengthValue = (RobotContainer.driverB_Controller.getL2Axis() + 1.0)
 				- (RobotContainer.driverB_Controller.getR2Axis() + 1.0);
 		double angleValue = RobotContainer.driverB_Controller.getLeftY();
