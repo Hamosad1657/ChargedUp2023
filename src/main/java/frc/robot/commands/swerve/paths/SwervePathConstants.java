@@ -10,6 +10,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.arm.ArmConstants.ArmState;
 import frc.robot.subsystems.arm.ArmSubsystem;
@@ -68,6 +70,7 @@ public final class SwervePathConstants {
 		TurretSubsystem turret = TurretSubsystem.getInstance();
 
 		// Wait a bit
+		SwervePathConstants.kPathCommandsMap.put("WaitABitLess", new WaitCommand(0.10));
 		SwervePathConstants.kPathCommandsMap.put("WaitABit", new WaitCommand(0.15));
 		SwervePathConstants.kPathCommandsMap.put("WaitABitMore", new WaitCommand(0.35));
 
@@ -114,5 +117,6 @@ public final class SwervePathConstants {
 		SwervePathConstants.kPathCommandsMap.put("RotateTurretBackPickupCube",
 				turret.getToSetpointCommand(TurretConstants.kBackRotationSetpoint)
 						.andThen(arm.getToStateCommand(ArmState.kLowCube, true)).andThen(grabber.collectCommand()));
+
 	}
 }

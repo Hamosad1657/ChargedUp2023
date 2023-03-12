@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
-import frc.robot.commands.swerve.chargestation.BalanceChassisCommand;
 import frc.robot.commands.swerve.paths.SwervePathConstants;
 import frc.robot.commands.swerve.teleop.TeleopDriveCommand;
 import frc.robot.subsystems.arm.ArmConstants.ArmState;
@@ -59,7 +58,6 @@ public class RobotContainer {
 		// Intake
 		this.driverA_CommandController.R2().onTrue(this.intake.lowerIntakeCommand());
 		this.driverA_CommandController.L2().onTrue(this.intake.raiseIntakeCommand());
-		this.driverA_CommandController.square().onTrue(new BalanceChassisCommand(this.swerve));
 
 		// Arm
 		this.driverB_CommandController.povUp().onTrue(this.arm.getToStateCommand(ArmState.kHigh));

@@ -483,6 +483,9 @@ public class SwerveSubsystem extends SubsystemBase {
 		SwervePathConstants.kPaths.putIfAbsent("High Cone & Cube & Station",
 				new SequentialCommandGroup(this.getPathPlannerAutoCommand("High Cone & Cube & Station"),
 						new BalanceChassisCommand(this), this.crossLockWheelsCommand()));
+		SwervePathConstants.kPaths.putIfAbsent("Low Cone & Cube & Station",
+				new SequentialCommandGroup(this.getPathPlannerAutoCommand("Low Cone & Cube & Station"),
+						new BalanceChassisCommand(this), this.crossLockWheelsCommand()));
 	}
 
 	@Override
