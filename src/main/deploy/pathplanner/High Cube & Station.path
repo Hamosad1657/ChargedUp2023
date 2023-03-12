@@ -2,44 +2,48 @@
   "waypoints": [
     {
       "anchorPoint": {
-        "x": 1.8861988601170188,
-        "y": 4.860544808808916
+        "x": 1.9134036513687065,
+        "y": 2.6841615086738955
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.8861988601170196,
-        "y": 4.860544808808916
+        "x": 2.9134036513687054,
+        "y": 2.6841615086738955
       },
-      "holonomicAngle": 0,
+      "holonomicAngle": -90.0,
       "isReversal": false,
       "velOverride": null,
       "isLocked": false,
       "isStopPoint": false,
       "stopEvent": {
-        "names": [],
-        "executionBehavior": "parallel",
+        "names": [
+          "CollectGamePiece",
+          "DropoffHigh",
+          "HomeArm"
+        ],
+        "executionBehavior": "sequential",
         "waitBehavior": "none",
         "waitTime": 0
       }
     },
     {
       "anchorPoint": {
-        "x": 6.257101987888187,
-        "y": 4.597565160042601
+        "x": 3.627305500225036,
+        "y": 2.68
       },
       "prevControl": {
-        "x": 5.257101987888187,
-        "y": 4.597565160042601
+        "x": 2.627305500225036,
+        "y": 2.68
       },
       "nextControl": null,
-      "holonomicAngle": 0,
+      "holonomicAngle": -90.0,
       "isReversal": false,
       "velOverride": null,
       "isLocked": false,
       "isStopPoint": false,
       "stopEvent": {
         "names": [],
-        "executionBehavior": "parallel",
+        "executionBehavior": "sequential",
         "waitBehavior": "none",
         "waitTime": 0
       }

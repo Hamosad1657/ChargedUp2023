@@ -1,10 +1,7 @@
 
 package frc.robot.subsystems.swerve;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.List;
-import java.util.stream.Stream;
 import com.hamosad1657.lib.sensors.HaNavX;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
@@ -21,7 +18,6 @@ import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.GenericEntry;
-import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
@@ -476,19 +472,17 @@ public class SwerveSubsystem extends SubsystemBase {
 	 * The function for putting paths inside the chooser
 	 */
 	private void createPaths() {
-		SwervePathConstants.kPaths.put("New New New Path",
-				new SequentialCommandGroup(this.getPathPlannerAutoCommand("New New New Path"),
+		SwervePathConstants.kPaths.putIfAbsent("High Cone & Cube Pickup & Station",
+				new SequentialCommandGroup(this.getPathPlannerAutoCommand("High Cone & Cube Pickup & Station"),
 						new BalanceChassisCommand(this), this.crossLockWheelsCommand()));
-
-		try (Stream<Path> paths = Files.walk(Filesystem.getDeployDirectory().toPath().resolve("pathplanner/"))) {
-			paths.filter(Files::isRegularFile).forEach((path) -> {
-				String name = path.getFileName().toString().replace(".path", "");
-				SwervePathConstants.kPaths.putIfAbsent(name, new SequentialCommandGroup(
-						this.getPathPlannerAutoCommand(name), this.crossLockWheelsCommand()));
-			});
-		} catch (Exception e) {
-			Robot.print(e);
-		}
+		SwervePathConstants.kPaths.putIfAbsent("High Cube & Station",
+				new SequentialCommandGroup(this.getPathPlannerAutoCommand("High Cube & Station"),
+						new BalanceChassisCommand(this), this.crossLockWheelsCommand()));
+		SwervePathConstants.kPaths.putIfAbsent("High Cone & Cube", new SequentialCommandGroup(
+				this.getPathPlannerAutoCommand("High Cone & Cube"), this.crossLockWheelsCommand()));
+		SwervePathConstants.kPaths.putIfAbsent("High Cone & Cube & Station",
+				new SequentialCommandGroup(this.getPathPlannerAutoCommand("High Cone & Cube & Station"),
+						new BalanceChassisCommand(this), this.crossLockWheelsCommand()));
 	}
 
 	@Override

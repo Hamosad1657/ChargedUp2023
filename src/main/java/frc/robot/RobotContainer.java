@@ -69,7 +69,8 @@ public class RobotContainer {
 		this.driverB_CommandController.options()
 				.onTrue(this.grabber.collectCommand().alongWith(this.arm.getToStateCommand(ArmState.kShelf)));
 		this.driverB_CommandController.square().onTrue(this.arm.getToStateCommand(ArmState.kLowRaiseCone));
-		this.driverB_CommandController.circle().onTrue(this.arm.getToStateCommand(ArmState.kLowConeDropoff));
+		this.driverB_CommandController.circle()
+				.onTrue(this.arm.getToStateCommand(ArmState.kLowConeDropoff).andThen(this.grabber.releaseCommand()));
 		this.driverB_CommandController.share().onTrue(this.arm.homeCommand());
 
 		// Grabber
@@ -124,8 +125,5 @@ public class RobotContainer {
 
 		SwervePathConstants.kPaths.forEach((name, command) -> comboBoxChooser.addOption(name, command));
 		autoTab.add("Path Chooser", this.comboBoxChooser).withWidget("ComboBox Chooser").withSize(3, 2);
-
-		this.comboBoxChooser.setDefaultOption("Arm & Mobility",
-				this.swerve.getPathPlannerAutoCommand("Arm & Mobility"));
 	}
 }

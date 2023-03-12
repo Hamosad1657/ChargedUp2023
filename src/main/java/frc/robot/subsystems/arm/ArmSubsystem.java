@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.RobotContainer;
@@ -317,6 +318,11 @@ public class ArmSubsystem extends SubsystemBase {
 	public Command pickupConeCommand() {
 		return new SequentialCommandGroup(this.getToStateCommand(ArmState.kLowCone, true),
 				GrabberSubsystem.getInstance().collectCommand(), this.getToStateCommand(ArmState.kLowConePickup));
+	}
+
+	public Command retractCommand() {
+		return new StartEndCommand(() -> this.setLengthMotorWithLimits(ArmConstants.kHomingLengthOutput),
+				() -> this.setLengthMotorWithLimits(0.0), this).until(() -> !this.retractLimit.get());
 	}
 
 	public boolean joysticksMoved() {

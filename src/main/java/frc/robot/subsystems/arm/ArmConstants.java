@@ -14,7 +14,7 @@ public class ArmConstants {
 	public static final double kHomingAngleOutput = -0.175;
 	public static final double kHomingLengthOutput = 1.0;
 	public static final double kHomingLengthKeepRetractedOutput = 0.1;
-	public static final double kHomingAnglePIDRatio = 1.35;
+	public static final double kHomingAnglePIDRatio = 1.45;
 	/** For homing - The max arm's length that still counts as retracted. */
 	public static final double kHomingRetractedMaxLength = 300.0;
 	/** For homing - The lowest angle the arm can go to when it's extended. */
@@ -35,12 +35,12 @@ public class ArmConstants {
 	public static final double kAngleMaxSetpoint = 119.0;
 	public static final double kAngleMinSetpoint = 35.0;
 
-	public static final PIDGains kArmLengthPIDGains = new PIDGains(0.0016, 0.0, 0.0);
-	public static final double kLengthTolerance = 50.0;
+	public static final PIDGains kArmLengthPIDGains = new PIDGains(0.0017, 0.0, 0.0);
+	public static final double kLengthTolerance = 100.0;
 
 	public static enum ArmState {
 		// Uses the relativity of the encoders as setpoints
-		kHigh(119.0, 2900.0), kMid(94.0, 1100.0), kLowCone(53.0, 1200.0), kLowConePickup(51.0, 2000.0),
+		kHigh(119.0, 2900.0), kMid(94.0, 1100.0), kLowCone(54.5, 1200.0), kLowConePickup(52.5, 2000.0),
 		kLowRaiseCone(48.0, 2100.0), kLowConeDropoff(65.0, 1000.0), kLowCube(42.0, 1600.0), kShelf(107.0, 100.0),
 		kHalfClosed(48.0, 500.0);
 
