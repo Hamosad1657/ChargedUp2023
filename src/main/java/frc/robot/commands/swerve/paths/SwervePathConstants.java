@@ -10,8 +10,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.arm.ArmConstants.ArmState;
 import frc.robot.subsystems.arm.ArmSubsystem;
@@ -79,6 +77,7 @@ public final class SwervePathConstants {
 				turret.getToSetpointWithHomingCommand(TurretConstants.kBackRotationSetpoint));
 		SwervePathConstants.kPathCommandsMap.put("RotateTurretFront",
 				turret.getToSetpointWithHomingCommand(TurretConstants.kFrontRotationSetpoint));
+		SwervePathConstants.kPathCommandsMap.put("FlipTurret", turret.flipTurretCommand());
 
 		// Arm
 		SwervePathConstants.kPathCommandsMap.put("HomeArm", arm.autoHomeCommand().withTimeout(3.0));
@@ -117,6 +116,9 @@ public final class SwervePathConstants {
 		SwervePathConstants.kPathCommandsMap.put("RotateTurretBackPickupCube",
 				turret.getToSetpointWithHomingCommand(TurretConstants.kBackRotationSetpoint)
 						.andThen(arm.getToStateCommand(ArmState.kLowCube, true)).andThen(grabber.collectCommand()));
+		SwervePathConstants.kPathCommandsMap.put("FlipTurretPickupCube",
+				turret.flipTurretCommand().deadlineWith(arm.getToStateCommand(ArmState.kHalfClosed, true))
+						.andThen(arm.getToStateCommand(ArmState.kLowCube, true).andThen(grabber.collectCommand())));
 
 	}
 }
