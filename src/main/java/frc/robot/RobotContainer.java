@@ -30,7 +30,7 @@ public class RobotContainer {
 	private IntakeSubsystem intake;
 	private SwerveSubsystem swerve;
 	private TurretSubsystem turret;
-	private SendableChooser<Command> comboBoxChooser;
+	private SendableChooser<Command> comboBoxChooser, testChooser;
 
 	public RobotContainer() {
 		driverA_Controller = new PS4Controller(RobotMap.kDriverA_ControllerUSBPort);
@@ -47,6 +47,7 @@ public class RobotContainer {
 		this.configureButtonsBindings();
 		this.setDefaultCommands();
 		this.createPathsComboBox();
+		this.pitTesting();
 	}
 
 	private void configureButtonsBindings() {
@@ -123,5 +124,29 @@ public class RobotContainer {
 
 		SwervePathConstants.kPaths.forEach((name, command) -> comboBoxChooser.addOption(name, command));
 		autoTab.add("Path Chooser", this.comboBoxChooser).withWidget("ComboBox Chooser").withSize(3, 2);
+	}
+
+	private void pitTesting() {
+		this.testChooser = new SendableChooser<Command>();
+		ShuffleboardTab autoTab = Shuffleboard.getTab("Auto");
+		this.testChooser.addOption("HomeArm", this.arm.autoHomeCommand());
+		this.testChooser.addOption("ArmHigh", this.arm.getToStateCommand(ArmState.kHigh));
+		this.testChooser.addOption("ArmShelf", this.arm.getToStateCommand(ArmState.kShelf));
+		this.testChooser.addOption("ArmMid", this.arm.getToStateCommand(ArmState.kMid));
+		this.testChooser.addOption("ArmHalfClosed", this.arm.getToStateCommand(ArmState.kHalfClosed));
+		this.testChooser.addOption("LowCube", this.arm.getToStateCommand(ArmState.kLowCube));
+		this.testChooser.addOption("LowCone", this.arm.getToStateCommand(ArmState.kLowCone));
+		this.testChooser.addOption("LowConePickup", this.arm.getToStateCommand(ArmState.kLowConePickup));
+		this.testChooser.addOption("LowRaiseCone", this.arm.getToStateCommand(ArmState.kLowRaiseCone));
+		this.testChooser.addOption("LowConeDropoff", this.arm.getToStateCommand(ArmState.kLowConeDropoff));
+		this.testChooser.addOption("RotateTurretFront", this.turret.getToSetpointCommand(TurretConstants.kFrontRotationSetpoint));
+		this.testChooser.addOption("RotateTurretBack",
+				this.turret.getToSetpointCommand(TurretConstants.kBackRotationSetpoint));
+		this.testChooser.addOption("Collect", this.grabber.collectCommand());
+		this.testChooser.addOption("Release", this.grabber.releaseCommand());
+		this.testChooser.addOption("LowerIntake", this.intake.lowerIntakeCommand());
+		this.testChooser.addOption("RaiseIntake", this.intake.raiseIntakeCommand());
+
+		autoTab.add("Pit Test Command", this.testChooser).withWidget("ComboBox Chooser").withSize(3, 2);
 	}
 }
