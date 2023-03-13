@@ -115,10 +115,10 @@ public class SwerveSubsystem extends SubsystemBase {
 			swerveTab.add("Gyro", this.gyro).withSize(2, 3).withPosition(0, 4);
 			swerveTab.add("Angle PID", this.anglePIDController);
 
-			swerveTab.add("Front Left Module", this.modules[0]).withSize(2, 3).withPosition(0, 0);
-			swerveTab.add("Front Right Module", this.modules[1]).withSize(2, 3).withPosition(2, 0);
-			swerveTab.add("Back Left Module", this.modules[2]).withSize(2, 3).withPosition(4, 0);
-			swerveTab.add("Back Right Module", this.modules[3]).withSize(2, 3).withPosition(6, 0);
+			swerveTab.add("Front Left Module", this.modules[0]).withSize(2, 2).withPosition(0, 0);
+			swerveTab.add("Front Right Module", this.modules[1]).withSize(2, 2).withPosition(2, 0);
+			swerveTab.add("Back Left Module", this.modules[2]).withSize(2, 2).withPosition(4, 0);
+			swerveTab.add("Back Right Module", this.modules[3]).withSize(2, 2).withPosition(6, 0);
 
 			odometryTab.addDouble("Odometry X", () -> this.getOdometryPose().getX()).withSize(1, 1).withPosition(0,
 					0);

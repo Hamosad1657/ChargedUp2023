@@ -61,11 +61,11 @@ public class TurretSubsystem extends SubsystemBase {
 			turretTab.addBoolean("CCW Limit", () -> !this.rotationCCWLimitSwitch.get()).withPosition(1, 0).withSize(1,
 					1);
 			turretTab.add("Rotation CANCoder", this.rotationEncoder).withPosition(0, 1).withSize(2, 2);
-			turretTab.addDouble("Rotation", this.rotationEncoder::getAbsAngleDeg).withWidget("Gyro").withPosition(2, 0)
+			turretTab.addDouble("Rotation", this.rotationEncoder::getAbsAngleDeg).withWidget("Gyro").withPosition(2, 1)
 					.withSize(2, 2);
 			turretTab.addDouble("Rotation Setpoint", this.rotationController::getSetpoint).withWidget("Gyro")
-					.withPosition(4, 0).withSize(2, 2);
-			turretTab.addBoolean("At Rotation Setpoint", this::isAtSetpoint).withSize(2, 1).withPosition(2, 2);
+					.withPosition(4, 1).withSize(2, 2);
+			turretTab.addBoolean("At Rotation Setpoint", this::isAtSetpoint).withSize(2, 1).withPosition(2, 0);
 		}
 	}
 
