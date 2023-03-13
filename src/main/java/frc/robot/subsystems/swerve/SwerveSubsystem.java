@@ -484,6 +484,11 @@ public class SwerveSubsystem extends SubsystemBase {
 		this.addPath("Low Cone & Cube", false, false);
 	}
 
+	/**
+	 * @param name - The name of the path.
+	 * @param isPathWithChargeStation - Does the robot end auto on the charging station.
+	 * @param startWithCube - Does the robot start auto with a cube.
+	 */
 	private void addPath(String name, boolean isPathWithChargeStation, boolean startWithCube) {
 		ArrayList<Command> commandList = new ArrayList<Command>();
 		commandList.add(GrabberSubsystem.getInstance().collectCommand());
