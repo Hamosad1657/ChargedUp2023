@@ -130,7 +130,7 @@
     {
       "position": 0.1,
       "names": [
-        "RotateTurretBackPickupCube"
+        "FlipTurretPickupCube"
       ]
     },
     {

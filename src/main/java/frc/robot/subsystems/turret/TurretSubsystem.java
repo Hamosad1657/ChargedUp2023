@@ -2,6 +2,7 @@
 package frc.robot.subsystems.turret;
 
 import java.util.function.DoubleSupplier;
+import javax.sound.sampled.ReverbType;
 import com.ctre.phoenix.sensors.AbsoluteSensorRange;
 import com.hamosad1657.lib.sensors.HaCANCoder;
 import com.revrobotics.CANSparkMax;
@@ -49,6 +50,7 @@ public class TurretSubsystem extends SubsystemBase {
 		this.rotationController = TurretConstants.kRotationPIDGains.toPIDController();
 		this.rotationController.setSetpoint(this.getCurrentAngle());
 		this.rotationController.setTolerance(TurretConstants.kRotationTolerance);
+		this.rotationController.disableContinuousInput();
 
 		this.rotationCCWLimitSwitch = new DigitalInput(RobotMap.kTurretCCWLimitPort);
 		this.rotationCWLimitSwitch = new DigitalInput(RobotMap.kTurretCWLimitPort);
@@ -120,6 +122,21 @@ public class TurretSubsystem extends SubsystemBase {
 		return new InstantCommand(() -> this.setSetpoint(rotation))
 				.andThen(new WaitUntilCommand(() -> this.isAtSetpoint(TurretConstants.kAutoRotationTolerance)))
 				.deadlineWith(ArmSubsystem.getInstance().autoHomeCommand());
+	}
+
+	public Command flipTurretCommand() {
+		double setpoint;
+		double currentAngle = this.getCurrentAngle();
+		// Within a 10 degree tolerance to 270
+		if (Math.abs(currentAngle) < TurretConstants.kFrontRotationSetpoint + 10 &&
+		Math.abs(currentAngle) > TurretConstants.kFrontRotationSetpoint - 10) {
+			setpoint = TurretConstants.kBackRotationSetpoint;
+		}
+		else {
+			setpoint = TurretConstants.kFrontRotationSetpoint;
+		}
+		return new InstantCommand(() -> this.setSetpoint(setpoint))
+				.andThen(new WaitUntilCommand(() -> this.isAtSetpoint(TurretConstants.kAutoRotationTolerance)));
 	}
 
 	public Command openLoopTeleopCommand(DoubleSupplier outputSupplier) {

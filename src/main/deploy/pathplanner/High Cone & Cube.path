@@ -109,13 +109,13 @@
     {
       "position": 0.05,
       "names": [
-        "RotateTurretBackPickupCube"
+        "FlipTurretPickupCube"
       ]
     },
     {
       "position": 2.05,
       "names": [
-        "RotateTurretFront"
+        "FlipTurret"
       ]
     }
   ]
