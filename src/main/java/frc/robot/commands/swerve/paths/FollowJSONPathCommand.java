@@ -1,6 +1,13 @@
 
 package frc.robot.commands.swerve.paths;
 
+import java.util.List;
+import com.pathplanner.lib.PathConstraints;
+import com.pathplanner.lib.PathPlanner;
+import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.PathPlannerTrajectory.EventMarker;
+import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -9,14 +16,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Robot;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
-import java.util.List;
-
-import com.pathplanner.lib.PathConstraints;
-import com.pathplanner.lib.PathPlanner;
-import com.pathplanner.lib.PathPlannerTrajectory;
-import com.pathplanner.lib.PathPlannerTrajectory.EventMarker;
-import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
-import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
 /**
  * Generates a PathPlanner path from a JSON (with or without events) and follows it.
@@ -78,7 +77,7 @@ public class FollowJSONPathCommand extends CommandBase {
 		Pose2d initialPose = this.trajectory.getInitialHolonomicPose();
 		this.swerve.resetOdometry(initialPose);
 		this.swerve.setGyro(initialPose.getRotation());
-		this.swerve.resetEstimatedPose(initialPose);
+		this.swerve.resetOdometry(initialPose);
 	}
 
 	@Override
@@ -86,12 +85,11 @@ public class FollowJSONPathCommand extends CommandBase {
 		// Trajectories contain states (velocities accelerations and positions) for any
 		// given time.
 		// Get the desired state by sampling the path for the current time.
-		PathPlannerState desiredState = (PathPlannerState) this.trajectory.sample(this.timer.get());
+		PathPlannerState desiredState = (PathPlannerState)this.trajectory.sample(this.timer.get());
 
 		// Calculate the desired field-relative ChassisSpeeds using the current position
 		// and desired state.
-		ChassisSpeeds fieldRelativeSpeeds = this.driveController.calculate(this.swerve.getEstimatedPose(),
-				desiredState);
+		ChassisSpeeds fieldRelativeSpeeds = this.driveController.calculate(this.swerve.getOdometryPose(), desiredState);
 
 		// Drive
 		this.swerve.autonomousDrive(fieldRelativeSpeeds, false, true);

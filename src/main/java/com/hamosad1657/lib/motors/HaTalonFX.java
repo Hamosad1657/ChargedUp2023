@@ -338,15 +338,15 @@ public class HaTalonFX extends HaBaseTalon {
 
 	@Override
 	public void configPID(PIDGains pidGains) {
-		this.p = pidGains.p;
+		this.p = pidGains.kP;
 		this.motor.config_kP(0, this.p, kMotorConfigsCANTimeoutMS);
-		this.i = pidGains.i;
+		this.i = pidGains.kI;
 		this.motor.config_kI(0, this.i, kMotorConfigsCANTimeoutMS);
-		this.d = pidGains.d;
+		this.d = pidGains.kD;
 		this.motor.config_kD(0, this.d, kMotorConfigsCANTimeoutMS);
-		this.ff = pidGains.ff;
+		this.ff = pidGains.kFF;
 		this.motor.config_kF(0, this.ff, kMotorConfigsCANTimeoutMS);
-		this.iZone = pidGains.iZone;
+		this.iZone = pidGains.kIZone;
 		this.motor.config_IntegralZone(0, this.iZone, kMotorConfigsCANTimeoutMS);
 	}
 

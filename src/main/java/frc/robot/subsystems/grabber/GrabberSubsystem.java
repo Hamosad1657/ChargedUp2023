@@ -1,13 +1,12 @@
 
 package frc.robot.subsystems.grabber;
 
-import com.hamosad1657.lib.sensors.HaColorSensor;
-import edu.wpi.first.wpilibj.PneumaticsModuleType;
-import edu.wpi.first.wpilibj.Solenoid;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMax.IdleMode;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotMap;
 
@@ -21,63 +20,39 @@ public class GrabberSubsystem extends SubsystemBase {
 		return instance;
 	}
 
-	private final Solenoid grabberSolenoid;
-	private final HaColorSensor colorSensor;
+	private final CANSparkMax motor;
+	private boolean isCollecting;
 
 	private GrabberSubsystem() {
-		this.colorSensor = new HaColorSensor(RobotMap.kColorSensorPort);
-		this.grabberSolenoid = new Solenoid(PneumaticsModuleType.REVPH, RobotMap.kGrabberSolenoidPort);
+		this.motor = new CANSparkMax(RobotMap.kGrabberMotorID, MotorType.kBrushless);
+		motor.setIdleMode(IdleMode.kBrake);
+		motor.setSmartCurrentLimit(GrabberConstants.kMaxAmpere);
 
-		ShuffleboardTab tab = Shuffleboard.getTab("Arm");
-		tab.addBoolean("Game Piece In Grabber", this::isGamePieceInRange);
-		tab.add("Color Sensor", this.colorSensor).withPosition(0, 2).withSize(3, 3);
+		this.isCollecting = false;
 	}
 
-	/**
-	 * Set the value of the intake's left solenoid.
-	 * 
-	 * @param on - True will turn the solenoid output on. False will turn the solenoid output off.
-	 */
-	public void setGrabberSolenoid(boolean on) {
-		this.grabberSolenoid.set(on);
+	public void onGrabberButtonPressed() {
+		if (this.isCollecting) {
+			this.motor.set(GrabberConstants.kMotorDefaultOutput);
+			this.isCollecting = false;
+		} else {
+			this.motor.set(-GrabberConstants.kMotorDefaultOutput);
+			this.isCollecting = true;
+		}
 	}
 
-	/**
-	 * Toggles the grabber solenoid.
-	 */
-	public void toggleGrabberSolenoid() {
-		this.grabberSolenoid.toggle();
+	public void onGrabberButtonReleased() {
+		if (!this.isCollecting) {
+			this.motor.set(0.0);
+		}
 	}
 
-	/**
-	 * Toggles the grabber solenoid.
-	 */
-	public Command toggleGrabberSolenoidCommand() {
-		return new InstantCommand(() -> this.grabberSolenoid.toggle(), this);
+	public Command collectCommand() {
+		return new InstantCommand(() -> this.motor.set(-GrabberConstants.kMotorDefaultOutput), this);
 	}
 
-	/**
-	 * Check if there's either a cone or a cube in the grabber's range.
-	 */
-	private boolean isGamePieceInRange() {
-		return this.isCubeInRange() || this.isConeInRange();
-	}
-
-	/**
-	 * Check if there's a cube in the grabber's range.
-	 */
-	private boolean isCubeInRange() {
-		return this.colorSensor.isColorInRangePercent(GrabberConstants.kCubeMinColor, GrabberConstants.kCubeMaxColor)
-				&& this.colorSensor.isObjectInProximityRange(GrabberConstants.kCubeMinDistance,
-						GrabberConstants.kCubeMaxDistance);
-	}
-
-	/**
-	 * Check if there's a cone in the grabber's range.
-	 */
-	private boolean isConeInRange() {
-		return this.colorSensor.isColorInRangePercent(GrabberConstants.kConeMinColor, GrabberConstants.kConeMaxColor)
-				&& this.colorSensor.isObjectInProximityRange(GrabberConstants.kConeMinDistance,
-						GrabberConstants.kConeMaxDistance);
+	public Command releaseCommand() {
+		return new RunCommand(() -> this.motor.set(GrabberConstants.kMotorDefaultOutput), this)
+				.withTimeout(GrabberConstants.kAutoReleaseTime).andThen(() -> this.motor.set(0), this);
 	}
 }
