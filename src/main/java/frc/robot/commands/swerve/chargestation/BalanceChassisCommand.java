@@ -4,6 +4,7 @@ package frc.robot.commands.swerve.chargestation;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Robot;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
@@ -11,11 +12,13 @@ import frc.robot.subsystems.swerve.SwerveSubsystem;
 public class BalanceChassisCommand extends CommandBase {
 	private SwerveSubsystem swerve;
 	private PIDController balanceController;
+	private Timer balanceTimer;
 
 	public BalanceChassisCommand(SwerveSubsystem swerve) {
 		this.balanceController = BalanceChassisConstants.kPIDGains.toPIDController();
 		this.balanceController.setSetpoint(BalanceChassisConstants.kGroundAngle);
 		this.balanceController.setTolerance(BalanceChassisConstants.kTolerance);
+		this.balanceTimer = new Timer();
 
 		this.swerve = swerve;
 		this.addRequirements(this.swerve);
@@ -41,6 +44,15 @@ public class BalanceChassisCommand extends CommandBase {
 
 	@Override
 	public boolean isFinished() {
+		if (this.balanceController.atSetpoint()) {
+			this.balanceTimer.start();
+			if (this.balanceTimer.hasElapsed(0.3)) {
+				return true;
+			}
+		} else {
+			this.balanceTimer.stop();
+			this.balanceTimer.reset();
+		}
 		return false;
 	}
 }
