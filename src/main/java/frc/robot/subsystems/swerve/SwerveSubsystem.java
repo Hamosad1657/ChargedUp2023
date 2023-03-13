@@ -18,15 +18,10 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -476,13 +471,5 @@ public class SwerveSubsystem extends SubsystemBase {
 
 		this.odometry.update(this.getYaw(), this.getModulesPositions());
 		this.field.setRobotPose(this.getOdometryPose());
-
-		for (SwerveModule mod : modules) {
-			SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Cancoder", mod.getCanCoder().getDegrees());
-			SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Integrated",
-					mod.getModulePosition().angle.getDegrees());
-			SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Velocity",
-					mod.getModuleState().speedMetersPerSecond);
-		}
 	}
 }
