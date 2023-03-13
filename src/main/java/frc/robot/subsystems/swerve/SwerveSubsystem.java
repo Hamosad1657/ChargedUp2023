@@ -1,6 +1,7 @@
 
 package frc.robot.subsystems.swerve;
 
+import java.util.ArrayList;
 import java.util.List;
 import com.hamosad1657.lib.sensors.HaNavX;
 import com.pathplanner.lib.PathPlanner;
@@ -37,6 +38,7 @@ import frc.robot.RobotMap;
 import frc.robot.commands.swerve.chargestation.BalanceChassisCommand;
 import frc.robot.commands.swerve.paths.SwervePathConstants;
 import frc.robot.subsystems.arm.ArmSubsystem;
+import frc.robot.subsystems.grabber.GrabberSubsystem;
 
 public class SwerveSubsystem extends SubsystemBase {
 	private static SwerveSubsystem instance;
@@ -473,31 +475,34 @@ public class SwerveSubsystem extends SubsystemBase {
 	 * The function for putting paths inside the chooser
 	 */
 	private void createPaths() {
-		SwervePathConstants.kPaths.putIfAbsent("Emergency High Cube & Pickup",
-				new SequentialCommandGroup(ArmSubsystem.getInstance().autoHomeCommand(),
-						this.getPathPlannerAutoCommand("Emergency High Cube & Pickup"), this.crossLockWheelsCommand()));
-		SwervePathConstants.kPaths.putIfAbsent("High Cone & Cube Pickup & Station",
-				new SequentialCommandGroup(ArmSubsystem.getInstance().autoHomeCommand(),
-						this.getPathPlannerAutoCommand("High Cone & Cube Pickup & Station"),
-						new BalanceChassisCommand(this), this.crossLockWheelsCommand()));
-		SwervePathConstants.kPaths.putIfAbsent("High Cube & Station",
-				new SequentialCommandGroup(ArmSubsystem.getInstance().autoHomeCommand(),
-						this.getPathPlannerAutoCommand("High Cube & Station"), new BalanceChassisCommand(this),
-						this.crossLockWheelsCommand()));
-		SwervePathConstants.kPaths.putIfAbsent("High Cone & Cube",
-				new SequentialCommandGroup(ArmSubsystem.getInstance().autoHomeCommand(),
-						this.getPathPlannerAutoCommand("High Cone & Cube"), this.crossLockWheelsCommand()));
-		SwervePathConstants.kPaths.putIfAbsent("High Cone & Cube & Station",
-				new SequentialCommandGroup(ArmSubsystem.getInstance().autoHomeCommand(),
-						this.getPathPlannerAutoCommand("High Cone & Cube & Station"), new BalanceChassisCommand(this),
-						this.crossLockWheelsCommand()));
-		SwervePathConstants.kPaths.putIfAbsent("Low Cone & Cube & Station",
-				new SequentialCommandGroup(ArmSubsystem.getInstance().autoHomeCommand(),
-						this.getPathPlannerAutoCommand("Low Cone & Cube & Station"), new BalanceChassisCommand(this),
-						this.crossLockWheelsCommand()));
-		SwervePathConstants.kPaths.putIfAbsent("Low Cone & Cube",
-				new SequentialCommandGroup(ArmSubsystem.getInstance().autoHomeCommand(),
-						this.getPathPlannerAutoCommand("Low Cone & Cube"), this.crossLockWheelsCommand()));
+		this.addPath("High Cone & Protector", false, false);
+		this.addPath("High Cone & Cube Pickup & Station", false, false);
+		this.addPath("High Cube & Station", true, true);
+		this.addPath("High Cone & Cube", false, false);
+		this.addPath("High Cone & Cube & Station", true, false);
+		this.addPath("Low Cone & Cube & Station", true, false);
+		this.addPath("Low Cone & Cube", false, false);
+	}
+
+	private void addPath(String name, boolean isPathWithChargeStation, boolean startWithCube) {
+		ArrayList<Command> commandList = new ArrayList<Command>();
+		commandList.add(GrabberSubsystem.getInstance().collectCommand());
+		if (startWithCube)
+			commandList.add(ArmSubsystem.getInstance().autoHomeCommand());
+		else
+			commandList.add(ArmSubsystem.getInstance().retractCommand());
+		commandList.add(this.getPathPlannerAutoCommand(name));
+		if (isPathWithChargeStation)
+			commandList.add(new BalanceChassisCommand(this));
+		commandList.add(this.crossLockWheelsCommand());
+		Command[] commandArr = new Command[commandList.size()];
+		int i = 0;
+		for (var it : commandList) {
+			commandArr[i] = it;
+			i++;
+		}
+		SwervePathConstants.kPaths.putIfAbsent(name, new SequentialCommandGroup(commandArr));
+
 	}
 
 	@Override

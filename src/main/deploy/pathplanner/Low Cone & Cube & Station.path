@@ -17,8 +17,7 @@
       "isStopPoint": false,
       "stopEvent": {
         "names": [
-          "CollectGamePiece",
-          "WaitABit"
+          "WaitABitless"
         ],
         "executionBehavior": "sequential",
         "waitBehavior": "none",
