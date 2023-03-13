@@ -125,14 +125,14 @@ public class TurretSubsystem extends SubsystemBase {
 
 	public Command flipTurretCommand() {
 		double setpoint;
-		double currentAngle = this.getCurrentAngle();
-		// Within a 10 degree tolerance to 270
-		if (Math.abs(currentAngle) < TurretConstants.kFrontRotationSetpoint + 10
-				&& Math.abs(currentAngle) > TurretConstants.kFrontRotationSetpoint - 10) {
+
+		// Within a 10 degree tolerance to 90
+		if (Math.abs(TurretConstants.kFrontRotationSetpoint - this.getCurrentAngle()) < 10.0) {
 			setpoint = TurretConstants.kBackRotationSetpoint;
 		} else {
 			setpoint = TurretConstants.kFrontRotationSetpoint;
 		}
+
 		return new InstantCommand(() -> this.setSetpoint(setpoint))
 				.andThen(new WaitUntilCommand(() -> this.isAtSetpoint(TurretConstants.kAutoRotationTolerance)));
 	}
