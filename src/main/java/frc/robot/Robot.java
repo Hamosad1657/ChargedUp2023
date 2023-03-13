@@ -12,7 +12,7 @@ public class Robot extends TimedRobot {
 	/**
 	 * Drivers don't need info from the subsystems in the shuffleboard. To reduce bandwidth, only send neccesary info.
 	 */
-	public static final boolean showShuffleboardSubsystemInfo = true;
+	public static final boolean showShuffleboardSubsystemInfo = false;
 
 	private RobotContainer robotContainer;
 	private CommandScheduler commandScheduler;
