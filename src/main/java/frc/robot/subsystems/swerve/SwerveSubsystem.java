@@ -120,10 +120,8 @@ public class SwerveSubsystem extends SubsystemBase {
 			swerveTab.add("Back Left Module", this.modules[2]).withSize(2, 2).withPosition(4, 0);
 			swerveTab.add("Back Right Module", this.modules[3]).withSize(2, 2).withPosition(6, 0);
 
-			odometryTab.addDouble("Odometry X", () -> this.getOdometryPose().getX()).withSize(1, 1).withPosition(0,
-					0);
-			odometryTab.addDouble("Odometry Y", () -> this.getOdometryPose().getY()).withSize(1, 1).withPosition(1,
-					0);
+			odometryTab.addDouble("Odometry X", () -> this.getOdometryPose().getX()).withSize(1, 1).withPosition(0, 0);
+			odometryTab.addDouble("Odometry Y", () -> this.getOdometryPose().getY()).withSize(1, 1).withPosition(1, 0);
 
 			this.field = new Field2d();
 			odometryTab.add("Field", this.field).withSize(5, 4).withPosition(0, 1);
@@ -434,40 +432,40 @@ public class SwerveSubsystem extends SubsystemBase {
 	 */
 	private void createPaths() {
 		this.addPath("High Cone & Protector", false, false);
-		this.addPath("High Cone & Cube Pickup & Station", false, false);
-		this.addPath("High Cube & Station", true, true);
-		this.addPath("High Cone & Cube", false, false);
+		this.addPath("High Cone & Cube Pickup & Station", false, true);
+		this.addPath("High Dropoff & Station", true, true);
+		this.addPath("High Cone & Cube", false, true);
 		this.addPath("High Cone & Cube & Station", true, false);
-		this.addPath("Low Cone & Cube & Station", true, false);
-		this.addPath("Low Cone & Cube", false, false);
-		SwervePathConstants.kPaths.putIfAbsent("Test Charge Station", new SequentialCommandGroup(
-				this.getPathPlannerAutoCommand("Test Charge Station"), new BalanceChassisCommand(this)));
+		this.addPath("Low Cone & Cube & Station", true, true);
+		this.addPath("Low Cone & Cube", false, true);
 	}
 
 	/**
-	 * @param name                    - The name of the path.
-	 * @param isPathWithChargeStation - Does the robot end auto on the charging station.
-	 * @param startWithCube           - Does the robot start auto with a cube.
+	 * @param name          - The name of the path.
+	 * @param balanceAtEnd  - Should the robot balance at the end of the path.
+	 * @param startWithCube - Should the robot retract instead of home the arm at the start of the path.
 	 */
-	private void addPath(String name, boolean isPathWithChargeStation, boolean startWithCube) {
+	private void addPath(String name, boolean balanceAtEnd, boolean retractAtStart) {
 		ArrayList<Command> commandList = new ArrayList<Command>();
 		commandList.add(GrabberSubsystem.getInstance().collectCommand());
-		if (startWithCube)
-			commandList.add(ArmSubsystem.getInstance().retractCommand());
-		else
-			commandList.add(ArmSubsystem.getInstance().autoHomeCommand());
-		commandList.add(this.getPathPlannerAutoCommand(name));
-		if (isPathWithChargeStation)
-			commandList.add(new BalanceChassisCommand(this));
-		commandList.add(this.crossLockWheelsCommand());
-		Command[] commandArr = new Command[commandList.size()];
-		int i = 0;
-		for (var it : commandList) {
-			commandArr[i] = it;
-			i++;
-		}
-		SwervePathConstants.kPaths.putIfAbsent(name, new SequentialCommandGroup(commandArr));
 
+		if (retractAtStart) {
+			commandList.add(ArmSubsystem.getInstance().retractCommand());
+		} else {
+			commandList.add(ArmSubsystem.getInstance().autoHomeCommand());
+		}
+
+		commandList.add(this.getPathPlannerAutoCommand(name));
+
+		if (balanceAtEnd) {
+			commandList.add(new BalanceChassisCommand(this));
+		}
+
+		commandList.add(this.crossLockWheelsCommand());
+
+		Command[] commandArray = new Command[commandList.size()];
+		commandArray = commandList.toArray(commandArray);
+		SwervePathConstants.kPaths.putIfAbsent(name, new SequentialCommandGroup(commandArray));
 	}
 
 	@Override
