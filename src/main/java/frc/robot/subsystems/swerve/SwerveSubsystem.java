@@ -65,8 +65,7 @@ public class SwerveSubsystem extends SubsystemBase {
 	private final PIDController anglePIDController;
 	private final Timer angleControlTimer;
 
-	private final ShuffleboardTab swerveTab, odometryTab;
-	private final Field2d field;
+	private Field2d field;
 
 	private double teleopAngleSetpointRad;
 	private boolean isRobotAngleCorrectionEnabled = false, runAngleCorrection = false;
@@ -109,23 +108,26 @@ public class SwerveSubsystem extends SubsystemBase {
 		this.angleControlTimer = new Timer();
 		this.angleControlTimer.start();
 
-		this.swerveTab = Shuffleboard.getTab("Swerve");
-		this.odometryTab = Shuffleboard.getTab("Odometry");
+		if (Robot.showShuffleboardSubsystemInfo) {
+			ShuffleboardTab swerveTab = Shuffleboard.getTab("Swerve");
+			ShuffleboardTab odometryTab = Shuffleboard.getTab("Odometry");
 
-		this.swerveTab.add("Gyro", this.gyro).withSize(2, 3).withPosition(0, 4);
-		this.swerveTab.add("Angle PID", this.anglePIDController);
-		
-		this.swerveTab.add("Front Left Module", this.modules[0]).withSize(2, 3).withPosition(0, 0);
-		this.swerveTab.add("Front Right Module", this.modules[1]).withSize(2, 3).withPosition(2, 0);
-		this.swerveTab.add("Back Left Module", this.modules[2]).withSize(2, 3).withPosition(4, 0);
-		this.swerveTab.add("Back Right Module", this.modules[3]).withSize(2, 3).withPosition(6, 0);
+			swerveTab.add("Gyro", this.gyro).withSize(2, 3).withPosition(0, 4);
+			swerveTab.add("Angle PID", this.anglePIDController);
 
-		this.odometryTab.addDouble("Odometry X", () -> this.getOdometryPose().getX()).withSize(1, 1).withPosition(0, 0);
-		this.odometryTab.addDouble("Odometry Y", () -> this.getOdometryPose().getY()).withSize(1, 1).withPosition(1,
-				0);
+			swerveTab.add("Front Left Module", this.modules[0]).withSize(2, 3).withPosition(0, 0);
+			swerveTab.add("Front Right Module", this.modules[1]).withSize(2, 3).withPosition(2, 0);
+			swerveTab.add("Back Left Module", this.modules[2]).withSize(2, 3).withPosition(4, 0);
+			swerveTab.add("Back Right Module", this.modules[3]).withSize(2, 3).withPosition(6, 0);
 
-		this.field = new Field2d();
-		this.odometryTab.add("Field", this.field).withSize(5, 4).withPosition(0, 1);
+			odometryTab.addDouble("Odometry X", () -> this.getOdometryPose().getX()).withSize(1, 1).withPosition(0,
+					0);
+			odometryTab.addDouble("Odometry Y", () -> this.getOdometryPose().getY()).withSize(1, 1).withPosition(1,
+					0);
+
+			this.field = new Field2d();
+			odometryTab.add("Field", this.field).withSize(5, 4).withPosition(0, 1);
+		}
 
 		SwervePathConstants.createCommands();
 		this.createPaths();
@@ -471,6 +473,9 @@ public class SwerveSubsystem extends SubsystemBase {
 		this.filteredTranslationRatio = this.speedModeRateLimiter.calculate(currentSwerveTranslateRatio);
 
 		this.odometry.update(this.getYaw(), this.getModulesPositions());
-		this.field.setRobotPose(this.getOdometryPose());
+
+		if (Robot.showShuffleboardSubsystemInfo) {
+			this.field.setRobotPose(this.getOdometryPose());
+		}
 	}
 }

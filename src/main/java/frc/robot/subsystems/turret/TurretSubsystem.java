@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+import frc.robot.Robot;
 import frc.robot.RobotMap;
 import frc.robot.subsystems.arm.ArmSubsystem;
 
@@ -54,15 +55,18 @@ public class TurretSubsystem extends SubsystemBase {
 		this.rotationCCWLimitSwitch = new DigitalInput(RobotMap.kTurretCCWLimitPort);
 		this.rotationCWLimitSwitch = new DigitalInput(RobotMap.kTurretCWLimitPort);
 
-		ShuffleboardTab turretTab = Shuffleboard.getTab("Turret");
-		turretTab.addBoolean("CW Limit", () -> !this.rotationCWLimitSwitch.get()).withPosition(0, 0).withSize(1, 1);
-		turretTab.addBoolean("CCW Limit", () -> !this.rotationCCWLimitSwitch.get()).withPosition(1, 0).withSize(1, 1);
-		turretTab.add("Rotation CANCoder", this.rotationEncoder).withPosition(0, 1).withSize(2, 2);
-		turretTab.addDouble("Rotation", this.rotationEncoder::getAbsAngleDeg).withWidget("Gyro").withPosition(2, 0)
-				.withSize(2, 2);
-		turretTab.addDouble("Rotation Setpoint", this.rotationController::getSetpoint).withWidget("Gyro")
-				.withPosition(4, 0).withSize(2, 2);
-		turretTab.addBoolean("At Rotation Setpoint", this::isAtSetpoint).withSize(2, 1).withPosition(2, 2);
+		if (Robot.showShuffleboardSubsystemInfo) {
+			ShuffleboardTab turretTab = Shuffleboard.getTab("Turret");
+			turretTab.addBoolean("CW Limit", () -> !this.rotationCWLimitSwitch.get()).withPosition(0, 0).withSize(1, 1);
+			turretTab.addBoolean("CCW Limit", () -> !this.rotationCCWLimitSwitch.get()).withPosition(1, 0).withSize(1,
+					1);
+			turretTab.add("Rotation CANCoder", this.rotationEncoder).withPosition(0, 1).withSize(2, 2);
+			turretTab.addDouble("Rotation", this.rotationEncoder::getAbsAngleDeg).withWidget("Gyro").withPosition(2, 0)
+					.withSize(2, 2);
+			turretTab.addDouble("Rotation Setpoint", this.rotationController::getSetpoint).withWidget("Gyro")
+					.withPosition(4, 0).withSize(2, 2);
+			turretTab.addBoolean("At Rotation Setpoint", this::isAtSetpoint).withSize(2, 1).withPosition(2, 2);
+		}
 	}
 
 	/**
