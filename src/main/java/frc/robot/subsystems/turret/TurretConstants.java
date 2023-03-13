@@ -5,7 +5,7 @@ import com.hamosad1657.lib.math.HaUnits.PIDGains;
 
 public class TurretConstants {
 	public static final double kMotorMaxOutput = 0.8;
-	public static final double kCANCoderOffsetDeg = 0.0;
+	public static final double kCANCoderOffsetDeg = 15.3;
 
 	public static final double kRotationMinAngle = 32.0;
 	public static final double kRotationMaxAngle = 350.0;

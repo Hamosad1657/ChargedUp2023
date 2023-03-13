@@ -76,9 +76,10 @@ public class RobotContainer {
 						this.turret.getToSetpointCommand(TurretConstants.kFrontRotationSetpoint),
 						this.arm.pickupConeCommand()));
 
-		this.driverB_CommandController.povDown().onTrue(new SequentialCommandGroup(
-				this.turret.getToSetpointCommand(TurretConstants.kFrontRotationSetpoint),
-				this.arm.getToStateCommand(ArmState.kLowCube)));
+		this.driverB_CommandController.povDown()
+				.onTrue(new SequentialCommandGroup(
+						this.turret.getToSetpointCommand(TurretConstants.kFrontRotationSetpoint),
+						this.arm.getToStateCommand(ArmState.kLowCube)));
 
 		this.driverB_CommandController.options()
 				.onTrue(this.grabber.collectCommand().alongWith(this.arm.getToStateCommand(ArmState.kShelf)));
