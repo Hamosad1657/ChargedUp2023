@@ -482,12 +482,14 @@ public class SwerveSubsystem extends SubsystemBase {
 		this.addPath("High Cone & Cube & Station", true, false);
 		this.addPath("Low Cone & Cube & Station", true, false);
 		this.addPath("Low Cone & Cube", false, false);
+		SwervePathConstants.kPaths.putIfAbsent("Test Charge Station", new SequentialCommandGroup(
+				this.getPathPlannerAutoCommand("Test Charge Station"), new BalanceChassisCommand(this)));
 	}
 
 	/**
-	 * @param name - The name of the path.
+	 * @param name                    - The name of the path.
 	 * @param isPathWithChargeStation - Does the robot end auto on the charging station.
-	 * @param startWithCube - Does the robot start auto with a cube.
+	 * @param startWithCube           - Does the robot start auto with a cube.
 	 */
 	private void addPath(String name, boolean isPathWithChargeStation, boolean startWithCube) {
 		ArrayList<Command> commandList = new ArrayList<Command>();
