@@ -113,6 +113,11 @@ public class TurretSubsystem extends SubsystemBase {
 
 	public Command getToSetpointCommand(double rotation) {
 		return new InstantCommand(() -> this.setSetpoint(rotation))
+				.andThen(new WaitUntilCommand(() -> this.isAtSetpoint(TurretConstants.kAutoRotationTolerance)));
+	}
+
+	public Command getToSetpointWithHomingCommand(double rotation) {
+		return new InstantCommand(() -> this.setSetpoint(rotation))
 				.andThen(new WaitUntilCommand(() -> this.isAtSetpoint(TurretConstants.kAutoRotationTolerance)))
 				.deadlineWith(ArmSubsystem.getInstance().autoHomeCommand());
 	}
