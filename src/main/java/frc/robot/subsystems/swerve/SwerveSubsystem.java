@@ -112,19 +112,20 @@ public class SwerveSubsystem extends SubsystemBase {
 		this.swerveTab = Shuffleboard.getTab("Swerve");
 		this.odometryTab = Shuffleboard.getTab("Odometry");
 
-		this.swerveTab.add("Gyro", this.gyro).withPosition(0, 3).withSize(2, 3);
+		this.swerveTab.add("Gyro", this.gyro).withSize(2, 3).withPosition(0, 4);
 		this.swerveTab.add("Angle PID", this.anglePIDController);
 		
-		this.swerveTab.add("Front Left Module", this.modules[0]);
-		this.swerveTab.add("Front Right Module", this.modules[1]);
-		this.swerveTab.add("Back Left Module", this.modules[2]);
-		this.swerveTab.add("Back Right Module", this.modules[3]);
+		this.swerveTab.add("Front Left Module", this.modules[0]).withSize(2, 3).withPosition(0, 0);
+		this.swerveTab.add("Front Right Module", this.modules[1]).withSize(2, 3).withPosition(2, 0);
+		this.swerveTab.add("Back Left Module", this.modules[2]).withSize(2, 3).withPosition(4, 0);
+		this.swerveTab.add("Back Right Module", this.modules[3]).withSize(2, 3).withPosition(6, 0);
 
-		this.swerveTab.addDouble("Odometry X", () -> this.getOdometryPose().getX());
-		this.swerveTab.addDouble("Odometry Y", () -> this.getOdometryPose().getY());
+		this.odometryTab.addDouble("Odometry X", () -> this.getOdometryPose().getX()).withSize(1, 1).withPosition(0, 0);
+		this.odometryTab.addDouble("Odometry Y", () -> this.getOdometryPose().getY()).withSize(1, 1).withPosition(1,
+				0);
 
 		this.field = new Field2d();
-		this.odometryTab.add("Field", this.field);
+		this.odometryTab.add("Field", this.field).withSize(5, 4).withPosition(0, 1);
 
 		SwervePathConstants.createCommands();
 		this.createPaths();
