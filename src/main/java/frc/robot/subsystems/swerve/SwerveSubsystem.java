@@ -488,9 +488,9 @@ public class SwerveSubsystem extends SubsystemBase {
 		ArrayList<Command> commandList = new ArrayList<Command>();
 		commandList.add(GrabberSubsystem.getInstance().collectCommand());
 		if (startWithCube)
-			commandList.add(ArmSubsystem.getInstance().autoHomeCommand());
-		else
 			commandList.add(ArmSubsystem.getInstance().retractCommand());
+		else
+			commandList.add(ArmSubsystem.getInstance().autoHomeCommand());
 		commandList.add(this.getPathPlannerAutoCommand(name));
 		if (isPathWithChargeStation)
 			commandList.add(new BalanceChassisCommand(this));
