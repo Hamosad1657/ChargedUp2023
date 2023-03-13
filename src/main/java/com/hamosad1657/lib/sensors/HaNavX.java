@@ -53,7 +53,7 @@ public class HaNavX implements Sendable {
 			Robot.print("Failed to connect to navX within 20 seconds from startup.");
 			DriverStation.reportError("Failed to connect to navX within 20 seconds from startup.", false);
 		} else {
-			Robot.print("navX done calibrating.");
+			Robot.print("navX done calibrating in " + Double.toString(this.commsTimoutTimer.get()) + " seconds from startup.");
 		}
 
 		this.commsTimoutTimer.stop();

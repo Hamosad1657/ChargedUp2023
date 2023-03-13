@@ -17,8 +17,7 @@
       "isStopPoint": false,
       "stopEvent": {
         "names": [
-          "CollectGamePiece",
-          "WaitABit"
+          "WaitABitless"
         ],
         "executionBehavior": "sequential",
         "waitBehavior": "none",
@@ -111,13 +110,13 @@
       "position": 0.01,
       "names": [
         "ReleaseGamePiece",
-        "RotateTurretBack"
+        "FlipTurret"
       ]
     },
     {
       "position": 2.545454545454546,
       "names": [
-        "RotateTurretFront"
+        "FlipTurret"
       ]
     }
   ]

@@ -17,9 +17,8 @@
       "isStopPoint": false,
       "stopEvent": {
         "names": [
-          "CollectGamePiece",
           "DropoffHigh",
-          "RetractArm"
+          "ArmHalfClosed"
         ],
         "executionBehavior": "sequential",
         "waitBehavior": "none",
@@ -29,15 +28,15 @@
     {
       "anchorPoint": {
         "x": 3.9718995227464147,
-        "y": 4.63
+        "y": 4.67
       },
       "prevControl": {
         "x": 2.6933840487724297,
-        "y": 4.590046391438314
+        "y": 4.630046391438314
       },
       "nextControl": {
         "x": 4.55226840278242,
-        "y": 4.648136527501125
+        "y": 4.688136527501125
       },
       "holonomicAngle": -90.0,
       "isReversal": false,
@@ -159,13 +158,13 @@
     {
       "position": 0.05,
       "names": [
-        "RotateTurretBackPickupCube"
+        "FlipTurretPickupCube"
       ]
     },
     {
       "position": 2.0454545454545454,
       "names": [
-        "RotateTurretFront"
+        "FlipTurret"
       ]
     }
   ]

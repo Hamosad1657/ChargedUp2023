@@ -2,22 +2,23 @@
   "waypoints": [
     {
       "anchorPoint": {
-        "x": 1.8952671238675813,
-        "y": 1.088147088574879
+        "x": 1.9,
+        "y": 0.55
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.1466875214452186,
-        "y": 1.0428057698220663
+        "x": 2.5272225044450085,
+        "y": 0.1577084698029061
       },
-      "holonomicAngle": -90.0,
+      "holonomicAngle": 90.0,
       "isReversal": false,
       "velOverride": null,
       "isLocked": false,
       "isStopPoint": false,
       "stopEvent": {
         "names": [
-          "DropoffHigh"
+          "DropoffHigh",
+          "HomeArm"
         ],
         "executionBehavior": "sequential",
         "waitBehavior": "none",
@@ -27,26 +28,23 @@
     {
       "anchorPoint": {
         "x": 5.35934387658249,
-        "y": 0.8614404948108144
+        "y": 0.8
       },
       "prevControl": {
         "x": 5.013873462808102,
-        "y": 0.8730738189730857
+        "y": 0.8116333241622713
       },
       "nextControl": {
         "x": 5.703937899103868,
-        "y": 0.8498366821295058
+        "y": 0.7883961873186914
       },
-      "holonomicAngle": -90.0,
+      "holonomicAngle": 90.0,
       "isReversal": false,
       "velOverride": null,
       "isLocked": false,
-      "isStopPoint": true,
+      "isStopPoint": false,
       "stopEvent": {
-        "names": [
-          "HomeArm",
-          "PickupCube"
-        ],
+        "names": [],
         "executionBehavior": "sequential",
         "waitBehavior": "none",
         "waitTime": 0
@@ -55,14 +53,14 @@
     {
       "anchorPoint": {
         "x": 6.773993021670255,
-        "y": 0.8070309123074395
+        "y": 0.8
       },
       "prevControl": {
         "x": 6.465672054151126,
-        "y": 0.8342357035591264
+        "y": 0.8272047912516869
       },
       "nextControl": null,
-      "holonomicAngle": -90.0,
+      "holonomicAngle": 90.0,
       "isReversal": false,
       "velOverride": null,
       "isLocked": false,
@@ -79,7 +77,7 @@
     {
       "position": 0.05,
       "names": [
-        "RotateTurretBack"
+        "FlipTurret"
       ]
     }
   ]

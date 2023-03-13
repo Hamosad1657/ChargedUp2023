@@ -17,7 +17,6 @@
       "isStopPoint": false,
       "stopEvent": {
         "names": [
-          "CollectGamePiece",
           "DropoffHigh",
           "ArmHalfClosed"
         ],
@@ -131,7 +130,7 @@
     {
       "position": 0.1,
       "names": [
-        "RotateTurretBackPickupCube"
+        "FlipTurretPickupCube"
       ]
     },
     {

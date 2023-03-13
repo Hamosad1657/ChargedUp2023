@@ -17,7 +17,6 @@
       "isStopPoint": false,
       "stopEvent": {
         "names": [
-          "CollectGamePiece",
           "DropoffHigh",
           "HomeArm"
         ],
