@@ -27,6 +27,7 @@ public class BalanceChassisCommand extends CommandBase {
 	@Override
 	public void initialize() {
 		Robot.print("Started Auto Balance Command");
+		this.balanceTimer.start();
 	}
 
 	@Override
@@ -35,6 +36,10 @@ public class BalanceChassisCommand extends CommandBase {
 				-BalanceChassisConstants.kDriveSpeedMPS, BalanceChassisConstants.kDriveSpeedMPS);
 
 		this.swerve.autonomousDrive(new ChassisSpeeds(0, vyMeters, 0), false, true);
+
+		if (!this.balanceController.atSetpoint()) {
+			this.balanceTimer.reset();
+		}
 	}
 
 	@Override
@@ -44,15 +49,6 @@ public class BalanceChassisCommand extends CommandBase {
 
 	@Override
 	public boolean isFinished() {
-		if (this.balanceController.atSetpoint()) {
-			this.balanceTimer.start();
-			if (this.balanceTimer.hasElapsed(0.3)) {
-				return true;
-			}
-		} else {
-			this.balanceTimer.stop();
-			this.balanceTimer.reset();
-		}
-		return false;
+		return this.balanceTimer.hasElapsed(0.3);
 	}
 }
