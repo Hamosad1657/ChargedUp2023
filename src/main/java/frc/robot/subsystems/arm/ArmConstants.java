@@ -11,9 +11,9 @@ public class ArmConstants {
 	public static final double kAngleEncoderOffset = 0.0;
 	public static final double kLengthEncoderOffset = 0.0;
 
-	public static final double kHomingAngleOutput = -0.175;
+	public static final double kHomingAngleOutput = -0.25;
 	public static final double kHomingLengthOutput = 1.0;
-	public static final double kHomingLengthKeepRetractedOutput = 0.1;
+	public static final double kHomingLengthKeepRetractedOutput = 0.15;
 	public static final double kHomingAnglePIDRatio = 1.45;
 	/** For homing - The max arm's length that still counts as retracted. */
 	public static final double kHomingRetractedMaxLength = 300.0;
