@@ -71,13 +71,7 @@ public class SwerveSubsystem extends SubsystemBase {
 	private final Timer angleControlTimer;
 
 	private final ShuffleboardTab swerveTab, odometryTab;
-	private final ShuffleboardLayout frontLeftModuleList, frontRightModuleList, backLeftModuleList, backRightModuleList,
-			odometryList;
 	private final Field2d field;
-	private final GenericEntry frontLeftAngle, frontLeftSetpoint, frontRightAngle, frontRightSetpoint, backLeftAngle,
-			backLeftSetpoint, backRightAngle, backRightSetpoint, frontLeftSpeed, frontRightSpeed, backLeftSpeed,
-			backRightSpeed, frontLeftError, frontRightError, backLeftError, backRightError, anglePIDRunningEntry,
-			odometryXEntry, odometryYEntry, teleopAngleErrorEntry;
 
 	private double teleopAngleSetpointRad;
 	private boolean isRobotAngleCorrectionEnabled = false, runAngleCorrection = false;
@@ -123,48 +117,19 @@ public class SwerveSubsystem extends SubsystemBase {
 		this.swerveTab = Shuffleboard.getTab("Swerve");
 		this.odometryTab = Shuffleboard.getTab("Odometry");
 
-		this.anglePIDRunningEntry = this.swerveTab.add("Angle PID Running", false).getEntry();
-		this.teleopAngleErrorEntry = this.swerveTab.add("Angle PID Error", 0.0).getEntry();
-
 		this.swerveTab.add("Gyro", this.gyro).withPosition(0, 3).withSize(2, 3);
 		this.swerveTab.add("Angle PID", this.anglePIDController);
-		this.frontLeftModuleList = this.swerveTab.getLayout("Front Left Module", BuiltInLayouts.kList)
-				.withPosition(0, 0).withSize(2, 3);
-		this.frontLeftAngle = this.frontLeftModuleList.add("Angle", 0.0).getEntry();
-		this.frontLeftSetpoint = this.frontLeftModuleList.add("Setpoint", 0.0).getEntry();
-		this.frontLeftSpeed = this.frontLeftModuleList.add("Speed", 0.0).getEntry();
-		this.frontLeftError = this.frontLeftModuleList.add("error", 0.0).getEntry();
+		
+		this.swerveTab.add("Front Left Module", this.modules[0]);
+		this.swerveTab.add("Front Right Module", this.modules[1]);
+		this.swerveTab.add("Back Left Module", this.modules[2]);
+		this.swerveTab.add("Back Right Module", this.modules[3]);
 
-		this.frontRightModuleList = this.swerveTab.getLayout("Front Right Module", BuiltInLayouts.kList)
-				.withPosition(2, 0).withSize(2, 3);
-		this.frontRightAngle = this.frontRightModuleList.add("Angle", 0.0).getEntry();
-		this.frontRightSetpoint = this.frontRightModuleList.add("Setpoint", 0.0).getEntry();
-		this.frontRightSpeed = this.frontRightModuleList.add("Speed", 0.0).getEntry();
-		this.frontRightError = this.frontRightModuleList.add("error", 0.0).getEntry();
-
-		this.backLeftModuleList = this.swerveTab.getLayout("Back Left Module", BuiltInLayouts.kList).withPosition(4, 0)
-				.withSize(2, 3);
-		this.backLeftAngle = this.backLeftModuleList.add("Angle", 0.0).getEntry();
-		this.backLeftSetpoint = this.backLeftModuleList.add("Setpoint", 0.0).getEntry();
-		this.backLeftSpeed = this.backLeftModuleList.add("Speed", 0.0).getEntry();
-		this.backLeftError = this.backLeftModuleList.add("error", 0.0).getEntry();
-
-		this.backRightModuleList = this.swerveTab.getLayout("Back Right Module", BuiltInLayouts.kList)
-				.withPosition(6, 0).withSize(2, 3);
-		this.backRightAngle = this.backRightModuleList.add("Angle", 0.0).getEntry();
-		this.backRightSetpoint = this.backRightModuleList.add("Setpoint", 0.0).getEntry();
-		this.backRightSpeed = this.backRightModuleList.add("Speed", 0.0).getEntry();
-		this.backRightError = this.backRightModuleList.add("error", 0.0).getEntry();
+		this.swerveTab.addDouble("Odometry X", () -> this.getOdometryPose().getX());
+		this.swerveTab.addDouble("Odometry Y", () -> this.getOdometryPose().getY());
 
 		this.field = new Field2d();
 		this.odometryTab.add("Field", this.field);
-
-		this.odometryList = this.odometryTab.getLayout("Odometry", BuiltInLayouts.kList).withPosition(0, 0).withSize(2,
-				4);
-		this.odometryXEntry = this.odometryList.add("Odometry X", -1657).withWidget(BuiltInWidgets.kTextView)
-				.getEntry();
-		this.odometryYEntry = this.odometryList.add("Odometry Y", -1657).withWidget(BuiltInWidgets.kTextView)
-				.getEntry();
 
 		SwervePathConstants.createCommands();
 		this.createPaths();
@@ -435,23 +400,18 @@ public class SwerveSubsystem extends SubsystemBase {
 	 * @return An adjusted angular velocity accounting for skew.
 	 */
 	private double calculateAngleCorrectionRadPS(double angularVelocityRadPS) {
-		this.teleopAngleErrorEntry.setDouble(Math.toDegrees(this.anglePIDController.getPositionError()));
-
 		if (!this.isRobotAngleCorrectionEnabled) {
-			this.anglePIDRunningEntry.setBoolean(false);
 			return angularVelocityRadPS;
 		}
 
 		if (angularVelocityRadPS != 0.0) {
 			this.runAngleCorrection = false;
 			this.angleControlTimer.reset();
-			this.anglePIDRunningEntry.setBoolean(false);
 			return angularVelocityRadPS;
 		}
 
 		if (this.angleControlTimer.hasElapsed(1.0)) {
 			if (this.runAngleCorrection) {
-				this.anglePIDRunningEntry.setBoolean(true);
 				return MathUtil.clamp(
 						-this.anglePIDController.calculate(this.gyro.getYawAngleRad(), this.teleopAngleSetpointRad),
 						-SwerveConstants.kMaxAngularVelocityRadPS, SwerveConstants.kMaxAngularVelocityRadPS);
@@ -524,31 +484,5 @@ public class SwerveSubsystem extends SubsystemBase {
 			SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Velocity",
 					mod.getModuleState().speedMetersPerSecond);
 		}
-
-		this.frontLeftAngle.setDouble(this.modules[0].getAngle().getDegrees());
-		this.frontLeftSetpoint.setDouble(this.modules[0].getDesiredAngle().getDegrees());
-		this.frontLeftSpeed.setDouble(this.modules[0].getModuleState().speedMetersPerSecond);
-		this.frontLeftError
-				.setDouble(this.modules[0].getDesiredAngle().getDegrees() - this.modules[0].getAngle().getDegrees());
-
-		this.frontRightAngle.setDouble(this.modules[1].getAngle().getDegrees());
-		this.frontRightSetpoint.setDouble(this.modules[1].getDesiredAngle().getDegrees());
-		this.frontRightSpeed.setDouble(this.modules[1].getModuleState().speedMetersPerSecond);
-		this.frontRightError
-				.setDouble(this.modules[1].getDesiredAngle().getDegrees() - this.modules[1].getAngle().getDegrees());
-
-		this.backLeftAngle.setDouble(this.modules[2].getAngle().getDegrees());
-		this.backLeftSetpoint.setDouble(this.modules[2].getDesiredAngle().getDegrees());
-		this.backLeftSpeed.setDouble(this.modules[2].getModuleState().speedMetersPerSecond);
-		this.backLeftError
-				.setDouble(this.modules[2].getDesiredAngle().getDegrees() - this.modules[2].getAngle().getDegrees());
-
-		this.backRightAngle.setDouble(this.modules[3].getAngle().getDegrees());
-		this.backRightSetpoint.setDouble(this.modules[3].getDesiredAngle().getDegrees());
-		this.backRightSpeed.setDouble(this.modules[3].getModuleState().speedMetersPerSecond);
-		this.backRightError
-				.setDouble(this.modules[3].getDesiredAngle().getDegrees() - this.modules[3].getAngle().getDegrees());
-		this.odometryXEntry.setDouble(this.getOdometryPose().getX());
-		this.odometryYEntry.setDouble(this.getOdometryPose().getY());
 	}
 }
