@@ -305,8 +305,8 @@ public class SwerveSubsystem extends SubsystemBase {
 	 * Sets the yaw angle as 0. This can be used to set the angle the robot is currently facing as "forwards".
 	 */
 	public void zeroGyro() {
-		this.gyro.zeroYaw();
-		this.teleopAngleSetpointRad = 0.0;
+		this.gyro.zeroYaw(180.0);
+		this.teleopAngleSetpointRad = Math.PI;
 	}
 
 	public void setGyro(double offsetDeg) {
@@ -495,6 +495,9 @@ public class SwerveSubsystem extends SubsystemBase {
 				new SequentialCommandGroup(ArmSubsystem.getInstance().autoHomeCommand(),
 						this.getPathPlannerAutoCommand("Low Cone & Cube & Station"), new BalanceChassisCommand(this),
 						this.crossLockWheelsCommand()));
+		SwervePathConstants.kPaths.putIfAbsent("Low Cone & Cube",
+				new SequentialCommandGroup(ArmSubsystem.getInstance().autoHomeCommand(),
+						this.getPathPlannerAutoCommand("Low Cone & Cube"), this.crossLockWheelsCommand()));
 	}
 
 	@Override
