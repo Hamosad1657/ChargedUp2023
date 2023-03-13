@@ -2,7 +2,6 @@
 package frc.robot.subsystems.turret;
 
 import java.util.function.DoubleSupplier;
-import javax.sound.sampled.ReverbType;
 import com.ctre.phoenix.sensors.AbsoluteSensorRange;
 import com.hamosad1657.lib.sensors.HaCANCoder;
 import com.revrobotics.CANSparkMax;
@@ -128,11 +127,10 @@ public class TurretSubsystem extends SubsystemBase {
 		double setpoint;
 		double currentAngle = this.getCurrentAngle();
 		// Within a 10 degree tolerance to 270
-		if (Math.abs(currentAngle) < TurretConstants.kFrontRotationSetpoint + 10 &&
-		Math.abs(currentAngle) > TurretConstants.kFrontRotationSetpoint - 10) {
+		if (Math.abs(currentAngle) < TurretConstants.kFrontRotationSetpoint + 10
+				&& Math.abs(currentAngle) > TurretConstants.kFrontRotationSetpoint - 10) {
 			setpoint = TurretConstants.kBackRotationSetpoint;
-		}
-		else {
+		} else {
 			setpoint = TurretConstants.kFrontRotationSetpoint;
 		}
 		return new InstantCommand(() -> this.setSetpoint(setpoint))
