@@ -53,15 +53,15 @@
     },
     {
       "anchorPoint": {
-        "x": 6.8,
+        "x": 6.85,
         "y": 4.55
       },
       "prevControl": {
-        "x": 6.92339288904904,
+        "x": 6.97339288904904,
         "y": 4.539416863825573
       },
       "nextControl": {
-        "x": 6.234555877883686,
+        "x": 6.284555877883686,
         "y": 4.598496896292039
       },
       "holonomicAngle": -90.0,
@@ -103,19 +103,19 @@
     }
   ],
   "maxVelocity": 4.0,
-  "maxAcceleration": 3.0,
+  "maxAcceleration": 4.0,
   "isReversed": null,
   "markers": [
     {
       "position": 0.05,
       "names": [
-        "RotateTurretBackPickupCube"
+        "FlipTurretPickupCube"
       ]
     },
     {
       "position": 2.05,
       "names": [
-        "RotateTurretFront"
+        "FlipTurret"
       ]
     }
   ]
