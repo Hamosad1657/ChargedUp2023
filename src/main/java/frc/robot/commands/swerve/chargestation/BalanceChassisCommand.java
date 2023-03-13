@@ -49,6 +49,6 @@ public class BalanceChassisCommand extends CommandBase {
 
 	@Override
 	public boolean isFinished() {
-		return this.balanceTimer.hasElapsed(0.3);
+		return this.balanceTimer.hasElapsed(BalanceChassisConstants.kWaitingTimeSec);
 	}
 }
