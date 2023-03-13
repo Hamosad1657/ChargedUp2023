@@ -1,0 +1,124 @@
+{
+  "waypoints": [
+    {
+      "anchorPoint": {
+        "x": 1.9134036513687065,
+        "y": 4.289244192523473
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 1.7773796951102676,
+        "y": 4.987500501316792
+      },
+      "holonomicAngle": -90.0,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [
+          "CollectGamePiece",
+          "WaitABit"
+        ],
+        "executionBehavior": "sequential",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 5.2323881840746145,
+        "y": 4.715452588799915
+      },
+      "prevControl": {
+        "x": 3.737294053488724,
+        "y": 4.774721386681065
+      },
+      "nextControl": {
+        "x": 5.821825327861182,
+        "y": 4.692086012593078
+      },
+      "holonomicAngle": -90.0,
+      "isReversal": false,
+      "velOverride": 1.0,
+      "isLocked": false,
+      "isStopPoint": true,
+      "stopEvent": {
+        "names": [
+          "HomeArm",
+          "PickupCube"
+        ],
+        "executionBehavior": "sequential",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 7.23647447295216,
+        "y": 4.6791795337949775
+      },
+      "prevControl": {
+        "x": 6.2752385153893115,
+        "y": 4.760793907552728
+      },
+      "nextControl": {
+        "x": 7.403085525859637,
+        "y": 4.665033312321283
+      },
+      "holonomicAngle": -90.0,
+      "isReversal": false,
+      "velOverride": 1.0,
+      "isLocked": false,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [],
+        "executionBehavior": "parallel",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 1.904335387618144,
+        "y": 3.745148367489718
+      },
+      "prevControl": {
+        "x": 1.904335387618144,
+        "y": 5.1416609850763555
+      },
+      "nextControl": null,
+      "holonomicAngle": -90.0,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [
+          "DropoffLowCube"
+        ],
+        "executionBehavior": "sequential",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    }
+  ],
+  "maxVelocity": 4.0,
+  "maxAcceleration": 3.0,
+  "isReversed": null,
+  "markers": [
+    {
+      "position": 0.01,
+      "names": [
+        "ReleaseGamePiece",
+        "RotateTurretBack"
+      ]
+    },
+    {
+      "position": 2.545454545454546,
+      "names": [
+        "RotateTurretFront"
+      ]
+    }
+  ]
+}
