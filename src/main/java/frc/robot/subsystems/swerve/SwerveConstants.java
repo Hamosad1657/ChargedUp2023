@@ -11,7 +11,7 @@ import frc.robot.RobotMap;
 
 public final class SwerveConstants {
 	public static final boolean invertGyro = false; // HaNavX already inverts the navX
-	public static final double kSwerveTranslateRatioFast = 0.9, kSwerveRotationRatioFast = 0.85;
+	public static final double kSwerveTranslateRatioFast = 0.9, kSwerveRotationRatioFast = 0.8;
 	public static final double kSwerveTranslateRatioSlow = 0.3, kSwerveRotationRatioSlow = 0.3;
 	public static final double kSpeedModeRateLimit = 0.75;
 	public static final double robotIsMovingThresholdMPS = 0.1;
