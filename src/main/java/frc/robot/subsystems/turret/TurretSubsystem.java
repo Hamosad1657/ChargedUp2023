@@ -124,17 +124,18 @@ public class TurretSubsystem extends SubsystemBase {
 	}
 
 	public Command flipTurretCommand() {
-		double setpoint;
+		return new InstantCommand(() -> {
+			double setpoint;
 
-		// Within a 10 degree tolerance to 90
-		if (Math.abs(TurretConstants.kFrontRotationSetpoint - this.getCurrentAngle()) < 10.0) {
-			setpoint = TurretConstants.kBackRotationSetpoint;
-		} else {
-			setpoint = TurretConstants.kFrontRotationSetpoint;
-		}
+			// Within a 10 degree tolerance to 90
+			if (Math.abs(TurretConstants.kFrontRotationSetpoint - this.getCurrentAngle()) < 10.0) {
+				setpoint = TurretConstants.kBackRotationSetpoint;
+			} else {
+				setpoint = TurretConstants.kFrontRotationSetpoint;
+			}
 
-		return new InstantCommand(() -> this.setSetpoint(setpoint))
-				.andThen(new WaitUntilCommand(() -> this.isAtSetpoint(TurretConstants.kAutoRotationTolerance)));
+			this.setSetpoint(setpoint);
+		}).andThen(new WaitUntilCommand(() -> this.isAtSetpoint(TurretConstants.kAutoRotationTolerance)));
 	}
 
 	public Command openLoopTeleopCommand(DoubleSupplier outputSupplier) {
