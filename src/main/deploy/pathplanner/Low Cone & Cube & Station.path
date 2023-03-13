@@ -42,7 +42,7 @@
       "isReversal": false,
       "velOverride": 1.0,
       "isLocked": false,
-      "isStopPoint": false,
+      "isStopPoint": true,
       "stopEvent": {
         "names": [
           "HomeArm",
@@ -98,7 +98,7 @@
       "isStopPoint": true,
       "stopEvent": {
         "names": [
-          "ReleaseGamePiece"
+          "DropoffLowCube"
         ],
         "executionBehavior": "sequential",
         "waitBehavior": "none",

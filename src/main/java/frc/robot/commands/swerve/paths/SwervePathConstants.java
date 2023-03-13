@@ -88,7 +88,7 @@ public final class SwervePathConstants {
 		SwervePathConstants.kPathCommandsMap.put("ArmLowCube", arm.getToStateCommand(ArmState.kLowCube, true));
 		SwervePathConstants.kPathCommandsMap.put("ArmHalfClosed",
 				arm.getToStateLengthFirstCommand(ArmState.kHalfClosed, true));
-		SwervePathConstants.kPathCommandsMap.put("RetractArm", arm.retractCommand());
+		// SwervePathConstants.kPathCommandsMap.put("RetractArm", arm.retractCommand());
 
 		// Grabber
 		SwervePathConstants.kPathCommandsMap.put("CollectGamePiece", grabber.collectCommand());
