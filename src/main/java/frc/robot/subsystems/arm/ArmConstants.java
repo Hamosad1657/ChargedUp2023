@@ -20,7 +20,7 @@ public class ArmConstants {
 	/** For homing - The lowest angle the arm can go to when it's extended. */
 	public static final double kHomingExtendedMinAngle = 80.0;
 
-	public static final PIDGains kAnglePIDGains = new PIDGains(0.02, 0.0065, 0.0);
+	public static final PIDGains kAnglePIDGains = new PIDGains(0.0225, 0.0065, 0.0);
 	public static final double kAngleTolerance = 2.5;
 	public static final double kAngleMotorMaxPIDOutput = 0.75;
 	public static final double kAngleDownOutputRatio = 0.5;
