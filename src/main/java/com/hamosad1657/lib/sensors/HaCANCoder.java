@@ -11,7 +11,7 @@ import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 
 public class HaCANCoder implements Sendable {
-	private final WPI_CANCoder cancoder;
+	public final WPI_CANCoder cancoder;
 	private int direction = 1;
 	private CANCoderSimCollection simCANCoder;
 	private double simAngleDeg = 0, simVelocityDegPS = 0;
@@ -141,37 +141,37 @@ public class HaCANCoder implements Sendable {
 
 	public void setSimAngleDeg(double angleDeg) {
 		this.simAngleDeg = angleDeg;
-		this.simCANCoder.setRawPosition((int) HaUnitConvertor.degreesToCANCoderTicks(simAngleDeg));
+		this.simCANCoder.setRawPosition((int)HaUnitConvertor.degreesToCANCoderTicks(simAngleDeg));
 	}
 
 	public void setSimAngleRad(double angleRad) {
 		this.simAngleDeg = HaUnitConvertor.radToDeg(angleRad);
-		this.simCANCoder.setRawPosition((int) HaUnitConvertor.degreesToCANCoderTicks(simAngleDeg));
+		this.simCANCoder.setRawPosition((int)HaUnitConvertor.degreesToCANCoderTicks(simAngleDeg));
 	}
 
 	public void setSimAngleRotation2d(Rotation2d angleRotation2d) {
 		this.simAngleDeg = angleRotation2d.getDegrees();
-		this.simCANCoder.setRawPosition((int) HaUnitConvertor.degreesToCANCoderTicks(simAngleDeg));
+		this.simCANCoder.setRawPosition((int)HaUnitConvertor.degreesToCANCoderTicks(simAngleDeg));
 	}
 
 	public void setSimVelocityDegPS(double degPS) {
 		this.simVelocityDegPS = degPS;
-		this.simCANCoder.setVelocity((int) HaUnitConvertor.degPSToCANCoderTicksPer100ms(this.simVelocityDegPS));
+		this.simCANCoder.setVelocity((int)HaUnitConvertor.degPSToCANCoderTicksPer100ms(this.simVelocityDegPS));
 	}
 
 	public void setSimVelocityRadPS(double radPS) {
 		this.simVelocityDegPS = HaUnitConvertor.radToDeg(radPS);
-		this.simCANCoder.setVelocity((int) HaUnitConvertor.degPSToCANCoderTicksPer100ms(this.simVelocityDegPS));
+		this.simCANCoder.setVelocity((int)HaUnitConvertor.degPSToCANCoderTicksPer100ms(this.simVelocityDegPS));
 	}
 
 	public void setSimVelocityMPS(double MPS, double wheelRadiusM) {
 		this.simVelocityDegPS = HaUnitConvertor.MPSToDegPS(MPS, wheelRadiusM);
-		this.simCANCoder.setVelocity((int) HaUnitConvertor.degPSToCANCoderTicksPer100ms(this.simVelocityDegPS));
+		this.simCANCoder.setVelocity((int)HaUnitConvertor.degPSToCANCoderTicksPer100ms(this.simVelocityDegPS));
 	}
 
 	public void setSimVelocityRPM(double RPM) {
 		this.simVelocityDegPS = HaUnitConvertor.RPMToDegPS(RPM);
-		this.simCANCoder.setVelocity((int) HaUnitConvertor.degPSToCANCoderTicksPer100ms(this.simVelocityDegPS));
+		this.simCANCoder.setVelocity((int)HaUnitConvertor.degPSToCANCoderTicksPer100ms(this.simVelocityDegPS));
 	}
 
 	// Private unit convertors

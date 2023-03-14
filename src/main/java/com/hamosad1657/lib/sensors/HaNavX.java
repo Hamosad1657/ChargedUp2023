@@ -21,14 +21,13 @@ import frc.robot.Robot;
  */
 public class HaNavX implements Sendable {
 	private AHRS navX;
-	private final Timer commsTimoutTimer = new Timer();
-	// KauaiLabs's website says it takes max ~17
-	// seconds, so i'm giving it some grace
-	private final double kTimeoutSec = 20.0;
 	private double yawOffsetDeg = 0.0;
+	private final Timer commsTimoutTimer = new Timer();
+	
+	private static final double kTimeoutSec = 5.0;
 
 	/*
-	 * Waites until the navX is connected and calibrated, or 20 seconds have passed since startup. If the former, print
+	 * Waites until the navX is connected and calibrated, or 5 seconds have passed since startup. If the former, print
 	 * that the navX is done calibrating and continue; If the latter, print that communication has failed and continue.
 	 */
 	private void initialize(AHRS navX) {
@@ -36,13 +35,13 @@ public class HaNavX implements Sendable {
 		this.navX.enableLogging(true);
 		this.commsTimoutTimer.start();
 
-		// Wait until navX is connected or 20 seconds have passed
+		// Wait until navX is connected or 5 seconds have passed
 		while (!this.navX.isConnected()) {
 			if (this.commsTimoutTimer.hasElapsed(kTimeoutSec)) {
 				break;
 			}
 		}
-		// Wait until navX is calibrated or 20 seconds have passed
+		// Wait until navX is calibrated or 5 seconds have passed
 		while (this.navX.isCalibrating()) {
 			if (this.commsTimoutTimer.hasElapsed(kTimeoutSec)) {
 				break;
@@ -50,10 +49,10 @@ public class HaNavX implements Sendable {
 		}
 
 		if (this.commsTimoutTimer.hasElapsed(kTimeoutSec)) {
-			Robot.print("Failed to connect to navX within 20 seconds from startup.");
-			DriverStation.reportError("Failed to connect to navX within 20 seconds from startup.", false);
+			Robot.print("Failed to connect to navX within " + Double.toString(kTimeoutSec) + " seconds from startup.");
+			DriverStation.reportError("Failed to connect to navX within " + Double.toString(kTimeoutSec) + " seconds from startup.", false);
 		} else {
-			Robot.print("navX done calibrating.");
+			Robot.print("navX done calibrating in " + Double.toString(this.commsTimoutTimer.get()) + " seconds from startup.");
 		}
 
 		this.commsTimoutTimer.stop();

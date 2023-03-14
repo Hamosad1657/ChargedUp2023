@@ -2,53 +2,23 @@
   "waypoints": [
     {
       "anchorPoint": {
-        "x": 1.95,
-        "y": 4.43
+        "x": 1.9,
+        "y": 0.55
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.583148880583476,
-        "y": 5.725897166080046
+        "x": 2.5272225044450085,
+        "y": 0.1577084698029061
       },
-      "holonomicAngle": 180.0,
+      "holonomicAngle": 90.0,
       "isReversal": false,
       "velOverride": null,
       "isLocked": false,
       "isStopPoint": false,
       "stopEvent": {
         "names": [
-          "OpenIntake",
-          "WaitABitMore",
-          "CloseIntake"
-        ],
-        "executionBehavior": "sequential",
-        "waitBehavior": "minimum",
-        "waitTime": 1.0
-      }
-    },
-    {
-      "anchorPoint": {
-        "x": 5.1,
-        "y": 2.725
-      },
-      "prevControl": {
-        "x": 7.225280307703473,
-        "y": 2.619597953481622
-      },
-      "nextControl": {
-        "x": 5.090942867899729,
-        "y": 2.7254491832232652
-      },
-      "holonomicAngle": 180.0,
-      "isReversal": false,
-      "velOverride": null,
-      "isLocked": false,
-      "isStopPoint": true,
-      "stopEvent": {
-        "names": [
-          "OpenIntake",
-          "WaitABit",
-          "OpenIntake"
+          "DropoffHigh",
+          "HomeArm"
         ],
         "executionBehavior": "sequential",
         "waitBehavior": "none",
@@ -57,28 +27,58 @@
     },
     {
       "anchorPoint": {
-        "x": 3.55,
-        "y": 2.725
+        "x": 5.35934387658249,
+        "y": 0.8
       },
       "prevControl": {
-        "x": 5.295124543278089,
-        "y": 2.725
+        "x": 5.013873462808102,
+        "y": 0.8116333241622713
       },
-      "nextControl": null,
-      "holonomicAngle": 180.0,
+      "nextControl": {
+        "x": 5.703937899103868,
+        "y": 0.7883961873186914
+      },
+      "holonomicAngle": 90.0,
       "isReversal": false,
       "velOverride": null,
       "isLocked": false,
       "isStopPoint": false,
       "stopEvent": {
-        "names": [
-          "CloseIntake"
-        ],
+        "names": [],
+        "executionBehavior": "sequential",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 6.773993021670255,
+        "y": 0.8
+      },
+      "prevControl": {
+        "x": 6.465672054151126,
+        "y": 0.8272047912516869
+      },
+      "nextControl": null,
+      "holonomicAngle": 90.0,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [],
         "executionBehavior": "sequential",
         "waitBehavior": "none",
         "waitTime": 0
       }
     }
   ],
-  "markers": []
+  "markers": [
+    {
+      "position": 0.05,
+      "names": [
+        "FlipTurret"
+      ]
+    }
+  ]
 }
