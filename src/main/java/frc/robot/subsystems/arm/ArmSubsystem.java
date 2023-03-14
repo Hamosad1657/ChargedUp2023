@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.RobotMap;
 import frc.robot.subsystems.arm.ArmConstants.ArmState;
@@ -85,22 +86,27 @@ public class ArmSubsystem extends SubsystemBase {
 
 		this.setState(ArmConstants.kAngleMinSetpoint, 0.0);
 
-		ShuffleboardTab armTab = Shuffleboard.getTab("Arm");
+		if (Robot.showShuffleboardSubsystemInfo) {
+			ShuffleboardTab armTab = Shuffleboard.getTab("Arm");
+			
+			armTab.add("Arm Length Motor", this.lengthMotor).withPosition(0, 0).withSize(2, 2);
+			armTab.add("Arm Angle CANCoder", this.angleCANCoder).withPosition(2, 0).withSize(2, 2);
+			armTab.add("Arm Length CANCoder", this.lengthCANCoder).withPosition(4, 0).withSize(2, 2);
 
-		armTab.add("Arm Length Motor", this.lengthMotor).withPosition(0, 0).withSize(2, 2);
-		armTab.add("Arm Angle CANCoder", this.angleCANCoder).withPosition(2, 0).withSize(2, 2);
-		armTab.add("Arm Length CANCoder", this.lengthCANCoder).withPosition(4, 0).withSize(2, 2);
+			armTab.addBoolean("Extend Limit", () -> !this.extendLimit.get()).withPosition(2, 2).withSize(2, 1);
+			armTab.addBoolean("Retract Limit", () -> !this.retractLimit.get()).withPosition(2, 3).withSize(2, 1);
+			armTab.addBoolean("Top Angle Limit", () -> !this.topAngleLimit.get()).withPosition(4, 2).withSize(2, 1);
+			armTab.addBoolean("Bottom Angle Limit", () -> !this.bottomAngleLimit.get()).withPosition(4, 3).withSize(2,
+					1);
 
-		armTab.addBoolean("Extend Limit", () -> !this.extendLimit.get()).withPosition(2, 2).withSize(2, 1);
-		armTab.addBoolean("Retract Limit", () -> !this.retractLimit.get()).withPosition(2, 3).withSize(2, 1);
-		armTab.addBoolean("Top Angle Limit", () -> !this.topAngleLimit.get()).withPosition(4, 2).withSize(2, 1);
-		armTab.addBoolean("Bottom Angle Limit", () -> !this.bottomAngleLimit.get()).withPosition(4, 3).withSize(2, 1);
-
-		armTab.addDouble("Angle Goal", () -> this.anglePIDController.getGoal().position).withPosition(6, 0).withSize(2,
-				1);
-		armTab.addDouble("Length Setpoint", this.lengthPIDController::getSetpoint).withPosition(6, 1).withSize(2, 1);
-		armTab.addBoolean("Angle At Goal", this.anglePIDController::atGoal).withPosition(6, 2).withSize(2, 1);
-		armTab.addBoolean("Length At Setpoint", this.lengthPIDController::atSetpoint).withPosition(6, 3).withSize(2, 1);
+			armTab.addDouble("Angle Goal", () -> this.anglePIDController.getGoal().position).withPosition(6, 0)
+					.withSize(2, 1);
+			armTab.addDouble("Length Setpoint", this.lengthPIDController::getSetpoint).withPosition(6, 1).withSize(2,
+					1);
+			armTab.addBoolean("Angle At Goal", this.anglePIDController::atGoal).withPosition(6, 2).withSize(2, 1);
+			armTab.addBoolean("Length At Setpoint", this.lengthPIDController::atSetpoint).withPosition(6, 3).withSize(2,
+					1);
+		}
 	}
 
 	public void resetLengthCANCoder() {

@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Robot;
 import frc.robot.RobotMap;
 
 public class IntakeSubsystem extends SubsystemBase {
@@ -22,22 +23,22 @@ public class IntakeSubsystem extends SubsystemBase {
 		return instance;
 	}
 
-	private final ShuffleboardTab intakeTab;
 	private final HaTalonSRX intakeMotor;
 	private final DigitalInput raiseLimit, lowerLimit;
 	private boolean isIntakeOpen;
 
 	private IntakeSubsystem() {
-		this.intakeTab = Shuffleboard.getTab("Intake");
-
 		this.intakeMotor = new HaTalonSRX(RobotMap.kIntakeMotorID);
 		this.intakeMotor.setIdleMode(IdleMode.kBrake);
 		this.isIntakeOpen = false;
 		this.raiseLimit = new DigitalInput(RobotMap.kIntakeRaiseLimitPort);
 		this.lowerLimit = new DigitalInput(RobotMap.kIntakeLowerLimitPort);
 
-		this.intakeTab.add("Raise Limit", this.raiseLimit);
-		this.intakeTab.add("Lower Limit", this.lowerLimit);
+		if (Robot.showShuffleboardSubsystemInfo) {
+			ShuffleboardTab intakeTab = Shuffleboard.getTab("Intake");
+			intakeTab.add("Raise Limit", this.raiseLimit);
+			intakeTab.add("Lower Limit", this.lowerLimit);
+		}
 	}
 
 	public Command lowerIntakeCommand() {
