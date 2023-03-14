@@ -438,6 +438,7 @@ public class SwerveSubsystem extends SubsystemBase {
 		this.addPath("High Cone & Cube & Station", true, false);
 		this.addPath("Low Cone & Cube & Station", true, true);
 		this.addPath("Low Cone & Cube", false, true);
+		this.addPath("Practice Station", true, false);
 	}
 
 	/**
