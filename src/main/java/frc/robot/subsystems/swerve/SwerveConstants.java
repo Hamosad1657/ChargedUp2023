@@ -17,8 +17,8 @@ public final class SwerveConstants {
 	public static final double robotIsMovingThresholdMPS = 0.1;
 
 	/* Drivetrain Constants */
-	public static final double kTrackWidthM = 0.42;
-	public static final double kWheelBaseM = 0.42;
+	public static final double kTrackWidthM = 0.5903;
+	public static final double kWheelBaseM = 0.5903;
 	public static final double kWheelDiameterM = 0.1016;
 	public static final double kWheelCircumferenceM = kWheelDiameterM * Math.PI;
 
