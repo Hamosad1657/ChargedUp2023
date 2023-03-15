@@ -54,7 +54,7 @@ public class RobotContainer {
 		// Swerve
 		this.driverA_CommandController.share().onTrue(new InstantCommand(this.swerve::zeroGyro));
 		this.driverA_CommandController.cross().onTrue(this.swerve.crossLockWheelsCommand());
-		this.driverA_CommandController.triangle().onTrue(new InstantCommand(this.swerve::toggleSwerveSpeed));
+		this.driverA_CommandController.triangle().onTrue(new InstantCommand(this.swerve::toggleTeleopSwerveSpeed));
 
 		// Intake
 		this.driverA_CommandController.R2().onTrue(this.intake.lowerIntakeCommand());

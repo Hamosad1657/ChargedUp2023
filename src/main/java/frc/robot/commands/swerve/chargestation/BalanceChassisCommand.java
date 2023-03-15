@@ -35,7 +35,7 @@ public class BalanceChassisCommand extends CommandBase {
 		double vyMeters = MathUtil.clamp(this.balanceController.calculate(this.swerve.getPitch().getDegrees()),
 				-BalanceChassisConstants.kDriveSpeedMPS, BalanceChassisConstants.kDriveSpeedMPS);
 
-		this.swerve.autonomousDrive(new ChassisSpeeds(0, vyMeters, 0), false, true);
+		this.swerve.autonomousDrive(new ChassisSpeeds(0, vyMeters, 0), true, true);
 
 		if (!this.balanceController.atSetpoint()) {
 			this.balanceTimer.reset();
