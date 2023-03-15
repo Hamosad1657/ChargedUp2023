@@ -285,10 +285,10 @@ public class SwerveSubsystem extends SubsystemBase {
 	}
 
 	/**
-	 * Sets the yaw angle as 180. This can be used to set the angle the robot is currently facing as "forwards".
+	 * Sets the yaw angle as 90. This can be used to set the angle the robot is currently facing as "forwards".
 	 */
 	public void zeroGyro() {
-		this.gyro.zeroYaw(180.0);
+		this.gyro.zeroYaw(90.0);
 		this.teleopAngleSetpointRad = Math.PI;
 	}
 
