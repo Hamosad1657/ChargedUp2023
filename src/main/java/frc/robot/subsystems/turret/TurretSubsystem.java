@@ -42,8 +42,7 @@ public class TurretSubsystem extends SubsystemBase {
 
 	private TurretSubsystem() {
 		this.rotationMotor = new CANSparkMax(RobotMap.kTurretMotorID, MotorType.kBrushless);
-		this.rotationMotor.setIdleMode(IdleMode.kBrake);
-
+		
 		this.rotationEncoder = new HaCANCoder(RobotMap.kTurretCANCoderID, TurretConstants.kCANCoderOffsetDeg);
 		this.rotationEncoder.setMeasurmentRange(AbsoluteSensorRange.Unsigned_0_to_360);
 
@@ -157,5 +156,9 @@ public class TurretSubsystem extends SubsystemBase {
 
 			this.rotationMotor.set(this.calculateRotationMotorOutput());
 		}, this);
+	}
+
+	public void setIdleMode(IdleMode idleMode) {
+		this.rotationMotor.setIdleMode(idleMode);
 	}
 }

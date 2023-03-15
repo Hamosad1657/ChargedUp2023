@@ -58,8 +58,13 @@ public class SwerveSubsystem extends SubsystemBase {
 	private final SwerveModule[] modules;
 	private final HaNavX gyro;
 	private final SwerveDriveOdometry odometry;
-	private final SlewRateLimiter speedModeRateLimiter;
 	private final SwerveAutoBuilder autoBuilder;
+
+	/**
+	 * There's a button that changes the swerve speed from fast to slow. In order to make the change smooth, we put a
+	 * slew-rate limiter on the speed ratio.
+	 */
+	private final SlewRateLimiter speedModeRateLimiter;
 
 	/** A PIDController for fixing the robot angle skew. */
 	private final PIDController anglePIDController;
@@ -69,7 +74,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
 	private double teleopAngleSetpointRad;
 	private boolean isRobotAngleCorrectionEnabled = false, runAngleCorrection = false;
-	public double currentSwerveTranslateRatio = SwerveConstants.kSwerveTranslateRatioFast,
+	private double currentSwerveTranslateRatio = SwerveConstants.kSwerveTranslateRatioFast,
 			filteredTranslationRatio = SwerveConstants.kSwerveTranslateRatioFast,
 			currentSwerveRotationRatio = SwerveConstants.kSwerveRotationRatioFast;
 
@@ -127,7 +132,7 @@ public class SwerveSubsystem extends SubsystemBase {
 			odometryTab.add("Field", this.field).withSize(5, 4).withPosition(0, 1);
 		}
 
-		SwervePathConstants.createCommands();
+		SwervePathConstants.createPathCommands();
 		this.createPaths();
 
 		/*
@@ -139,20 +144,23 @@ public class SwerveSubsystem extends SubsystemBase {
 	}
 
 	/**
-	 * Drive the swerve.
+	 * Drive the swerve using translation and rotation speeds and directions. Most suitable for driving using joystick
+	 * inputs (hence the name "teleop drive"), but may also be used in other ways. For driving using ChassisSpeeds, use
+	 * the alternative method {@link SwerveSubsystem#autonomousDrive(ChassisSpeeds, boolean, boolean)}.
 	 * 
 	 * @param translation     - A field-relative or robot-relative direction+speed to move in.
 	 * @param rotationRadPS   - A rotation speed in RadPS. Open-loop
 	 * @param isRobotRelative - Whether the passed Translation2d is field-relative or robot-relative (true if robot
 	 *                        relative).
-	 * @param isOpenLoop      - Is the wheel speed controlled open-loop or closed-loop.
+	 * @param isOpenLoop      - Should the wheel speeds be controlled open-loop or closed-loop. Open-loop is perfectly
+	 *                        fine for most cases.
 	 */
 	public void teleopDrive(Translation2d translation, double rotationRadPS, boolean isRobotRelative,
 			boolean isOpenLoop) {
 		// Set the swerveModuleStates from the desired ChassisSpeeds using kinematics.
 		SwerveModuleState[] swerveModuleStates = SwerveConstants.kSwerveKinematics.toSwerveModuleStates(
 				// If robot relative, just convert to ChassisSpeeds.
-				// If field relative, convert to robot-relative ChassisSpeeds with gyro.
+				// If field relative, convert to robot-relative ChassisSpeeds using the gyro.
 				isRobotRelative
 						? new ChassisSpeeds(translation.getX(), translation.getY(),
 								this.calculateAngleCorrectionRadPS(rotationRadPS))
@@ -168,14 +176,26 @@ public class SwerveSubsystem extends SubsystemBase {
 		}
 	}
 
-	public void autonomousDrive(ChassisSpeeds chassisSpeeds, boolean isRobotRelativeSpeeds, boolean isOpenLoop) {
-		SwerveModuleState[] swerveModuleStates = SwerveConstants.kSwerveKinematics
-				.toSwerveModuleStates(isRobotRelativeSpeeds
-						? ChassisSpeeds.fromFieldRelativeSpeeds(chassisSpeeds.vxMetersPerSecond,
-								chassisSpeeds.vyMetersPerSecond,
-								this.calculateAngleCorrectionRadPS(chassisSpeeds.omegaRadiansPerSecond), this.getYaw())
-						: new ChassisSpeeds(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond,
-								this.calculateAngleCorrectionRadPS(chassisSpeeds.omegaRadiansPerSecond)));
+	/**
+	 * Drive the swerve using ChassisSpeeds. Most sutiable for driving when controlling robot position (hence the name
+	 * "autonomous drive"), but may also be used in other ways. For driving using translation and rotation speeds and
+	 * directions, use the alternative method
+	 * {@link SwerveSubsystem#teleopDrive(Translation2d, double, boolean, boolean)}.
+	 * 
+	 * @param chassisSpeeds   - A field-relative or robot-relative ChassisSpeeds to move in.
+	 * @param isRobotRelative - Whether the passed ChassisSpeeds is field-relative or robot-relative (true if robot
+	 *                        relative).
+	 * @param isOpenLoop      - Should the wheel speeds be controlled open-loop or closed-loop. Open-loop is perfectly
+	 *                        fine for most cases.
+	 */
+	public void autonomousDrive(ChassisSpeeds chassisSpeeds, boolean isRobotRelative, boolean isOpenLoop) {
+		SwerveModuleState[] swerveModuleStates = SwerveConstants.kSwerveKinematics.toSwerveModuleStates(isRobotRelative
+				// If field relative, convert to robot-relative ChassisSpeeds using the gyro.
+				? new ChassisSpeeds(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond,
+						this.calculateAngleCorrectionRadPS(chassisSpeeds.omegaRadiansPerSecond))
+				: ChassisSpeeds.fromFieldRelativeSpeeds(chassisSpeeds.vxMetersPerSecond,
+						chassisSpeeds.vyMetersPerSecond,
+						this.calculateAngleCorrectionRadPS(chassisSpeeds.omegaRadiansPerSecond), this.getYaw()));
 
 		// If any of the speeds are above the maximum, lower them all in the same ratio.
 		SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, SwerveConstants.kChassisMaxSpeedMPS);
@@ -186,7 +206,8 @@ public class SwerveSubsystem extends SubsystemBase {
 		}
 	}
 
-	public void toggleSwerveSpeed() {
+	/** Switches between the fast and the slow swerve speed ratios. */
+	public void toggleTeleopSwerveSpeed() {
 		if (this.currentSwerveTranslateRatio == SwerveConstants.kSwerveTranslateRatioFast) {
 			this.currentSwerveTranslateRatio = SwerveConstants.kSwerveTranslateRatioSlow;
 			this.currentSwerveRotationRatio = SwerveConstants.kSwerveRotationRatioSlow;
@@ -208,7 +229,7 @@ public class SwerveSubsystem extends SubsystemBase {
 		}
 	}
 
-	/* Used by SwerveControllerCommand in Auto */
+	/* Used by SwerveControllerCommand in auto. */
 	public void setModuleStates(SwerveModuleState[] desiredStates) {
 		SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, SwerveConstants.kChassisMaxSpeedMPS);
 
@@ -226,11 +247,10 @@ public class SwerveSubsystem extends SubsystemBase {
 
 	/** Set the odometry to a specific position. Units in meters and Rotation2d. */
 	public void resetOdometry(Pose2d pose) {
-		this.setGyro(pose.getRotation().getDegrees() + 90.0);
-		Robot.print("Gyro reset to: " + Double.toString(this.getYaw().getDegrees()));
+		this.setGyro(pose.getRotation().getDegrees());
 		this.odometry.resetPosition(this.getYaw(), this.getModulesPositions(), pose);
-		Robot.print("Odometry reset to: " + Double.toString(this.getOdometryPose().getX()) + " | "
-				+ Double.toString(this.getOdometryPose().getY()));
+		Robot.print("Odometry reset to X: " + this.getOdometryPose().getX() + ", Y: " + this.getOdometryPose().getY()
+				+ ", rotation (degrees): " + this.getOdometryPose().getRotation().getDegrees());
 	}
 
 	/**
@@ -265,15 +285,15 @@ public class SwerveSubsystem extends SubsystemBase {
 	}
 
 	/**
-	 * Sets the yaw angle as 0. This can be used to set the angle the robot is currently facing as "forwards".
+	 * Sets the yaw angle as 90. This can be used to set the angle the robot is currently facing as "forwards".
 	 */
 	public void zeroGyro() {
-		this.gyro.zeroYaw(180.0);
+		this.gyro.zeroYaw(90.0);
 		this.teleopAngleSetpointRad = Math.PI;
 	}
 
 	public void setGyro(double offsetDeg) {
-		this.gyro.zeroYaw(offsetDeg);
+		this.gyro.zeroYaw(offsetDeg + 90.0);
 		this.teleopAngleSetpointRad = this.getYaw().getRadians();
 	}
 
@@ -283,33 +303,39 @@ public class SwerveSubsystem extends SubsystemBase {
 	}
 
 	/**
-	 * Returns the angle measured by the navX, inverted to adhere to WPILib's axis conventions.
+	 * @return The yaw angle measured by the navX, inverted to adhere to WPILib's coordinate system conventions.
 	 */
 	public Rotation2d getYaw() {
-		return (SwerveConstants.invertGyro) ? Rotation2d.fromDegrees(360 - this.gyro.getYawAngleDeg())
-				: Rotation2d.fromDegrees(this.gyro.getYawAngleDeg());
+		return Rotation2d.fromDegrees(this.gyro.getYawAngleDeg());
 	}
 
 	/**
-	 * Returns the angle measured by the navX, inverted to adhere to WPILib's axis conventions.
+	 * @return The pitch angle measured by the navX.
 	 */
 	public Rotation2d getPitch() {
-		return (SwerveConstants.invertGyro) ? Rotation2d.fromDegrees(360 - this.gyro.getPitchAngleDeg())
-				: Rotation2d.fromDegrees(this.gyro.getPitchAngleDeg());
+		return Rotation2d.fromDegrees(this.gyro.getPitchAngleDeg());
 	}
 
 	/**
-	 * Returns the angle measured by the navX, inverted to adhere to WPILib's axis conventions.
+	 * @return The roll angle measured by the navX.
 	 */
 	public Rotation2d getRoll() {
 		return (SwerveConstants.invertGyro) ? Rotation2d.fromDegrees(360 - this.gyro.getRollAngleDeg())
 				: Rotation2d.fromDegrees(this.gyro.getRollAngleDeg());
 	}
 
+	/**
+	 * @return The rate of change in degrees per second measured by the navX, inverted to adhere to WPILib's coordinate
+	 *         system conventions
+	 */
 	public double getYawDegPS() {
 		return this.gyro.getAngularVelocityDegPS();
 	}
 
+	/**
+	 * @return The rate of change in radidans per second measured by the navX, inverted to adhere to WPILib's coordinate
+	 *         system conventions
+	 */
 	public double getYawRadPS() {
 		return this.gyro.getAngularVelocityRadPS();
 	}
@@ -323,6 +349,10 @@ public class SwerveSubsystem extends SubsystemBase {
 		}
 	}
 
+	/**
+	 * Make the wheels stop spinning and do an X shape. Used to stop the swerve from being pushed, or from slipping down
+	 * a slope (like an unbalanced charging station in 2023).
+	 */
 	public void crossLockWheels() {
 		this.modules[0].setState(
 				new SwerveModuleState(0.0, Rotation2d.fromDegrees(SwerveConstants.FrontLeftModule.kCrossAngleDeg)),
@@ -340,9 +370,8 @@ public class SwerveSubsystem extends SubsystemBase {
 
 	/**
 	 * @param desiredPose
-	 * @param currentPose
-	 * @param tolerance
-	 * @return Is the robot within the position tolerance.
+	 * @param tolerance   - X, Y and rotation tolerance in a Pose2d object.
+	 * @return Is the robot within the specified position tolerance.
 	 */
 	public boolean withinPositionTolerance(Translation2d desiredPose, Pose2d tolerance) {
 		Pose2d currentPose = this.getOdometryPose();
@@ -355,9 +384,8 @@ public class SwerveSubsystem extends SubsystemBase {
 
 	/**
 	 * @param desiredPose
-	 * @param currentPose
-	 * @param tolerance
-	 * @return Is the robot within the position tolerance.
+	 * @param tolerance   - X, Y and rotation tolerance in a Pose2d object.
+	 * @return Is the robot within the specified position tolerance.
 	 */
 	public boolean withinPositionTolerance(Pose2d desiredPose, Pose2d tolerance) {
 		Pose2d error = desiredPose.relativeTo(this.getOdometryPose());
@@ -365,27 +393,62 @@ public class SwerveSubsystem extends SubsystemBase {
 				&& Math.abs(error.getRotation().getDegrees()) < tolerance.getRotation().getDegrees();
 	}
 
+	/**
+	 * Get the command used to run a PathPlanner path, with events and stop points in it. When run, this resets the
+	 * odometry pose to the begininng of the path.
+	 */
 	public Command getPathPlannerAutoCommand(String pathGroupName) {
 		List<PathPlannerTrajectory> pathGroup = PathPlanner.loadPathGroup(pathGroupName,
 				SwervePathConstants.kMaxSpeedMPS, SwervePathConstants.kMaxAccelMPSSquared);
 		return this.autoBuilder.fullAuto(pathGroup);
 	}
 
+	/**
+	 * Make the wheels stop spinning and do an X shape. Used to stop the swerve from being pushed, or from slipping down
+	 * a slope (like an unbalanced charging station in 2023). This command ends when the driver A joysticks move.
+	 */
 	public Command crossLockWheelsCommand() {
 		return new RunCommand(this::crossLockWheels, this).until(() -> this.joysticksMoved());
 	}
 
+	/**
+	 * @return Whether any of the driver A joysticks are outside the deadband (on the axises used to drive the swerve).
+	 */
 	public boolean joysticksMoved() {
-		double translationXValue = RobotContainer.driverA_Controller.getLeftX();
-		double translationYValue = RobotContainer.driverA_Controller.getLeftY();
-		double rotationValue = RobotContainer.driverA_Controller.getRightX();
+		double leftX = RobotContainer.driverA_Controller.getLeftX();
+		double leftY = RobotContainer.driverA_Controller.getLeftY();
+		double rightX = RobotContainer.driverA_Controller.getRightX();
 
-		return (translationXValue > RobotContainer.kJoystickDeadband
-				|| translationXValue < -RobotContainer.kJoystickDeadband
-				|| translationYValue > RobotContainer.kJoystickDeadband
-				|| translationYValue < -RobotContainer.kJoystickDeadband
-				|| rotationValue > RobotContainer.kJoystickDeadband
-				|| rotationValue < -RobotContainer.kJoystickDeadband);
+		return (Math.abs(leftX) > RobotContainer.kJoystickDeadband || Math.abs(leftY) > RobotContainer.kJoystickDeadband
+				|| Math.abs(rightX) > RobotContainer.kJoystickDeadband);
+	}
+
+	/**
+	 * @return Whether any of the wheel speeds are moving faster than the threshold specified in SwerveConstants.
+	 */
+	public boolean isChassisMoving() {
+		return Math
+				.abs(this.modules[0].getModuleState().speedMetersPerSecond) < SwerveConstants.robotIsMovingThresholdMPS
+				&& Math.abs(this.modules[1]
+						.getModuleState().speedMetersPerSecond) < SwerveConstants.robotIsMovingThresholdMPS
+				&& Math.abs(this.modules[2]
+						.getModuleState().speedMetersPerSecond) < SwerveConstants.robotIsMovingThresholdMPS
+				&& Math.abs(this.modules[3]
+						.getModuleState().speedMetersPerSecond) < SwerveConstants.robotIsMovingThresholdMPS;
+	}
+
+	/**
+	 * @return The current translation ratio, filtered through a slew-rate limiter to make it change smoothly.
+	 */
+	public double getCurrentTranslationSpeedRatio() {
+		return this.filteredTranslationRatio;
+	}
+
+	/**
+	 * @return The current rotation ratio.
+	 */
+	public double getCurrentRotationSpeedRatio() {
+		return this.currentSwerveRotationRatio;
 	}
 
 	/**
@@ -420,15 +483,9 @@ public class SwerveSubsystem extends SubsystemBase {
 		return angularVelocityRadPS;
 	}
 
-	public boolean isChassisMoving() {
-		return this.modules[0].getModuleState().speedMetersPerSecond < SwerveConstants.robotIsMovingThresholdMPS
-				&& this.modules[1].getModuleState().speedMetersPerSecond < SwerveConstants.robotIsMovingThresholdMPS
-				&& this.modules[2].getModuleState().speedMetersPerSecond < SwerveConstants.robotIsMovingThresholdMPS
-				&& this.modules[3].getModuleState().speedMetersPerSecond < SwerveConstants.robotIsMovingThresholdMPS;
-	}
-
 	/**
-	 * The function for putting paths inside the chooser
+	 * Used to put all path options in the drop-down menue in the shuffleboard. To change the options, edit them manually
+	 * here.
 	 */
 	private void createPaths() {
 		this.addPath("High Cone & Protector", false, false);
@@ -438,9 +495,12 @@ public class SwerveSubsystem extends SubsystemBase {
 		this.addPath("High Cone & Cube & Station", true, false);
 		this.addPath("Low Cone & Cube & Station", true, true);
 		this.addPath("Low Cone & Cube", false, true);
+		this.addPath("Practice Station", true, false);
 	}
 
 	/**
+	 * Adds a single path to the drop-down menue in the shuffleboard.
+	 * 
 	 * @param name          - The name of the path.
 	 * @param balanceAtEnd  - Should the robot balance at the end of the path.
 	 * @param startWithCube - Should the robot retract instead of home the arm at the start of the path.
@@ -465,11 +525,14 @@ public class SwerveSubsystem extends SubsystemBase {
 
 		Command[] commandArray = new Command[commandList.size()];
 		commandArray = commandList.toArray(commandArray);
-		SwervePathConstants.kPaths.putIfAbsent(name, new SequentialCommandGroup(commandArray));
+		SwervePathConstants.kAutoOptionsMap.putIfAbsent(name, new SequentialCommandGroup(commandArray));
 	}
 
 	@Override
 	public void periodic() {
+		// There's a button that changes the swerve speed from fast to slow. In order to make the change smooth, we put
+		// a
+		// slew-rate limiter on the speed ratio.
 		this.filteredTranslationRatio = this.speedModeRateLimiter.calculate(currentSwerveTranslateRatio);
 
 		this.odometry.update(this.getYaw(), this.getModulesPositions());

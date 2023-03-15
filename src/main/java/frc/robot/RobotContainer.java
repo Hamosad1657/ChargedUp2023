@@ -55,7 +55,7 @@ public class RobotContainer {
 		// Swerve
 		this.driverA_CommandController.share().onTrue(new InstantCommand(this.swerve::zeroGyro));
 		this.driverA_CommandController.cross().onTrue(this.swerve.crossLockWheelsCommand());
-		this.driverA_CommandController.triangle().onTrue(new InstantCommand(this.swerve::toggleSwerveSpeed));
+		this.driverA_CommandController.triangle().onTrue(new InstantCommand(this.swerve::toggleTeleopSwerveSpeed));
 
 		// Intake
 		this.driverA_CommandController.R2().onTrue(this.intake.lowerIntakeCommand());
@@ -97,10 +97,8 @@ public class RobotContainer {
 		this.driverB_CommandController.triangle().onTrue(this.grabber.releaseCommand());
 
 		// Turret
-		this.driverB_CommandController.R1()
-				.onTrue(new InstantCommand(() -> this.turret.setSetpoint(TurretConstants.kFrontRotationSetpoint)));
 		this.driverB_CommandController.L1()
-				.onTrue(new InstantCommand(() -> this.turret.setSetpoint(TurretConstants.kBackRotationSetpoint)));
+				.onTrue(new InstantCommand(() -> this.turret.setSetpoint(TurretConstants.kFrontRotationSetpoint)));
 	}
 
 	private void setDefaultCommands() {
@@ -142,7 +140,7 @@ public class RobotContainer {
 		ShuffleboardTab autoTab = Shuffleboard.getTab("Auto");
 		this.comboBoxChooser = new SendableChooser<Command>();
 
-		SwervePathConstants.kPaths.forEach((name, command) -> comboBoxChooser.addOption(name, command));
+		SwervePathConstants.kAutoOptionsMap.forEach((name, command) -> comboBoxChooser.addOption(name, command));
 		autoTab.add("Path Chooser", this.comboBoxChooser).withWidget("ComboBox Chooser").withSize(3, 2);
 	}
 
