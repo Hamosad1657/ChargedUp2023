@@ -96,10 +96,8 @@ public class RobotContainer {
 		this.driverB_CommandController.triangle().onTrue(this.grabber.releaseCommand());
 
 		// Turret
-		this.driverB_CommandController.R1()
-				.onTrue(new InstantCommand(() -> this.turret.setSetpoint(TurretConstants.kFrontRotationSetpoint)));
 		this.driverB_CommandController.L1()
-				.onTrue(new InstantCommand(() -> this.turret.setSetpoint(TurretConstants.kBackRotationSetpoint)));
+				.onTrue(new InstantCommand(() -> this.turret.setSetpoint(TurretConstants.kFrontRotationSetpoint)));
 	}
 
 	private void setDefaultCommands() {

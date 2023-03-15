@@ -15,6 +15,6 @@ public class TurretConstants {
 	public static final double kAutoRotationTolerance = 20.0;
 	public static final double kRotationTeleopSetpointMultiplier = 1.4;
 
-	public static final double kFrontRotationSetpoint = 90.0;
-	public static final double kBackRotationSetpoint = 270.0;
+	public static final double kFrontRotationSetpoint = 270.0;
+	public static final double kBackRotationSetpoint = 90.0;
 }
