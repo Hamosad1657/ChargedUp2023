@@ -54,7 +54,6 @@ public class ArmSubsystem extends SubsystemBase {
 
 	public ArmSubsystem() {
 		this.angleMotor = new CANSparkMax(RobotMap.kArmAngleMotorID, MotorType.kBrushless);
-		this.angleMotor.setIdleMode(IdleMode.kBrake);
 		this.angleMotor.setInverted(false);
 		this.angleMotor.enableVoltageCompensation(12.0);
 
@@ -68,7 +67,6 @@ public class ArmSubsystem extends SubsystemBase {
 		this.lengthCANCoder.setPosition(0.0);
 
 		this.lengthMotor = new WPI_TalonFX(RobotMap.kArmLengthMotorID);
-		this.lengthMotor.setNeutralMode(NeutralMode.Brake);
 		this.lengthMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 35.0, 40.0, 0.25));
 		this.lengthMotor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 35.0, 40.0, 0.25));
 		this.lengthMotor.configNeutralDeadband(0.1);
@@ -340,5 +338,18 @@ public class ArmSubsystem extends SubsystemBase {
 
 		return (lengthValue > RobotContainer.kJoystickDeadband || lengthValue < -RobotContainer.kJoystickDeadband
 				|| angleValue > RobotContainer.kJoystickDeadband || angleValue < -RobotContainer.kJoystickDeadband);
+	}
+
+	public void setAngleIdleMode(IdleMode idleMode) {
+		this.angleMotor.setIdleMode(idleMode);
+	}
+
+	public void setLengthIdleMode(IdleMode idleMode) {
+		if (idleMode == IdleMode.kBrake) {
+			this.lengthMotor.setNeutralMode(NeutralMode.Brake);
+		}
+		else {
+			this.lengthMotor.setNeutralMode(NeutralMode.Coast);
+		}
 	}
 }
