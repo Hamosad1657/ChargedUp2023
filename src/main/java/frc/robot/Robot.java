@@ -5,6 +5,7 @@ import com.revrobotics.CANSparkMax.IdleMode;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.subsystems.arm.ArmSubsystem;
@@ -20,9 +21,11 @@ public class Robot extends TimedRobot {
 	private RobotContainer robotContainer;
 	private CommandScheduler commandScheduler;
 	private Command autoCommand;
+	private Command testCommand;
 
 	@Override
 	public void robotInit() {
+		LiveWindow.setEnabled(false);
 		CameraServer.startAutomaticCapture().setResolution(80, 60);
 
 		this.robotContainer = new RobotContainer();
@@ -51,6 +54,18 @@ public class Robot extends TimedRobot {
 		if (this.autoCommand != null) {
 			this.autoCommand.cancel();
 		}
+		if (this.testCommand != null) {
+			this.testCommand.cancel();
+		}
+	}
+
+	@Override
+	public void testInit() {
+		this.testCommand = this.robotContainer.getAutoCommand();
+		if (this.testCommand != null) {
+			this.testCommand.schedule();
+		}
+		
 	}
 
 	@Override
@@ -63,13 +78,9 @@ public class Robot extends TimedRobot {
 		TurretSubsystem.getInstance().setIdleMode(IdleMode.kBrake);
 		ArmSubsystem.getInstance().setAngleIdleMode(IdleMode.kBrake);
 		ArmSubsystem.getInstance().setLengthIdleMode(IdleMode.kBrake);
+		this.commandScheduler.cancelAll();
 	}
 
-	@Override
-	public void testInit() {
-		CommandScheduler.getInstance().cancelAll();
-		CommandScheduler.getInstance().schedule();
-	}
 
 	public static void print(Object object) {
 		DriverStation.reportWarning(object.toString(), false);

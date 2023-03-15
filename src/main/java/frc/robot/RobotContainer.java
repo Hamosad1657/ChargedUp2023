@@ -31,7 +31,7 @@ public class RobotContainer {
 	private IntakeSubsystem intake;
 	private SwerveSubsystem swerve;
 	private TurretSubsystem turret;
-	private SendableChooser<Command> comboBoxChooser, testChooser;
+	private SendableChooser<Command> autoChooser, testChooser;
 
 	public RobotContainer() {
 		driverA_Controller = new PS4Controller(RobotMap.kDriverA_ControllerUSBPort);
@@ -130,7 +130,12 @@ public class RobotContainer {
 	 * @return The command to run in autonomous
 	 */
 	public Command getAutoCommand() {
-		return this.comboBoxChooser.getSelected();
+		return this.autoChooser.getSelected();
+	}
+
+	public Command getTestCommand() {
+		Robot.print("Called getTestCommand");
+		return this.testChooser.getSelected();
 	}
 
 	/**
@@ -138,15 +143,17 @@ public class RobotContainer {
 	 */
 	private void createPathsComboBox() {
 		ShuffleboardTab autoTab = Shuffleboard.getTab("Auto");
-		this.comboBoxChooser = new SendableChooser<Command>();
+		this.autoChooser = new SendableChooser<Command>();
 
-		SwervePathConstants.kAutoOptionsMap.forEach((name, command) -> comboBoxChooser.addOption(name, command));
-		autoTab.add("Path Chooser", this.comboBoxChooser).withWidget("ComboBox Chooser").withSize(3, 2);
+		SwervePathConstants.kAutoOptionsMap.forEach((name, command) -> autoChooser.addOption(name, command));
+		autoTab.add("Path Chooser", this.autoChooser).withWidget("ComboBox Chooser").withSize(3, 2);
 	}
 
 	private void pitTesting() {
 		this.testChooser = new SendableChooser<Command>();
 		ShuffleboardTab autoTab = Shuffleboard.getTab("Auto");
+		this.testChooser.addOption("None", new InstantCommand());
+		this.testChooser.addOption("DS Print", new InstantCommand(() -> Robot.print("Hello")));
 		this.testChooser.addOption("HomeArm", this.arm.autoHomeCommand());
 		this.testChooser.addOption("ArmHigh", this.arm.getToStateCommand(ArmState.kHigh));
 		this.testChooser.addOption("ArmShelf", this.arm.getToStateCommand(ArmState.kShelf));
