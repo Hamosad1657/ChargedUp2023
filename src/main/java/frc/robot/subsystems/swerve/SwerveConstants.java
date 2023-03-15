@@ -3,10 +3,10 @@ package frc.robot.subsystems.swerve;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.hamosad1657.lib.math.HaUnits.PIDGains;
+import com.hamosad1657.lib.swerve.SwerveModuleConstants;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import frc.fusionLib.swerve.SwerveModuleConstants;
 import frc.robot.RobotMap;
 
 public final class SwerveConstants {
