@@ -20,7 +20,7 @@ public class ArmConstants {
 	/** For homing - The lowest angle the arm can go to when it's extended. */
 	public static final double kHomingExtendedMinAngle = 80.0;
 
-	public static final PIDGains kAnglePIDGains = new PIDGains(0.02, 0.0065, 0.0);
+	public static final PIDGains kAnglePIDGains = new PIDGains(0.0225, 0.0065, 0.0);
 	public static final double kAngleTolerance = 2.5;
 	public static final double kAngleMotorMaxPIDOutput = 0.75;
 	public static final double kAngleDownOutputRatio = 0.5;
@@ -42,7 +42,7 @@ public class ArmConstants {
 		// Uses the relativity of the encoders as setpoints
 		kHigh(119.0, 2900.0), kMid(96.0, 1100.0), kLowCone(54.5, 1200.0), kLowConePickup(52.5, 2000.0),
 		kLowRaiseCone(48.0, 2100.0), kLowConeDropoff(65.0, 1000.0), kLowCube(42.0, 1500.0), kShelf(107.0, 0.0),
-		kHalfClosed(48.0, 500.0);
+		kHalfClosed(48.0, 400.0);
 
 		public final double angleDeg;
 		public final double lengthDeg;

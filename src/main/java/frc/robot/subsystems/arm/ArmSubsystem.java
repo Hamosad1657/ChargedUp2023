@@ -88,7 +88,7 @@ public class ArmSubsystem extends SubsystemBase {
 
 		if (Robot.showShuffleboardSubsystemInfo) {
 			ShuffleboardTab armTab = Shuffleboard.getTab("Arm");
-			
+
 			armTab.add("Arm Length Motor", this.lengthMotor).withPosition(0, 0).withSize(2, 2);
 			armTab.add("Arm Angle CANCoder", this.angleCANCoder).withPosition(2, 0).withSize(2, 2);
 			armTab.add("Arm Length CANCoder", this.lengthCANCoder).withPosition(4, 0).withSize(2, 2);
@@ -327,8 +327,10 @@ public class ArmSubsystem extends SubsystemBase {
 	}
 
 	public Command retractCommand() {
-		return new StartEndCommand(() -> this.setLengthMotorWithLimits(ArmConstants.kHomingLengthOutput),
-				() -> this.setLengthMotorWithLimits(0.0), this).until(() -> !this.retractLimit.get());
+		return new StartEndCommand(() -> this.setLengthMotorWithLimits(ArmConstants.kHomingLengthOutput), () -> {
+			this.setLengthMotorWithLimits(0.0);
+			this.resetLengthCANCoder();
+		}, this).until(() -> !this.retractLimit.get());
 	}
 
 	public boolean joysticksMoved() {
