@@ -10,6 +10,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.arm.ArmConstants.ArmState;
 import frc.robot.subsystems.arm.ArmSubsystem;
@@ -57,11 +58,26 @@ public final class SwervePathConstants {
 	public static final TrapezoidProfile.Constraints kThetaControllerConstraints = new TrapezoidProfile.Constraints(
 			kMaxAngularSpeedRadPS, kMaxAngularAccelRadPSSquared);
 
-	// For use with getPathFollowingCommand
+	/**
+	 * Command to be used in PathPlanner paths + their names, are added to this map in
+	 * {@link SwervePathConstants#createPathCommands()}. The names in the PathPlanner app must match the names in the
+	 * code.
+	 * <p>
+	 * this map is passed as a parameter when constructing the auto builder in SwerveSubsystem.
+	 */
 	public static final HashMap<String, Command> kPathCommandsMap = new HashMap<String, Command>();
-	public static final HashMap<String, Command> kPaths = new HashMap<String, Command>();
 
-	public static void createCommands() {
+	/**
+	 * A HashMap of command groups and their names, to choose from in the drop-down menue in the shuffleboard and then
+	 * run in autonomous.
+	 * <p>
+	 * Options are added to this map using SwerveSubsystem.addPath(), which is called as
+	 * many times as needed in SwerveSubsystem.createPaths().
+	 */
+	public static final HashMap<String, SequentialCommandGroup> kAutoOptionsMap = new HashMap<String, SequentialCommandGroup>();
+
+	/** Add command options to use in PathPlanner paths. */
+	public static void createPathCommands() {
 		ArmSubsystem arm = ArmSubsystem.getInstance();
 		GrabberSubsystem grabber = GrabberSubsystem.getInstance();
 		IntakeSubsystem intake = IntakeSubsystem.getInstance();

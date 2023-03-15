@@ -132,7 +132,7 @@ public class SwerveSubsystem extends SubsystemBase {
 			odometryTab.add("Field", this.field).withSize(5, 4).withPosition(0, 1);
 		}
 
-		SwervePathConstants.createCommands();
+		SwervePathConstants.createPathCommands();
 		this.createPaths();
 
 		/*
@@ -484,7 +484,7 @@ public class SwerveSubsystem extends SubsystemBase {
 	}
 
 	/**
-	 * Used to put path options in the drop-down menue in the shuffleboard. To change the options, edit them manually
+	 * Used to put all path options in the drop-down menue in the shuffleboard. To change the options, edit them manually
 	 * here.
 	 */
 	private void createPaths() {
@@ -525,7 +525,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
 		Command[] commandArray = new Command[commandList.size()];
 		commandArray = commandList.toArray(commandArray);
-		SwervePathConstants.kPaths.putIfAbsent(name, new SequentialCommandGroup(commandArray));
+		SwervePathConstants.kAutoOptionsMap.putIfAbsent(name, new SequentialCommandGroup(commandArray));
 	}
 
 	@Override

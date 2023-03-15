@@ -141,7 +141,7 @@ public class RobotContainer {
 		ShuffleboardTab autoTab = Shuffleboard.getTab("Auto");
 		this.comboBoxChooser = new SendableChooser<Command>();
 
-		SwervePathConstants.kPaths.forEach((name, command) -> comboBoxChooser.addOption(name, command));
+		SwervePathConstants.kAutoOptionsMap.forEach((name, command) -> comboBoxChooser.addOption(name, command));
 		autoTab.add("Path Chooser", this.comboBoxChooser).withWidget("ComboBox Chooser").withSize(3, 2);
 	}
 }
