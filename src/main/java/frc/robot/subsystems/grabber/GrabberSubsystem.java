@@ -25,7 +25,6 @@ public class GrabberSubsystem extends SubsystemBase {
 
 	private GrabberSubsystem() {
 		this.motor = new CANSparkMax(RobotMap.kGrabberMotorID, MotorType.kBrushless);
-		motor.setIdleMode(IdleMode.kBrake);
 		motor.setSmartCurrentLimit(GrabberConstants.kMaxAmpere);
 
 		this.isCollecting = false;
@@ -54,5 +53,9 @@ public class GrabberSubsystem extends SubsystemBase {
 	public Command releaseCommand() {
 		return new RunCommand(() -> this.motor.set(GrabberConstants.kMotorDefaultOutput), this)
 				.withTimeout(GrabberConstants.kAutoReleaseTime).andThen(() -> this.motor.set(0), this);
+	}
+
+	public void setIdleMode(IdleMode idleMode) {
+		this.motor.setIdleMode(idleMode);
 	}
 }
