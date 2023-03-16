@@ -24,7 +24,6 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.RobotMap;
@@ -280,13 +279,6 @@ public class ArmSubsystem extends SubsystemBase {
 		}, this);
 	}
 
-	public Command homeCommand() {
-		return this.autoHomeCommand().andThen(new InstantCommand(() -> {
-			this.setAngleMotorWithLimits(ArmConstants.kHomingAngleOutput);
-			this.setLengthMotorWithLimits(ArmConstants.kHomingLengthKeepRetractedOutput);
-		}, this).andThen(new WaitUntilCommand(this::joysticksMoved)));
-	}
-
 	public Command autoHomeCommand() {
 		return new RunCommand(() -> {
 			if (this.getCurrentAngle() < ArmConstants.kLengthRetractMinAngle) {
@@ -319,6 +311,13 @@ public class ArmSubsystem extends SubsystemBase {
 						}));
 	}
 
+	public Command homeCommand() {
+		return this.autoHomeCommand().andThen(new RunCommand(() -> {
+			this.setAngleMotorWithLimits(ArmConstants.kHomingAngleOutput);
+			this.setLengthMotorWithLimits(ArmConstants.kHomingLengthKeepRetractedOutput);
+		}, this).until(this::joysticksMoved));
+	}
+
 	public Command pickupConeCommand() {
 		return new SequentialCommandGroup(this.getToStateCommand(ArmState.kLowCone, true),
 				GrabberSubsystem.getInstance().collectCommand(), this.getToStateCommand(ArmState.kLowConePickup));
@@ -347,8 +346,7 @@ public class ArmSubsystem extends SubsystemBase {
 	public void setLengthIdleMode(IdleMode idleMode) {
 		if (idleMode == IdleMode.kBrake) {
 			this.lengthMotor.setNeutralMode(NeutralMode.Brake);
-		}
-		else {
+		} else {
 			this.lengthMotor.setNeutralMode(NeutralMode.Coast);
 		}
 	}
