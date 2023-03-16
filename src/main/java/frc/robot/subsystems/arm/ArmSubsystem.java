@@ -86,7 +86,7 @@ public class ArmSubsystem extends SubsystemBase {
 		if (Robot.showShuffleboardSubsystemInfo) {
 			ShuffleboardTab armTab = Shuffleboard.getTab("Arm");
 
-			armTab.add("Arm Length Motor", this.lengthMotor).withPosition(0, 0).withSize(2, 2);
+			armTab.add("Arm Length Motor", this.lengthMotor).withPosition(0, 0).withSize(2, 1);
 			armTab.add("Arm Angle CANCoder", this.angleCANCoder).withPosition(2, 0).withSize(2, 2);
 			armTab.add("Arm Length CANCoder", this.lengthCANCoder).withPosition(4, 0).withSize(2, 2);
 
@@ -103,6 +103,8 @@ public class ArmSubsystem extends SubsystemBase {
 			armTab.addBoolean("Angle At Goal", this.anglePIDController::atGoal).withPosition(6, 2).withSize(2, 1);
 			armTab.addBoolean("Length At Setpoint", this.lengthPIDController::atSetpoint).withPosition(6, 3).withSize(2,
 					1);
+			armTab.add("Subsystem", this).withPosition(0, 1).withSize(2, 3);
+			armTab.addDouble("Angle Error", this.anglePIDController::getPositionError);
 		}
 	}
 
@@ -306,6 +308,8 @@ public class ArmSubsystem extends SubsystemBase {
 						.finallyDo((interrupted) -> {
 							if (!(interrupted || this.joysticksMoved())) {
 								this.resetLengthCANCoder();
+								this.anglePIDController.reset(this.getCurrentAngle());
+								this.lengthPIDController.reset();
 							}
 							this.setState(this.getCurrentAngle(), this.getCurrentLength());
 						}));
