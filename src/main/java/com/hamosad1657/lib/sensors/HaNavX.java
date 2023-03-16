@@ -26,41 +26,6 @@ public class HaNavX implements Sendable {
 
 	private static final double kTimeoutSec = 5.0;
 
-	/*
-	 * Waites until the navX is connected and calibrated, or 5 seconds have passed since startup. If the former, print
-	 * that the navX is done calibrating and continue; If the latter, print that communication has failed and continue.
-	 */
-	private void initialize(AHRS navX) {
-		this.navX = navX;
-		this.navX.enableLogging(true);
-		this.commsTimoutTimer.start();
-
-		// Wait until navX is connected or 5 seconds have passed
-		while (!this.navX.isConnected()) {
-			if (this.commsTimoutTimer.hasElapsed(kTimeoutSec)) {
-				break;
-			}
-		}
-		// Wait until navX is calibrated or 5 seconds have passed
-		while (this.navX.isCalibrating()) {
-			if (this.commsTimoutTimer.hasElapsed(kTimeoutSec)) {
-				break;
-			}
-		}
-
-		if (this.commsTimoutTimer.hasElapsed(kTimeoutSec)) {
-			Robot.print("Failed to connect to navX within " + Double.toString(kTimeoutSec) + " seconds from startup.");
-			DriverStation.reportError(
-					"Failed to connect to navX within " + Double.toString(kTimeoutSec) + " seconds from startup.",
-					false);
-		} else {
-			Robot.print("navX done calibrating in " + Double.toString(this.commsTimoutTimer.get())
-					+ " seconds from startup.");
-		}
-
-		this.commsTimoutTimer.stop();
-	}
-
 	/**
 	 * Starts communtication between navX and RoboRIO, enables logging to the RioLog & Driver Station, waits until the
 	 * navX is connected and calibrated, then returns an instance.
@@ -70,7 +35,7 @@ public class HaNavX implements Sendable {
 	 */
 	public HaNavX(SerialPort.Port port) {
 		try {
-			this.initialize(new AHRS(port, SerialDataType.kProcessedData, (byte)60));
+			this.initialize(port);
 		} catch (RuntimeException E) {
 			Robot.print("Failed to connect to navX.");
 		}
@@ -86,7 +51,7 @@ public class HaNavX implements Sendable {
 	 */
 	public HaNavX(I2C.Port port) {
 		try {
-			this.initialize(new AHRS(port));
+			this.initialize(port);
 		} catch (RuntimeException E) {
 			Robot.print("Failed to connect to navX.");
 		}
@@ -101,7 +66,7 @@ public class HaNavX implements Sendable {
 	 */
 	public HaNavX(SPI.Port port) {
 		try {
-			this.initialize(new AHRS(port));
+			this.initialize(port);
 		} catch (RuntimeException E) {
 			Robot.print("Failed to connect to navX.");
 		}
@@ -122,7 +87,7 @@ public class HaNavX implements Sendable {
 	/**
 	 * Used to set the angle the navX is currently facing minus the offset as zero.
 	 */
-	public void zeroYaw(double offsetDeg) {
+	public void setYaw(double offsetDeg) {
 		this.zeroYaw(); // Must be first, because zeroYaw() sets the offset as 0.
 		this.yawOffsetDeg = offsetDeg;
 		Robot.print("Gyro set to: " + Double.toString(offsetDeg) + " degrees.");
@@ -131,8 +96,8 @@ public class HaNavX implements Sendable {
 	/**
 	 * Used to set the angle the navX is currently facing minus the offset as zero.
 	 */
-	public void zeroYaw(Rotation2d offset) {
-		this.zeroYaw(offset.getDegrees());
+	public void setYaw(Rotation2d offset) {
+		this.setYaw(offset.getDegrees());
 	}
 
 	/**
@@ -169,9 +134,9 @@ public class HaNavX implements Sendable {
 	/**
 	 * 
 	 * @return The angle of the navX on the X axis (forward-backward tilt) in degrees. Tilting backwards makes the angle
-	 *         increase, and tilting forwards makes the angle decrease. If the angle returned is incorrect, verify that the
-	 *         navX axises are matching to the robot axises, or use the omnimount feature (as specified in kauailabs's
-	 *         website).
+	 *         increase, and tilting forwards makes the angle decrease. If the angle returned is incorrect, verify that
+	 *         the navX axises are matching to the robot axises, or use the omnimount feature (as specified in
+	 *         kauailabs's website).
 	 *
 	 */
 	public double getPitchAngleDeg() {
@@ -203,10 +168,10 @@ public class HaNavX implements Sendable {
 	}
 
 	/**
-	 * @return The angle of the navX on the Y axis (left-right tilt) in degrees. Tilting left makes the angle
-	 *         increase, and tilting right makes the angle decrease. If the angle returned is incorrect, verify that
-	 *         the navX axises are matching to the robot axises, or use the omnimount feature (as specified in
-	 *         kauailabs's website).
+	 * @return The angle of the navX on the Y axis (left-right tilt) in degrees. Tilting left makes the angle increase,
+	 *         and tilting right makes the angle decrease. If the angle returned is incorrect, verify that the navX
+	 *         axises are matching to the robot axises, or use the omnimount feature (as specified in kauailabs's
+	 *         website).
 	 */
 	public double getRollAngleDeg() {
 		try {
@@ -227,9 +192,9 @@ public class HaNavX implements Sendable {
 	}
 
 	/**
-	 * @return The angle of the navX on the Y axis (left-right tilt) as a Rotation2d. Tilting left makes the angle increase,
-	 *         and tilting right makes the angle decrease. If the angle returned is incorrect, verify that the navX
-	 *         axises are matching to the robot axises, or use the omnimount feature (as specified in kauailabs's
+	 * @return The angle of the navX on the Y axis (left-right tilt) as a Rotation2d. Tilting left makes the angle
+	 *         increase, and tilting right makes the angle decrease. If the angle returned is incorrect, verify that the
+	 *         navX axises are matching to the robot axises, or use the omnimount feature (as specified in kauailabs's
 	 *         website).
 	 */
 	public Rotation2d getRollRotation2d() {
@@ -264,10 +229,66 @@ public class HaNavX implements Sendable {
 		builder.addDoubleProperty("PitchAngleDeg", this::getPitchAngleDeg, null);
 		builder.addDoubleProperty("RollAngleDeg", this::getRollAngleDeg, null);
 		builder.addDoubleProperty("Offset", () -> this.yawOffsetDeg, null);
+	}
 
-		// builder.addDoubleProperty("AngularVelocityDegPS",
-		// this::getAngularVelocityDegPS, null);
-		// builder.addDoubleProperty("AngularVelocityRadPS",
-		// this::getAngularVelocityRadPS, null);
+	/*
+	 * Waites until the navX is connected and calibrated, or 5 seconds have passed since startup. If the former, print
+	 * that the navX is done calibrating and continue; If the latter, print that communication has failed or navX did
+	 * not calibrate and continue.
+	 */
+	private void initialize(SerialPort.Port port) {
+		this.commsTimoutTimer.start();
+		this.navX = new AHRS(port, SerialDataType.kProcessedData, (byte)60);
+		this.navX.enableLogging(true);
+		this.initReport();
+	}
+
+	/*
+	 * Waites until the navX is connected and calibrated, or 5 seconds have passed since startup. If the former, print
+	 * that the navX is done calibrating and continue; If the latter, print that communication has failed or navX did
+	 * not calibrate and continue.
+	 */
+	private void initialize(I2C.Port port) {
+		this.commsTimoutTimer.start();
+		this.navX = new AHRS(port);
+		this.navX.enableLogging(true);
+		this.initReport();
+	}
+
+	/*
+	 * Waites until the navX is connected and calibrated, or 5 seconds have passed since startup. If the former, print
+	 * that the navX is done calibrating and continue; If the latter, print that communication has failed or navX did
+	 * not calibrate and continue.
+	 */
+	private void initialize(SPI.Port port) {
+		this.commsTimoutTimer.start();
+		this.navX = new AHRS(port);
+		this.navX.enableLogging(true);
+		this.initReport();
+	}
+
+	private void initReport() {
+		// Wait until navX is connected or 5 seconds have passed
+		while (!this.navX.isConnected()) {
+			if (this.commsTimoutTimer.hasElapsed(kTimeoutSec)) {
+				break;
+			}
+		}
+		// Wait until navX is calibrated or 5 seconds have passed
+		while (this.navX.isCalibrating()) {
+			if (this.commsTimoutTimer.hasElapsed(kTimeoutSec)) {
+				break;
+			}
+		}
+
+		// If 5 seconds have passed
+		if (this.commsTimoutTimer.hasElapsed(kTimeoutSec)) {
+			DriverStation.reportError("Failed to connect to navX, or navX didn't calibrate, within "
+					+ Double.toString(kTimeoutSec) + " seconds from startup.", true);
+		} else {
+			Robot.print("navX done calibrating in " + Double.toString(this.commsTimoutTimer.get())
+					+ " seconds from startup.");
+		}
+		this.commsTimoutTimer.stop();
 	}
 }

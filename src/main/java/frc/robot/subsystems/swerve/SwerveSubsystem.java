@@ -4,6 +4,7 @@ package frc.robot.subsystems.swerve;
 import java.util.ArrayList;
 import java.util.List;
 import com.hamosad1657.lib.sensors.HaNavX;
+import com.hamosad1657.lib.swerve.SwerveModule;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.auto.SwerveAutoBuilder;
@@ -26,7 +27,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.fusionLib.swerve.SwerveModule;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.RobotMap;
@@ -285,20 +285,26 @@ public class SwerveSubsystem extends SubsystemBase {
 	}
 
 	/**
-	 * Sets the yaw angle as 90. This can be used to set the angle the robot is currently facing as "forwards".
+	 * Sets the yaw angle as 270. This can be used to set the angle the robot is currently facing as "forwards".
 	 */
 	public void zeroGyro() {
-		this.gyro.zeroYaw(90.0);
+		this.gyro.setYaw(SwerveConstants.kNavxYawOffsetFromFrontDeg);
 		this.teleopAngleSetpointRad = Math.PI;
 	}
 
+	/**
+	 * Sets the yaw angle as offsetDeg + 270. If offsetDeg is 0, the angle the robot is currently facing is considered
+	 * "forwards".
+	 * 
+	 * @param offsetDeg
+	 */
 	public void setGyro(double offsetDeg) {
-		this.gyro.zeroYaw(offsetDeg + 90.0);
+		this.gyro.setYaw(offsetDeg + SwerveConstants.kNavxYawOffsetFromFrontDeg);
 		this.teleopAngleSetpointRad = this.getYaw().getRadians();
 	}
 
 	public void setGyro(Rotation2d offset) {
-		this.gyro.zeroYaw(offset);
+		this.setGyro(offset.getDegrees());
 		this.teleopAngleSetpointRad = this.getYaw().getRadians();
 	}
 
@@ -484,8 +490,8 @@ public class SwerveSubsystem extends SubsystemBase {
 	}
 
 	/**
-	 * Used to put all path options in the drop-down menue in the shuffleboard. To change the options, edit them manually
-	 * here.
+	 * Used to put all path options in the drop-down menue in the shuffleboard. To change the options, edit them
+	 * manually here.
 	 */
 	private void createPaths() {
 		this.addPath("High Cone & Protector", false, false);

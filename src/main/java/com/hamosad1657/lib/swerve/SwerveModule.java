@@ -1,5 +1,5 @@
 
-package frc.fusionLib.swerve;
+package com.hamosad1657.lib.swerve;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
