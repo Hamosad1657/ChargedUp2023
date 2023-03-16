@@ -285,20 +285,25 @@ public class SwerveSubsystem extends SubsystemBase {
 	}
 
 	/**
-	 * Sets the yaw angle as 90. This can be used to set the angle the robot is currently facing as "forwards".
+	 * Sets the yaw angle as 270. This can be used to set the angle the robot is currently facing as "forwards".
 	 */
 	public void zeroGyro() {
-		this.gyro.zeroYaw(90.0);
+		this.gyro.zeroYaw(SwerveConstants.kNavxYawOffsetFromFrontDeg);
 		this.teleopAngleSetpointRad = Math.PI;
 	}
 
+	/**
+	 * Sets the yaw angle as offsetDeg + 270. If offsetDeg is 0, the angle the robot is currently facing is considered
+	 * "forwards".
+	 * @param offsetDeg
+	 */
 	public void setGyro(double offsetDeg) {
-		this.gyro.zeroYaw(offsetDeg + 90.0);
+		this.gyro.zeroYaw(offsetDeg + SwerveConstants.kNavxYawOffsetFromFrontDeg);
 		this.teleopAngleSetpointRad = this.getYaw().getRadians();
 	}
 
 	public void setGyro(Rotation2d offset) {
-		this.gyro.zeroYaw(offset);
+		this.setGyro(offset.getDegrees());
 		this.teleopAngleSetpointRad = this.getYaw().getRadians();
 	}
 
@@ -484,8 +489,8 @@ public class SwerveSubsystem extends SubsystemBase {
 	}
 
 	/**
-	 * Used to put all path options in the drop-down menue in the shuffleboard. To change the options, edit them manually
-	 * here.
+	 * Used to put all path options in the drop-down menue in the shuffleboard. To change the options, edit them
+	 * manually here.
 	 */
 	private void createPaths() {
 		this.addPath("High Cone & Protector", false, false);
