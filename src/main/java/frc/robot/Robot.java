@@ -63,6 +63,7 @@ public class Robot extends TimedRobot {
 	@Override
 	public void disabledExit() {
 		TurretSubsystem.getInstance().setIdleMode(IdleMode.kBrake);
+		TurretSubsystem.getInstance().resetSetpoint();
 		ArmSubsystem.getInstance().setAngleIdleMode(IdleMode.kBrake);
 		ArmSubsystem.getInstance().setLengthIdleMode(IdleMode.kBrake);
 		GrabberSubsystem.getInstance().setIdleMode(IdleMode.kBrake);

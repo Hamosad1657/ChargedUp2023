@@ -36,8 +36,8 @@ public class ArmConstants {
 	public static final double kAngleMaxSetpoint = 119.0;
 	public static final double kAngleMinSetpoint = 35.0;
 
-	public static final PIDGains kArmLengthPIDGains = new PIDGains(0.0017, 0.0000325, 0.0);
-	public static final double kLengthTolerance = 50.0;
+	public static final PIDGains kArmLengthPIDGains = new PIDGains(0.0015, 0.0000325, 0.0);
+	public static final double kLengthTolerance = 75.0;
 
 	public static enum ArmState {
 		// Uses the relativity of the encoders as setpoints
