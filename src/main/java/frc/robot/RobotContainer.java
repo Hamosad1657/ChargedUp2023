@@ -103,7 +103,8 @@ public class RobotContainer {
 	private void setDefaultCommands() {
 		// All of the actions are detailed in the DRIVING_INSTRUCTIONS.md file.
 
-		// Swerve teleop driving - Left stick for X and Y movement, right X for rotation.
+		// Swerve teleop driving - Left stick for X and Y movement, right X for
+		// rotation.
 		this.swerve.setDefaultCommand(new TeleopDriveCommand(this.swerve,
 				() -> HaUnits.deadband(driverA_Controller.getLeftX(), kJoystickDeadband),
 				() -> HaUnits.deadband(-driverA_Controller.getLeftY(), kJoystickDeadband),
@@ -120,7 +121,7 @@ public class RobotContainer {
 				() -> HaUnits.deadband((driverB_Controller.getL2Axis() + 1.0), kJoystickDeadband)));
 
 		// Intake keep up - Not teleop
-		this.intake.setDefaultCommand(this.intake.keepIntakeUpCommand());
+		this.intake.setDefaultCommand(this.intake.keepRaisedCommand());
 	}
 
 	/**

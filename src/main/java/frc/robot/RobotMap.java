@@ -30,13 +30,15 @@ public class RobotMap {
 	public static final int kBackRightCANCoderID = 12;
 
 	public static final int kTurretCANCoderID = 14;
-	public static final int kIntakeMotorID = 19;
+	public static final int kIntakeAngleMotorID = 19;
 	public static final int kArmLengthMotorID = 20;
 	public static final int kArmLengthCANCoderID = 22;
 	public static final int kArmAngleCANCoderID = 23;
 	public static final int kTurretMotorID = 24;
 	public static final int kArmAngleMotorID = 25;
 	public static final int kGrabberMotorID = 26;
+	public static final int kIntakeMotorID = 27;
+	public static final int kIntakeAngleCANCoderID = 28;
 
 	// Turret limit switches
 	public static final int kTurretCWLimitPort = 0;
