@@ -16,6 +16,7 @@ import frc.robot.subsystems.arm.ArmConstants.ArmState;
 import frc.robot.subsystems.arm.ArmSubsystem;
 import frc.robot.subsystems.grabber.GrabberSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
+import frc.robot.subsystems.intake.IntakeConstants.ShootHeight;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 import frc.robot.subsystems.turret.TurretConstants;
 import frc.robot.subsystems.turret.TurretSubsystem;
@@ -59,6 +60,10 @@ public class RobotContainer {
 		// Intake
 		this.driverA_CommandController.R2().onTrue(this.intake.lowerIntakeCommand());
 		this.driverA_CommandController.L2().onTrue(this.intake.raiseIntakeCommand());
+		this.driverA_CommandController.povUp().onTrue(this.intake.getToShootAngleCommand(ShootHeight.kHigh));
+		this.driverA_CommandController.povLeft().onTrue(this.intake.getToShootAngleCommand(ShootHeight.kMid));
+		this.driverA_CommandController.povRight().onTrue(this.intake.getToShootAngleCommand(ShootHeight.kMid));
+		this.driverA_CommandController.R1().onTrue(this.intake.shootCommand());
 
 		// Arm
 		this.driverB_CommandController.povUp()
