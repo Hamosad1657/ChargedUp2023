@@ -32,6 +32,7 @@ public class IntakeSubsystem extends SubsystemBase {
 		return instance;
 	}
 
+	/** Negative output lowers the intake, positive output raises the intake. */
 	private final CANSparkMax angleMotor;
 	private final PIDController angleController;
 	private final HaCANCoder angleCANCoder;
@@ -54,6 +55,7 @@ public class IntakeSubsystem extends SubsystemBase {
 		this.intakeMotor.setNeutralMode(NeutralMode.Brake);
 		this.intakeMotor.setInverted(true);
 
+		// The limits are wired normally true, false when pressed
 		this.raiseLimit = new DigitalInput(RobotMap.kIntakeRaiseLimitPort);
 		this.lowerLimit = new DigitalInput(RobotMap.kIntakeLowerLimitPort);
 
@@ -77,14 +79,18 @@ public class IntakeSubsystem extends SubsystemBase {
 	}
 
 	public Command lowerIntakeCommand() {
-		return new StartEndCommand(() -> this.angleMotor.set(-IntakeConstants.kAngleMotorDefaultOutput), () -> {
+		return new StartEndCommand(() -> {
+			this.angleMotor.set(-IntakeConstants.kAngleMotorDefaultOutput);
+		}, () -> {
 			this.angleMotor.set(0.0);
 			this.isIntakeLowered = true;
 		}, this).until(() -> !this.lowerLimit.get());
 	}
 
 	public Command raiseIntakeCommand() {
-		return new StartEndCommand(() -> this.angleMotor.set(IntakeConstants.kAngleMotorDefaultOutput), () -> {
+		return new StartEndCommand(() -> {
+			this.angleMotor.set(IntakeConstants.kAngleMotorDefaultOutput);
+		}, () -> {
 			this.angleMotor.set(0.0);
 			this.isIntakeLowered = false;
 		}, this).until(() -> !this.raiseLimit.get());
@@ -92,7 +98,9 @@ public class IntakeSubsystem extends SubsystemBase {
 
 	public Command keepRaisedCommand() {
 		return new InstantCommand(
-				() -> this.angleMotor.set(this.isIntakeLowered ? 0.0 : IntakeConstants.kAngleMotorKeepRaisedOutput),
+				() -> {
+					this.angleMotor.set(this.isIntakeLowered ? 0.0 : IntakeConstants.kAngleMotorKeepRaisedOutput);
+				},
 				this);
 	}
 
@@ -116,5 +124,21 @@ public class IntakeSubsystem extends SubsystemBase {
 				}, () -> {
 					this.intakeMotor.set(0.0);
 				}, this).withTimeout(IntakeConstants.kShootDuration));
+	}
+
+	public Command autoCollectPieceCommand() {
+		return new StartEndCommand(() -> {
+			this.intakeMotor.set(IntakeConstants.kIntakeCollectMotorOutput);
+		}, () -> {
+			this.intakeMotor.set(0.0);
+		}, this).withTimeout(IntakeConstants.kShootDuration);
+	}
+
+	public Command autoReleasePieceCommand() {
+		return new StartEndCommand(() -> {
+			this.intakeMotor.set(-ShootHeight.kAuto.motorOutput);
+		}, () -> {
+			this.intakeMotor.set(0.0);
+		}, this).withTimeout(IntakeConstants.kShootDuration);
 	}
 }
