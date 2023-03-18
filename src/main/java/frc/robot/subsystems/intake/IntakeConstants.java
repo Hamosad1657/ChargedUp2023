@@ -4,13 +4,14 @@ package frc.robot.subsystems.intake;
 import com.hamosad1657.lib.math.HaUnits.PIDGains;
 
 public class IntakeConstants {
-	public static final double kAngleMotorDefaultOutput = 0.65;
+	public static final double kAngleMotorDefaultOutput = 0.6;
 	public static final double kAngleMotorKeepRaisedOutput = 0.1;
+	public static final double kAngleMotorKeepInPlaceOutput = 0.05;
 
 	public static final double kAngleCANCoderOffset = 0.0;
 
-	public static final PIDGains kIntakeMotorGains = new PIDGains(0.0065, 0.0075, 0.0);
-	public static final double kAngleMotorMaxPIDOutput = 1.0;
+	public static final PIDGains kIntakeMotorGains = new PIDGains(0.004, 0.0, 0.0);
+	public static final double kAngleMotorMaxPIDOutput = 0.75;
 	public static final double kAngleTolerance = 1.0;
 
 	public static final double kShootDuration = 0.5;

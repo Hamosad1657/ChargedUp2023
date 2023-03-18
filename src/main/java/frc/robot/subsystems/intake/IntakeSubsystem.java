@@ -8,6 +8,8 @@ import com.hamosad1657.lib.sensors.HaCANCoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
@@ -57,6 +59,8 @@ public class IntakeSubsystem extends SubsystemBase {
 		this.intakeMotor = new WPI_TalonFX(RobotMap.kIntakeMotorID);
 		this.intakeMotor.setNeutralMode(NeutralMode.Coast);
 		this.intakeMotor.setInverted(true);
+		this.intakeMotor.configVoltageCompSaturation(12.0);
+		this.intakeMotor.enableVoltageCompensation(true);
 
 		/** Wired normally true, false when pressed. */
 		this.raiseLimit = new DigitalInput(RobotMap.kIntakeRaiseLimitPort);
@@ -74,7 +78,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
 			intakeTab.addDouble("Intake Angle", this.angleCANCoder::getAbsAngleDeg).withPosition(2, 0).withSize(1, 1);
 			intakeTab.addDouble("Intake Setpoint", this.angleController::getSetpoint).withPosition(3, 0).withSize(1, 1);
-			intakeTab.addString("Shoot Height", () -> this.currentShootHeight.name()).withPosition(4, 0).withSize(2, 1);
+			intakeTab.addString("Shoot Height", () -> this.currentShootHeight.name()).withPosition(4, 0).withSize(1, 1);
 			intakeTab.addDouble("Intake Angle Error", this.angleController::getPositionError).withPosition(0, 1)
 					.withSize(3, 3).withWidget(BuiltInWidgets.kGraph);
 			intakeTab.addBoolean("Intake Angle At Setpoint", this.angleController::atSetpoint).withPosition(3, 1)
@@ -88,13 +92,33 @@ public class IntakeSubsystem extends SubsystemBase {
 		this.angleMotor.setIdleMode(idleMode);
 	}
 
+	public void setAngleMotorWithLimits(double output) {
+		if ((output > 0.0 && !this.raiseLimit.get()) || (output < 0.0 && !this.lowerLimit.get())) {
+			this.angleMotor.set(0.0);
+		} else {
+			this.angleMotor.set(output);
+		}
+	}
+
+	public double calculateAngleMotorOutput() {
+		double output = this.angleController.calculate(this.angleCANCoder.getAbsAngleDeg());
+		output = MathUtil.clamp(output, -IntakeConstants.kAngleMotorMaxPIDOutput,
+				IntakeConstants.kAngleMotorMaxPIDOutput);
+
+		if (this.angleController.atSetpoint()) {
+			return 0.0;
+		}
+
+		return output;
+	}
+
 	/** Lowers the intake untill the limit switch is pressed. */
 	public Command lowerIntakeCommand() {
 		return new StartEndCommand(() -> {
-			this.angleMotor.set(-IntakeConstants.kAngleMotorDefaultOutput);
+			this.setAngleMotorWithLimits(-IntakeConstants.kAngleMotorDefaultOutput);
 			this.intakeMotor.set(IntakeConstants.kIntakeMotorCollectOutput);
 		}, () -> {
-			this.angleMotor.set(0.0);
+			this.setAngleMotorWithLimits(0.0);
 			this.isIntakeLowered = true;
 		}, this).until(() -> !this.lowerLimit.get());
 	}
@@ -102,9 +126,9 @@ public class IntakeSubsystem extends SubsystemBase {
 	/** Raises the intake untill the limit switch is pressed. */
 	public Command raiseIntakeCommand() {
 		return new StartEndCommand(() -> {
-			this.angleMotor.set(IntakeConstants.kAngleMotorDefaultOutput);
+			this.setAngleMotorWithLimits(IntakeConstants.kAngleMotorDefaultOutput);
 		}, () -> {
-			this.angleMotor.set(0.0);
+			this.setAngleMotorWithLimits(0.0);
 			this.intakeMotor.set(0.0);
 			this.isIntakeLowered = false;
 		}, this).until(() -> !this.raiseLimit.get());
@@ -115,9 +139,10 @@ public class IntakeSubsystem extends SubsystemBase {
 		return new InstantCommand(
 				() -> {
 					if (this.raiseLimit.get()) {
-						this.angleMotor.set(this.isIntakeLowered ? 0.0 : IntakeConstants.kAngleMotorKeepRaisedOutput);
+						this.setAngleMotorWithLimits(
+								this.isIntakeLowered ? 0.0 : IntakeConstants.kAngleMotorKeepRaisedOutput);
 					} else {
-						this.angleMotor.set(0.0);
+						this.setAngleMotorWithLimits(0.0);
 					}
 				},
 				this);
@@ -129,10 +154,9 @@ public class IntakeSubsystem extends SubsystemBase {
 			this.angleController.reset();
 			this.angleController.setSetpoint(shootHeight.angle);
 		}, () -> {
-			this.angleMotor.set(this.angleController.calculate(this.angleCANCoder.getAbsAngleDeg())
-					* IntakeConstants.kAngleMotorMaxPIDOutput);
+			this.setAngleMotorWithLimits(this.calculateAngleMotorOutput());
 		}, (interrupted) -> {
-			this.angleMotor.set(0.0);
+			this.setAngleMotorWithLimits(0.0);
 		}, () -> {
 			return false;
 		}, this);
