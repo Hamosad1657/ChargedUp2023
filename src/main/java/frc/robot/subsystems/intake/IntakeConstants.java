@@ -17,7 +17,7 @@ public class IntakeConstants {
 	public static final double kShootDuration = 0.5;
 
 	public enum ShootHeight {
-		kMid(0.325), kHigh(0.75);
+		kMid(0.325), kHigh(0.75), kAuto(1.0);
 
 		public final double motorOutput;
 
