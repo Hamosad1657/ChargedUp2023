@@ -42,8 +42,17 @@ public class IntakeSubsystem extends SubsystemBase {
 	private boolean isIntakeLowered;
 
 	private IntakeSubsystem() {
+		/*
+		 * When voltage compensation is disabled, the percent-output control mode outputs a certain percentage of the CURRENT voltage.
+		 * When voltage compensation is enabled, it outputs a certain percentage of the NOMINAL voltage (in this case, 12 volts).
+		 * Voltage compensation is important for mechanisms that need high accuracy and repeatability, even when the voltage changes
+		 * throughout the match - for example, a shooting mechanism.
+		 * For this reason, voltage compensation is enabled here, for both motors.
+		 */
+
 		this.angleMotor = new CANSparkMax(RobotMap.kIntakeAngleMotorID, MotorType.kBrushless);
 		this.angleMotor.setIdleMode(IdleMode.kCoast);
+		this.angleMotor.enableVoltageCompensation(12.0);
 
 		this.angleController = IntakeConstants.kIntakeMotorGains.toPIDController();
 		this.angleController.setTolerance(IntakeConstants.kAngleTolerance);
@@ -54,9 +63,13 @@ public class IntakeSubsystem extends SubsystemBase {
 		this.intakeMotor = new WPI_TalonFX(RobotMap.kIntakeMotorID);
 		this.intakeMotor.setNeutralMode(NeutralMode.Brake);
 		this.intakeMotor.setInverted(true);
+		this.intakeMotor.configVoltageCompSaturation(12.0);
+		this.intakeMotor.enableVoltageCompensation(true);
 
-		// The limits are wired normally true, false when pressed
+
+		/** Wired normally true, false when pressed. */
 		this.raiseLimit = new DigitalInput(RobotMap.kIntakeRaiseLimitPort);
+		/** Wired normally true, false when pressed. */
 		this.lowerLimit = new DigitalInput(RobotMap.kIntakeLowerLimitPort);
 
 		this.isIntakeLowered = false;
@@ -78,6 +91,7 @@ public class IntakeSubsystem extends SubsystemBase {
 		}
 	}
 
+	/** Lowers the intake untill the limit switch is pressed. */
 	public Command lowerIntakeCommand() {
 		return new StartEndCommand(() -> {
 			this.angleMotor.set(-IntakeConstants.kAngleMotorDefaultOutput);
@@ -87,6 +101,7 @@ public class IntakeSubsystem extends SubsystemBase {
 		}, this).until(() -> !this.lowerLimit.get());
 	}
 
+	/** Raises the intake untill the limit switch is pressed. */
 	public Command raiseIntakeCommand() {
 		return new StartEndCommand(() -> {
 			this.angleMotor.set(IntakeConstants.kAngleMotorDefaultOutput);
@@ -96,6 +111,7 @@ public class IntakeSubsystem extends SubsystemBase {
 		}, this).until(() -> !this.raiseLimit.get());
 	}
 
+	/** If the intake is supposed to be raised, apply power to keep it that way. */
 	public Command keepRaisedCommand() {
 		return new InstantCommand(
 				() -> {
@@ -107,6 +123,7 @@ public class IntakeSubsystem extends SubsystemBase {
 	public Command getToShootAngleCommand() {
 		return new FunctionalCommand(() -> {
 			this.angleController.setSetpoint(IntakeConstants.kShootAngleSetpoint);
+			this.angleController.reset();
 		}, () -> {
 			this.angleMotor.set(this.angleController.calculate(this.angleCANCoder.getAbsAngleDeg()));
 		}, (interrupted) -> {
