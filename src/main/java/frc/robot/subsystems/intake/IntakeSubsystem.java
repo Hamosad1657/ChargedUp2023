@@ -43,9 +43,12 @@ public class IntakeSubsystem extends SubsystemBase {
 
 	private IntakeSubsystem() {
 		/*
-		 * When voltage compensation is disabled, the percent-output control mode outputs a certain percentage of the CURRENT voltage.
-		 * When voltage compensation is enabled, it outputs a certain percentage of the NOMINAL voltage (in this case, 12 volts).
-		 * Voltage compensation is important for mechanisms that need high accuracy and repeatability, even when the voltage changes
+		 * When voltage compensation is disabled, the percent-output control mode
+		 * outputs a certain percentage of the CURRENT voltage.
+		 * When voltage compensation is enabled, it outputs a certain percentage of the
+		 * NOMINAL voltage (in this case, 12 volts).
+		 * Voltage compensation is important for mechanisms that need high accuracy and
+		 * repeatability, even when the voltage changes
 		 * throughout the match - for example, a shooting mechanism.
 		 * For this reason, voltage compensation is enabled here, for both motors.
 		 */
@@ -65,7 +68,6 @@ public class IntakeSubsystem extends SubsystemBase {
 		this.intakeMotor.setInverted(true);
 		this.intakeMotor.configVoltageCompSaturation(12.0);
 		this.intakeMotor.enableVoltageCompensation(true);
-
 
 		/** Wired normally true, false when pressed. */
 		this.raiseLimit = new DigitalInput(RobotMap.kIntakeRaiseLimitPort);
@@ -122,8 +124,8 @@ public class IntakeSubsystem extends SubsystemBase {
 
 	public Command getToShootAngleCommand() {
 		return new FunctionalCommand(() -> {
-			this.angleController.setSetpoint(IntakeConstants.kShootAngleSetpoint);
 			this.angleController.reset();
+			this.angleController.setSetpoint(IntakeConstants.kShootAngleSetpoint);
 		}, () -> {
 			this.angleMotor.set(this.angleController.calculate(this.angleCANCoder.getAbsAngleDeg()));
 		}, (interrupted) -> {
