@@ -44,20 +44,8 @@ public class IntakeSubsystem extends SubsystemBase {
 	private ShootHeight currentShootHeight;
 
 	private IntakeSubsystem() {
-		/*
-		 * When voltage compensation is disabled, the percent-output control mode
-		 * outputs a certain percentage of the CURRENT voltage.
-		 * When voltage compensation is enabled, it outputs a certain percentage of the
-		 * NOMINAL voltage (in this case, 12 volts).
-		 * Voltage compensation is important for mechanisms that need high accuracy and
-		 * repeatability, even when the voltage changes
-		 * throughout the match - for example, a shooting mechanism.
-		 * For this reason, voltage compensation is enabled here, for both motors.
-		 */
-
 		this.angleMotor = new CANSparkMax(RobotMap.kIntakeAngleMotorID, MotorType.kBrushless);
 		this.angleMotor.setIdleMode(IdleMode.kCoast);
-		this.angleMotor.enableVoltageCompensation(12.0);
 
 		this.angleController = IntakeConstants.kIntakeMotorGains.toPIDController();
 		this.angleController.setTolerance(IntakeConstants.kAngleTolerance);
@@ -76,6 +64,7 @@ public class IntakeSubsystem extends SubsystemBase {
 		this.lowerLimit = new DigitalInput(RobotMap.kIntakeLowerLimitPort);
 
 		this.isIntakeLowered = false;
+		this.currentShootHeight = ShootHeight.kFar;
 
 		if (Robot.showShuffleboardSubsystemInfo) {
 			ShuffleboardTab intakeTab = Shuffleboard.getTab("Intake");
@@ -85,6 +74,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
 			intakeTab.addDouble("Intake Angle", this.angleCANCoder::getAbsAngleDeg).withPosition(2, 0).withSize(1, 1);
 			intakeTab.addDouble("Intake Setpoint", this.angleController::getSetpoint).withPosition(3, 0).withSize(1, 1);
+			intakeTab.addString("Shoot Height", () -> this.currentShootHeight.name()).withPosition(4, 0).withSize(2, 1);
 			intakeTab.addDouble("Intake Angle Error", this.angleController::getPositionError).withPosition(0, 1)
 					.withSize(3, 3).withWidget(BuiltInWidgets.kGraph);
 			intakeTab.addBoolean("Intake Angle At Setpoint", this.angleController::atSetpoint).withPosition(3, 1)
@@ -133,14 +123,14 @@ public class IntakeSubsystem extends SubsystemBase {
 				this);
 	}
 
-	public Command getToShootAngleCommand(ShootHeight shootHeight) {
+	public Command getToShootHeightCommand(ShootHeight shootHeight) {
 		return new FunctionalCommand(() -> {
 			this.currentShootHeight = shootHeight;
 			this.angleController.reset();
-			this.angleController.setSetpoint(IntakeConstants.kShootAngleSetpoint);
+			this.angleController.setSetpoint(shootHeight.angle);
 		}, () -> {
 			this.angleMotor.set(this.angleController.calculate(this.angleCANCoder.getAbsAngleDeg())
-					* IntakeConstants.kAngleMotorDefaultOutput);
+					* IntakeConstants.kAngleMotorMaxPIDOutput);
 		}, (interrupted) -> {
 			this.angleMotor.set(0.0);
 		}, () -> {

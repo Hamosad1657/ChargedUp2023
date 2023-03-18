@@ -54,16 +54,18 @@ public class RobotContainer {
 	private void configureButtonsBindings() {
 		// Swerve
 		this.driverA_CommandController.share().onTrue(new InstantCommand(this.swerve::zeroGyro));
-		this.driverA_CommandController.cross().onTrue(this.swerve.crossLockWheelsCommand());
-		this.driverA_CommandController.triangle().onTrue(new InstantCommand(this.swerve::toggleTeleopSwerveSpeed));
+		this.driverA_CommandController.PS().onTrue(this.swerve.crossLockWheelsCommand());
+		this.driverA_CommandController.L3().onTrue(new InstantCommand(this.swerve::toggleTeleopSwerveSpeed));
 
 		// Intake
 		this.driverA_CommandController.R2().onTrue(this.intake.lowerIntakeCommand());
 		this.driverA_CommandController.L2().onTrue(this.intake.raiseIntakeCommand());
-		this.driverA_CommandController.povUp().onTrue(this.intake.getToShootAngleCommand(ShootHeight.kHigh));
-		this.driverA_CommandController.povLeft().onTrue(this.intake.getToShootAngleCommand(ShootHeight.kMid));
-		this.driverA_CommandController.povRight().onTrue(this.intake.getToShootAngleCommand(ShootHeight.kMid));
+		this.driverA_CommandController.triangle().onTrue(this.intake.getToShootHeightCommand(ShootHeight.kHigh));
+		this.driverA_CommandController.square().onTrue(this.intake.getToShootHeightCommand(ShootHeight.kMid));
+		this.driverA_CommandController.circle().onTrue(this.intake.getToShootHeightCommand(ShootHeight.kMid));
+		this.driverA_CommandController.cross().onTrue(this.intake.getToShootHeightCommand(ShootHeight.kFar));
 		this.driverA_CommandController.R1().onTrue(this.intake.shootCommand());
+		this.driverA_CommandController.L1().onTrue(this.intake.shootCommand());
 
 		// Arm
 		this.driverB_CommandController.povUp()
