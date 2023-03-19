@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.subsystems.arm.ArmSubsystem;
 import frc.robot.subsystems.grabber.GrabberSubsystem;
-import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 import frc.robot.subsystems.turret.TurretSubsystem;
 

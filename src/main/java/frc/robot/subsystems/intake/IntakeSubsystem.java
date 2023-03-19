@@ -102,7 +102,9 @@ public class IntakeSubsystem extends SubsystemBase {
 
 	public double calculateAngleMotorOutput() {
 		double output = this.angleController.calculate(this.angleCANCoder.getAbsAngleDeg());
-		output = MathUtil.clamp(output, -IntakeConstants.kAngleMotorMaxPIDOutput,
+		output = MathUtil.clamp(
+				output + IntakeConstants.kBalanceFFOutput,
+				-IntakeConstants.kAngleMotorMaxPIDOutput,
 				IntakeConstants.kAngleMotorMaxPIDOutput);
 
 		if (this.angleController.atSetpoint()) {

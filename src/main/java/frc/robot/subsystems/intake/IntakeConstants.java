@@ -10,10 +10,12 @@ public class IntakeConstants {
 
 	public static final double kAngleCANCoderOffset = 0.0;
 
-	public static final PIDGains kIntakeMotorGains = new PIDGains(0.004, 0.0, 0.0005
-	);
+	// public static final PIDGains kIntakeMotorGains = new PIDGains(0.008, 0.0001,
+	// 0.000);
+	public static final PIDGains kIntakeMotorGains = new PIDGains(0.008, 0.0005, 0.000);
+	public static final double kBalanceFFOutput = 0.015;
 	public static final double kAngleMotorMaxPIDOutput = 0.85;
-	public static final double kAngleTolerance = 1.0;
+	public static final double kAngleTolerance = 0.05;
 
 	public static final double kShootDuration = 0.5;
 	public static final double kShootCollectDuration = 0.1;
