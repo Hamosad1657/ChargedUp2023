@@ -34,7 +34,6 @@ public class Robot extends TimedRobot {
 		ArmSubsystem.getInstance().setAngleIdleMode(IdleMode.kCoast);
 		ArmSubsystem.getInstance().setLengthIdleMode(IdleMode.kCoast);
 		GrabberSubsystem.getInstance().setIdleMode(IdleMode.kCoast);
-		IntakeSubsystem.getInstance().setAngleIdleMode(IdleMode.kCoast);
 	}
 
 	@Override
@@ -69,7 +68,6 @@ public class Robot extends TimedRobot {
 		ArmSubsystem.getInstance().setAngleIdleMode(IdleMode.kBrake);
 		ArmSubsystem.getInstance().setLengthIdleMode(IdleMode.kBrake);
 		GrabberSubsystem.getInstance().setIdleMode(IdleMode.kBrake);
-		IntakeSubsystem.getInstance().setAngleIdleMode(IdleMode.kBrake);
 	}
 
 	@Override

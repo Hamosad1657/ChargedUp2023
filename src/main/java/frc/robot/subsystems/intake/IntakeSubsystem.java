@@ -47,7 +47,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
 	private IntakeSubsystem() {
 		this.angleMotor = new CANSparkMax(RobotMap.kIntakeAngleMotorID, MotorType.kBrushless);
-		this.angleMotor.setIdleMode(IdleMode.kCoast);
+		this.angleMotor.setIdleMode(IdleMode.kBrake);
 
 		this.angleController = IntakeConstants.kIntakeMotorGains.toPIDController();
 		this.angleController.setTolerance(IntakeConstants.kAngleTolerance);

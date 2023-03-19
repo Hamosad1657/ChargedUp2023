@@ -537,8 +537,7 @@ public class SwerveSubsystem extends SubsystemBase {
 	@Override
 	public void periodic() {
 		// There's a button that changes the swerve speed from fast to slow. In order to make the change smooth, we put
-		// a
-		// slew-rate limiter on the speed ratio.
+		// a slew-rate limiter on the speed ratio.
 		this.filteredTranslationRatio = this.speedModeRateLimiter.calculate(currentSwerveTranslateRatio);
 
 		this.odometry.update(this.getYaw(), this.getModulesPositions());
