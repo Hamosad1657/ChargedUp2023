@@ -2,23 +2,47 @@
   "waypoints": [
     {
       "anchorPoint": {
-        "x": 1.904335387618144,
-        "y": 3.8086262137436555
+        "x": 1.9134036513687065,
+        "y": 4.289244192523473
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.1219737176316458,
-        "y": 4.724520852550477
+        "x": 2.057658115316231,
+        "y": 4.80975361950724
       },
-      "holonomicAngle": 0.0,
+      "holonomicAngle": 270.0,
       "isReversal": false,
       "velOverride": null,
       "isLocked": false,
       "isStopPoint": false,
       "stopEvent": {
+        "names": [],
+        "executionBehavior": "sequential",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 4.579473194034107,
+        "y": 4.688247797548227
+      },
+      "prevControl": {
+        "x": 3.0843790634482167,
+        "y": 4.747516595429377
+      },
+      "nextControl": {
+        "x": 5.168910337820675,
+        "y": 4.6648812213413775
+      },
+      "holonomicAngle": 270.0,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": true,
+      "stopEvent": {
         "names": [
-          "DropoffHigh",
-          "ArmHalfClosed"
+          "WaitABitJava"
         ],
         "executionBehavior": "sequential",
         "waitBehavior": "none",
@@ -27,43 +51,18 @@
     },
     {
       "anchorPoint": {
-        "x": 3.9718995227464147,
-        "y": 4.69
+        "x": 6.781523277332269,
+        "y": 4.6236619616096375
       },
       "prevControl": {
-        "x": 2.6933840487724297,
-        "y": 4.650046391438314
+        "x": 5.82028731976942,
+        "y": 4.705276335367388
       },
       "nextControl": {
-        "x": 4.55226840278242,
-        "y": 4.708136527501125
+        "x": 6.948134330239745,
+        "y": 4.609515740135943
       },
-      "holonomicAngle": 0.0,
-      "isReversal": false,
-      "velOverride": null,
-      "isLocked": false,
-      "isStopPoint": false,
-      "stopEvent": {
-        "names": [],
-        "executionBehavior": "parallel",
-        "waitBehavior": "none",
-        "waitTime": 0
-      }
-    },
-    {
-      "anchorPoint": {
-        "x": 6.85,
-        "y": 4.55
-      },
-      "prevControl": {
-        "x": 6.97339288904904,
-        "y": 4.539416863825573
-      },
-      "nextControl": {
-        "x": 6.284555877883686,
-        "y": 4.598496896292039
-      },
-      "holonomicAngle": 0.0,
+      "holonomicAngle": 270.0,
       "isReversal": false,
       "velOverride": 1.0,
       "isLocked": false,
@@ -77,24 +76,22 @@
     },
     {
       "anchorPoint": {
-        "x": 1.8952671238675813,
-        "y": 4.33
+        "x": 3.6907833464789737,
+        "y": 4.7698621713032905
       },
       "prevControl": {
-        "x": 2.2579976738900847,
-        "y": 4.751725643802166
+        "x": 4.171581481007577,
+        "y": 5.00256001955613
       },
       "nextControl": null,
-      "holonomicAngle": 0.0,
+      "holonomicAngle": 90.0,
       "isReversal": false,
       "velOverride": null,
       "isLocked": false,
       "isStopPoint": false,
       "stopEvent": {
         "names": [
-          "RetractArm",
-          "DropoffHigh",
-          "HomeArm"
+          "ShootGamePiece"
         ],
         "executionBehavior": "sequential",
         "waitBehavior": "none",
@@ -102,20 +99,17 @@
       }
     }
   ],
-  "maxVelocity": 4.0,
-  "maxAcceleration": 4.0,
-  "isReversed": null,
   "markers": [
     {
-      "position": 0.05,
+      "position": 0.4,
       "names": [
-        "FlipTurretPickupCube"
+        "OpenIntake"
       ]
     },
     {
-      "position": 2.127272727272728,
+      "position": 2.4818181818181806,
       "names": [
-        "FlipTurret"
+        "GetIntakeToAngle"
       ]
     }
   ]

@@ -10,9 +10,36 @@
         "x": 3.037438448422067,
         "y": 3.0
       },
-      "holonomicAngle": 0.0,
+      "holonomicAngle": 270.0,
       "isReversal": false,
       "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [
+          "OpenIntake"
+        ],
+        "executionBehavior": "sequential",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 3.6,
+        "y": 3.0
+      },
+      "prevControl": {
+        "x": 2.6000000000000028,
+        "y": 3.0
+      },
+      "nextControl": {
+        "x": 4.600000000000003,
+        "y": 3.0
+      },
+      "holonomicAngle": 270.0,
+      "isReversal": false,
+      "velOverride": 2.0,
       "isLocked": false,
       "isStopPoint": false,
       "stopEvent": {
@@ -24,26 +51,33 @@
     },
     {
       "anchorPoint": {
-        "x": 3.63,
+        "x": 1.85,
         "y": 3.0
       },
       "prevControl": {
-        "x": 2.63,
-        "y": 3.0
+        "x": 3.244571229317897,
+        "y": 3.030963553155176
       },
       "nextControl": null,
-      "holonomicAngle": 0.0,
+      "holonomicAngle": 270.0,
       "isReversal": false,
       "velOverride": null,
       "isLocked": false,
       "isStopPoint": false,
       "stopEvent": {
         "names": [],
-        "executionBehavior": "parallel",
+        "executionBehavior": "sequential",
         "waitBehavior": "none",
         "waitTime": 0
       }
     }
   ],
-  "markers": []
+  "markers": [
+    {
+      "position": 1.1,
+      "names": [
+        "CloseIntake"
+      ]
+    }
+  ]
 }

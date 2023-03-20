@@ -62,8 +62,8 @@ public class RobotContainer {
 		this.driverA_CommandController.L2().onTrue(this.intake.raiseIntakeCommand());
 		this.driverA_CommandController.triangle().onTrue(this.intake.getToShootHeightCommand(ShootHeight.kHigh));
 		this.driverA_CommandController.square().onTrue(this.intake.getToShootHeightCommand(ShootHeight.kMid));
-		this.driverA_CommandController.circle().onTrue(this.intake.getToShootHeightCommand(ShootHeight.kMid));
-		this.driverA_CommandController.cross().onTrue(this.intake.getToShootHeightCommand(ShootHeight.kFar));
+		this.driverA_CommandController.cross().onTrue(this.intake.getToShootHeightCommand(ShootHeight.kLow));
+		this.driverA_CommandController.circle().onTrue(this.intake.getToShootHeightCommand(ShootHeight.kFar));
 		this.driverA_CommandController.R1().onTrue(this.intake.shootCommand());
 		this.driverA_CommandController.L1().onTrue(this.intake.shootCommand());
 
@@ -128,7 +128,7 @@ public class RobotContainer {
 				() -> HaUnits.deadband((driverB_Controller.getL2Axis() + 1.0), kJoystickDeadband)));
 
 		// Intake keep up - Not teleop
-		this.intake.setDefaultCommand(this.intake.keepRaisedCommand());
+		this.intake.setDefaultCommand(this.intake.keepInPlaceCommand());
 	}
 
 	/**

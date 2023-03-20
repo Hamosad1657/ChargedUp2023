@@ -8,7 +8,6 @@ import com.hamosad1657.lib.sensors.HaCANCoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -17,7 +16,6 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -101,16 +99,16 @@ public class IntakeSubsystem extends SubsystemBase {
 	}
 
 	public double calculateAngleMotorOutput() {
-		double output = this.angleController.calculate(this.angleCANCoder.getAbsAngleDeg());
-		output = MathUtil.clamp(
-				output + IntakeConstants.kBalanceFFOutput,
-				-IntakeConstants.kAngleMotorMaxPIDOutput,
-				IntakeConstants.kAngleMotorMaxPIDOutput);
+		double output = this.angleController.calculate(this.angleCANCoder.getAbsAngleDeg())
+				+ IntakeConstants.kBalanceFFOutput;
 
 		if (this.angleController.atSetpoint()) {
 			return 0.0;
 		}
 
+		output = MathUtil.clamp(output,
+				-IntakeConstants.kAngleMotorMaxPIDOutput,
+				IntakeConstants.kAngleMotorMaxPIDOutput);
 		return output;
 	}
 
@@ -137,14 +135,13 @@ public class IntakeSubsystem extends SubsystemBase {
 	}
 
 	/** If the intake is supposed to be raised, apply power to keep it that way. */
-	public Command keepRaisedCommand() {
-		return new InstantCommand(
+	public Command keepInPlaceCommand() {
+		return new RunCommand(
 				() -> {
-					if (this.raiseLimit.get()) {
-						this.setAngleMotorWithLimits(
-								this.isIntakeLowered ? 0.0 : IntakeConstants.kAngleMotorKeepRaisedOutput);
+					if (this.isIntakeLowered) {
+						this.angleMotor.set(IntakeConstants.kAngleMotorKeepInPlaceOutput * -3.0);
 					} else {
-						this.setAngleMotorWithLimits(0.0);
+						this.setAngleMotorWithLimits(IntakeConstants.kAngleMotorKeepInPlaceOutput);
 					}
 				},
 				this);
@@ -153,6 +150,8 @@ public class IntakeSubsystem extends SubsystemBase {
 	public Command getToShootHeightCommand(ShootHeight shootHeight) {
 		return new FunctionalCommand(() -> {
 			this.currentShootHeight = shootHeight;
+			this.intakeMotor.set(0.0);
+
 			this.angleController.reset();
 			this.angleController.setSetpoint(shootHeight.angle);
 		}, () -> {

@@ -2,24 +2,21 @@
   "waypoints": [
     {
       "anchorPoint": {
-        "x": 1.904335387618144,
-        "y": 3.1647794874537123
+        "x": 1.8861988601170188,
+        "y": 3.745148367489718
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.351171298833826,
-        "y": 5.413708897593234
+        "x": 1.4055808813372015,
+        "y": 5.313957996337046
       },
-      "holonomicAngle": -89.21517539700811,
+      "holonomicAngle": -90.0,
       "isReversal": false,
       "velOverride": null,
       "isLocked": false,
       "isStopPoint": false,
       "stopEvent": {
-        "names": [
-          "ReleasePiece",
-          "WaitABit"
-        ],
+        "names": [],
         "executionBehavior": "parallel",
         "waitBehavior": "none",
         "waitTime": 0
@@ -63,15 +60,14 @@
         "x": 6.961485056303446,
         "y": 4.633838215044852
       },
-      "holonomicAngle": 0.0,
+      "holonomicAngle": -90.0,
       "isReversal": false,
-      "velOverride": null,
+      "velOverride": 1.0,
       "isLocked": false,
       "isStopPoint": true,
       "stopEvent": {
         "names": [
-          "OpenIntake",
-          "CollectPieceIntake"
+          "WaitABitMore++"
         ],
         "executionBehavior": "sequential",
         "waitBehavior": "none",
@@ -80,18 +76,18 @@
     },
     {
       "anchorPoint": {
-        "x": 6.33871636164325,
+        "x": 6.4,
         "y": 4.6
       },
       "prevControl": {
-        "x": 6.674439247657367,
+        "x": 6.735722886014117,
         "y": 4.6
       },
       "nextControl": {
-        "x": 6.2217188202579035,
+        "x": 6.283002458614654,
         "y": 4.6
       },
-      "holonomicAngle": 0,
+      "holonomicAngle": -90.0,
       "isReversal": false,
       "velOverride": 1.0,
       "isLocked": false,
@@ -116,7 +112,7 @@
         "x": 4.710518074731281,
         "y": 4.551006421311088
       },
-      "holonomicAngle": 180.0,
+      "holonomicAngle": -180.0,
       "isReversal": false,
       "velOverride": null,
       "isLocked": false,
@@ -130,25 +126,25 @@
     },
     {
       "anchorPoint": {
-        "x": 3.6726468189778485,
-        "y": 4.552223841289789
+        "x": 3.600100708973348,
+        "y": 4.751725643802166
       },
       "prevControl": {
-        "x": 4.017240841499228,
-        "y": 4.570360368790914
+        "x": 3.944694731494727,
+        "y": 4.769862171303291
       },
       "nextControl": {
-        "x": 3.3280527964564692,
-        "y": 4.534087313788663
+        "x": 3.2555066864519686,
+        "y": 4.73358911630104
       },
-      "holonomicAngle": -180.0,
+      "holonomicAngle": 90.0,
       "isReversal": false,
       "velOverride": null,
       "isLocked": false,
       "isStopPoint": true,
       "stopEvent": {
         "names": [
-          "ReleasePieceIntake"
+          "ShootGamePiece"
         ],
         "executionBehavior": "parallel",
         "waitBehavior": "none",
@@ -161,22 +157,21 @@
         "y": 3.445895663721153
       },
       "prevControl": {
-        "x": 5.77648400910837,
-        "y": 5.658552018858424
+        "x": 5.667664844101619,
+        "y": 5.368367578840421
       },
       "nextControl": {
-        "x": 5.677061103140723,
-        "y": 3.2326331132478376
+        "x": 5.687814881807572,
+        "y": 3.2324635820093657
       },
-      "holonomicAngle": 0.0,
+      "holonomicAngle": -90.0,
       "isReversal": false,
       "velOverride": null,
       "isLocked": false,
       "isStopPoint": true,
       "stopEvent": {
         "names": [
-          "OpenIntake",
-          "CollectPieceIntake"
+          "WaitABitMore++"
         ],
         "executionBehavior": "sequential",
         "waitBehavior": "none",
@@ -185,18 +180,18 @@
     },
     {
       "anchorPoint": {
-        "x": 6.34,
+        "x": 6.4,
         "y": 3.4277591362200277
       },
       "prevControl": {
-        "x": 6.371962165076491,
-        "y": 3.2889145231722647
+        "x": 6.424824189397032,
+        "y": 3.287462428526867
       },
       "nextControl": {
-        "x": 6.012258866622997,
-        "y": 4.851476545058354
+        "x": 6.11760018537581,
+        "y": 5.023773556319043
       },
-      "holonomicAngle": 0.0,
+      "holonomicAngle": -90.0,
       "isReversal": false,
       "velOverride": 1.0,
       "isLocked": false,
@@ -235,24 +230,24 @@
     },
     {
       "anchorPoint": {
-        "x": 2.36,
-        "y": 3.9083771149998445
+        "x": 3.5728959177216604,
+        "y": 4.506882522536975
       },
       "prevControl": {
-        "x": 2.387204791251688,
-        "y": 5.123524457575232
+        "x": 3.8358755664879753,
+        "y": 4.969363973815667
       },
       "nextControl": null,
-      "holonomicAngle": -179.29701957726442,
+      "holonomicAngle": 90.0,
       "isReversal": false,
       "velOverride": null,
       "isLocked": false,
       "isStopPoint": false,
       "stopEvent": {
         "names": [
-          "ReleasePieceIntake"
+          "ShootGamePiece"
         ],
-        "executionBehavior": "parallel",
+        "executionBehavior": "sequential",
         "waitBehavior": "none",
         "waitTime": 0
       }
@@ -264,6 +259,24 @@
   "markers": [
     {
       "position": 4.05,
+      "names": [
+        "GetIntakeToAngle"
+      ]
+    },
+    {
+      "position": 0.5,
+      "names": [
+        "OpenIntake"
+      ]
+    },
+    {
+      "position": 5.75,
+      "names": [
+        "OpenIntake"
+      ]
+    },
+    {
+      "position": 7.3,
       "names": [
         "GetIntakeToAngle"
       ]

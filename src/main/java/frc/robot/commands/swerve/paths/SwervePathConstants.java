@@ -96,6 +96,9 @@ public final class SwervePathConstants {
 		SwervePathConstants.kPathCommandsMap.put("WaitABitLess", new WaitCommand(0.10));
 		SwervePathConstants.kPathCommandsMap.put("WaitABit", new WaitCommand(0.15));
 		SwervePathConstants.kPathCommandsMap.put("WaitABitMore", new WaitCommand(0.35));
+		SwervePathConstants.kPathCommandsMap.put("WaitABitMore++", new WaitCommand(0.5));
+		SwervePathConstants.kPathCommandsMap.put("WaitABitMore#", new WaitCommand(0.75));
+		SwervePathConstants.kPathCommandsMap.put("WaitABitMoreJava", new WaitCommand(1.0));
 
 		// Turret
 		SwervePathConstants.kPathCommandsMap.put("RotateTurretBack",
@@ -122,9 +125,8 @@ public final class SwervePathConstants {
 		// Intake
 		SwervePathConstants.kPathCommandsMap.put("OpenIntake", intake.lowerIntakeCommand());
 		SwervePathConstants.kPathCommandsMap.put("CloseIntake", intake.raiseIntakeCommand());
-		SwervePathConstants.kPathCommandsMap.put("CollectPieceIntake", intake.autoCollectPieceCommand());
-		SwervePathConstants.kPathCommandsMap.put("ReleasePieceIntake", intake.autoReleasePieceCommand());
 		SwervePathConstants.kPathCommandsMap.put("GetIntakeToAngle", intake.getToShootHeightCommand(ShootHeight.kAuto));
+		SwervePathConstants.kPathCommandsMap.put("ShootGamePiece", intake.shootCommand());
 
 		// Pickups
 		SwervePathConstants.kPathCommandsMap.put("PickupCone", arm.pickupConeCommand());
