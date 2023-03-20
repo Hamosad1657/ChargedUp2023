@@ -16,6 +16,7 @@ import frc.robot.subsystems.arm.ArmConstants.ArmState;
 import frc.robot.subsystems.arm.ArmSubsystem;
 import frc.robot.subsystems.grabber.GrabberSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
+import frc.robot.subsystems.intake.IntakeConstants.ShootHeight;
 import frc.robot.subsystems.turret.TurretConstants;
 import frc.robot.subsystems.turret.TurretSubsystem;
 
@@ -123,7 +124,7 @@ public final class SwervePathConstants {
 		SwervePathConstants.kPathCommandsMap.put("CloseIntake", intake.raiseIntakeCommand());
 		SwervePathConstants.kPathCommandsMap.put("CollectPieceIntake", intake.autoCollectPieceCommand());
 		SwervePathConstants.kPathCommandsMap.put("ReleasePieceIntake", intake.autoReleasePieceCommand());
-		SwervePathConstants.kPathCommandsMap.put("GetIntakeToAngle", intake.getToShootAngleCommand());
+		SwervePathConstants.kPathCommandsMap.put("GetIntakeToAngle", intake.getToShootHeightCommand(ShootHeight.kAuto));
 
 		// Pickups
 		SwervePathConstants.kPathCommandsMap.put("PickupCone", arm.pickupConeCommand());
