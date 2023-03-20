@@ -4,7 +4,7 @@ package frc.robot.subsystems.turret;
 import com.hamosad1657.lib.math.HaUnits.PIDGains;
 
 public class TurretConstants {
-	public static final double kMotorMaxOutput = 0.8;
+	public static final double kMotorMaxOutput = 1;
 	public static final double kCANCoderOffsetDeg = 10.0;
 
 	public static final double kRotationMinAngle = 32.0;
