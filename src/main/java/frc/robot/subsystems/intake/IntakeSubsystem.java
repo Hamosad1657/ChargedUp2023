@@ -2,6 +2,7 @@
 package frc.robot.subsystems.intake;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.TalonFXSensorCollection;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.AbsoluteSensorRange;
 import com.hamosad1657.lib.sensors.HaCANCoder;
@@ -38,6 +39,7 @@ public class IntakeSubsystem extends SubsystemBase {
 	private final PIDController angleController;
 	private final HaCANCoder angleCANCoder;
 	private final WPI_TalonFX intakeMotor;
+	private final TalonFXSensorCollection intakeSensors;
 	private final DigitalInput raiseLimit, lowerLimit;
 
 	private boolean isIntakeLowered;
@@ -59,7 +61,7 @@ public class IntakeSubsystem extends SubsystemBase {
 		this.intakeMotor.setInverted(true);
 		this.intakeMotor.configVoltageCompSaturation(12.0);
 		this.intakeMotor.enableVoltageCompensation(true);
-
+		this.intakeSensors = this.intakeMotor.getSensorCollection();
 		/** Wired normally true, false when pressed. */
 		this.raiseLimit = new DigitalInput(RobotMap.kIntakeRaiseLimitPort);
 		/** Wired normally true, false when pressed. */
@@ -83,7 +85,15 @@ public class IntakeSubsystem extends SubsystemBase {
 					.withSize(2, 1);
 
 			intakeTab.addDouble("Intake Motor Output", this.intakeMotor::get).withPosition(3, 2).withSize(2, 1);
+			intakeTab.addDouble("Intake Motor Velocity", this::getIntakeVelocity)
+					.withWidget(BuiltInWidgets.kGraph)
+					.withPosition(5, 0).withSize(4, 4);
+
 		}
+	}
+
+	public double getIntakeVelocity() {
+		return this.intakeSensors.getIntegratedSensorVelocity() / 10.0;
 	}
 
 	public void setAngleIdleMode(IdleMode idleMode) {
@@ -116,8 +126,9 @@ public class IntakeSubsystem extends SubsystemBase {
 	public Command lowerIntakeCommand() {
 		return new StartEndCommand(() -> {
 			this.setAngleMotorWithLimits(-IntakeConstants.kAngleMotorDefaultOutput);
-			this.intakeMotor.set(IntakeConstants.kIntakeMotorCollectOutput);
+			this.intakeMotor.set(IntakeConstants.kIntakeMotorCollectOutput / 5.0);
 		}, () -> {
+			this.intakeMotor.set(IntakeConstants.kIntakeMotorCollectOutput);
 			this.setAngleMotorWithLimits(0.0);
 			this.isIntakeLowered = true;
 		}, this).until(() -> !this.lowerLimit.get());
@@ -142,6 +153,10 @@ public class IntakeSubsystem extends SubsystemBase {
 						this.angleMotor.set(IntakeConstants.kAngleMotorKeepInPlaceOutput * -3.0);
 					} else {
 						this.setAngleMotorWithLimits(IntakeConstants.kAngleMotorKeepInPlaceOutput);
+					}
+					if (this.getIntakeVelocity() < IntakeConstants.kCollectWithCubeMaxVelocity
+							&& this.isIntakeLowered) {
+						this.intakeMotor.set(0.0);
 					}
 				},
 				this);

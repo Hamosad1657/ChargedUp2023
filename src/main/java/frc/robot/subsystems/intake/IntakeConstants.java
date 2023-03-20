@@ -13,6 +13,7 @@ public class IntakeConstants {
 	public static final double kBalanceFFOutput = 0.01;
 	public static final double kAngleMotorMaxPIDOutput = 0.85;
 	public static final double kAngleTolerance = 1.0;
+	public static final double kCollectWithCubeMaxVelocity = 50.0;
 
 	public static final double kShootDuration = 0.5;
 	public static final double kShootCollectDuration = 0.1;
