@@ -126,12 +126,13 @@ public class IntakeSubsystem extends SubsystemBase {
 	public Command lowerIntakeCommand() {
 		return new StartEndCommand(() -> {
 			this.setAngleMotorWithLimits(-IntakeConstants.kAngleMotorDefaultOutput);
-			this.intakeMotor.set(IntakeConstants.kIntakeMotorCollectOutput / 5.0);
-		}, () -> {
 			this.intakeMotor.set(IntakeConstants.kIntakeMotorCollectOutput);
+		}, () -> {
+			this.intakeMotor.set(0.0);
 			this.setAngleMotorWithLimits(0.0);
 			this.isIntakeLowered = true;
-		}, this).until(() -> !this.lowerLimit.get());
+		}, this).until(
+				() -> !this.lowerLimit.get() && this.getIntakeVelocity() < IntakeConstants.kCollectWithCubeMaxVelocity);
 	}
 
 	/** Raises the intake untill the limit switch is pressed. */
@@ -153,10 +154,6 @@ public class IntakeSubsystem extends SubsystemBase {
 						this.angleMotor.set(IntakeConstants.kAngleMotorKeepInPlaceOutput * -3.0);
 					} else {
 						this.setAngleMotorWithLimits(IntakeConstants.kAngleMotorKeepInPlaceOutput);
-					}
-					if (this.getIntakeVelocity() < IntakeConstants.kCollectWithCubeMaxVelocity
-							&& this.isIntakeLowered) {
-						this.intakeMotor.set(0.0);
 					}
 				},
 				this);
@@ -189,7 +186,8 @@ public class IntakeSubsystem extends SubsystemBase {
 						}, () -> {
 							this.intakeMotor.set(0.0);
 						}, this)
-								.withTimeout(IntakeConstants.kShootDuration));
+								.withTimeout(IntakeConstants.kShootDuration))
+				.andThen(this.raiseIntakeCommand());
 	}
 
 	public Command autoCollectPieceCommand() {
