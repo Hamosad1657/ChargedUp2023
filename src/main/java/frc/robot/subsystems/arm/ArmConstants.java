@@ -20,9 +20,9 @@ public class ArmConstants {
 	/** For homing - The lowest angle the arm can go to when it's extended. */
 	public static final double kHomingExtendedMinAngle = 80.0;
 
-	public static final PIDGains kAnglePIDGains = new PIDGains(0.02725, 0.0075, 0.0);
+	public static final PIDGains kAnglePIDGains = new PIDGains(0.025, 0.0075, 0.0);
 	public static final double kAngleTolerance = 1.0;
-	public static final double kAngleMotorMaxPIDOutput = 0.75;
+	public static final double kAngleMotorMaxPIDOutput = 0.7;
 	public static final double kAngleDownOutputRatio = 0.5;
 
 	public static final double kLengthRetractMinAngle = 50.0;
@@ -33,11 +33,15 @@ public class ArmConstants {
 			kAngleMaxAccelerationDegPS);
 
 	public static final double kAngleTeleopSetpointMultiplier = 1.25;
-	public static final double kAngleMaxSetpoint = 119.0;
 	public static final double kAngleMinSetpoint = 35.0;
+	public static final double kAngleMaxSetpoint = 119.0;
 
 	public static final PIDGains kArmLengthPIDGains = new PIDGains(0.0015, 0.0000325, 0.0);
 	public static final double kLengthTolerance = 75.0;
+
+	public static final double kLengthTeleopSetpointMultiplier = 20.0;
+	public static final double kLengthMinSetpoint = 250.0;
+	public static final double kLengthMaxSetpoint = 3200.0;
 
 	public static enum ArmState {
 		// Uses the relativity of the encoders as setpoints

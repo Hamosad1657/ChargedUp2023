@@ -1,0 +1,263 @@
+{
+  "waypoints": [
+    {
+      "anchorPoint": {
+        "x": 4.361834864020606,
+        "y": 0.57
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 4.579613359974328,
+        "y": 0.57
+      },
+      "holonomicAngle": 90.0,
+      "isReversal": false,
+      "velOverride": 1.0,
+      "isLocked": false,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [],
+        "executionBehavior": "parallel",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 4.652019304038609,
+        "y": 0.5712560547928115
+      },
+      "prevControl": {
+        "x": 4.486539019168257,
+        "y": 0.5712560547928115
+      },
+      "nextControl": {
+        "x": 4.8174995889089605,
+        "y": 0.5712560547928115
+      },
+      "holonomicAngle": -270.0,
+      "isReversal": false,
+      "velOverride": 1.0,
+      "isLocked": false,
+      "isStopPoint": true,
+      "stopEvent": {
+        "names": [
+          "GetIntakeToAngle",
+          "ShootGamePiece"
+        ],
+        "executionBehavior": "sequential",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 5.304934294079115,
+        "y": 0.7798261210557514
+      },
+      "prevControl": {
+        "x": 4.908503854713997,
+        "y": 0.7550492185954308
+      },
+      "nextControl": {
+        "x": 5.5951187340971185,
+        "y": 0.7979626485568772
+      },
+      "holonomicAngle": 90.0,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [],
+        "executionBehavior": "parallel",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 6.084804976627497,
+        "y": 0.8886452860625026
+      },
+      "prevControl": {
+        "x": 5.839961855362308,
+        "y": 0.8433039673096898
+      },
+      "nextControl": {
+        "x": 6.329648097892687,
+        "y": 0.9339866048153154
+      },
+      "holonomicAngle": -90.0,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": true,
+      "stopEvent": {
+        "names": [
+          "WaitABitMore"
+        ],
+        "executionBehavior": "parallel",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 6.973494824182631,
+        "y": 0.8795770223119402
+      },
+      "prevControl": {
+        "x": 6.869209791051161,
+        "y": 0.8523722310602527
+      },
+      "nextControl": {
+        "x": 7.077779857314101,
+        "y": 0.9067818135636277
+      },
+      "holonomicAngle": 270.0,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [],
+        "executionBehavior": "parallel",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 4.579473194034107,
+        "y": 0.8433039673096898
+      },
+      "prevControl": {
+        "x": 4.267882231686245,
+        "y": 0.7728573149527819
+      },
+      "nextControl": {
+        "x": 5.622323525348806,
+        "y": 1.0790788248243168
+      },
+      "holonomicAngle": 90.0,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": true,
+      "stopEvent": {
+        "names": [
+          "ShootGamePiece"
+        ],
+        "executionBehavior": "sequential",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 5.985054075371309,
+        "y": 2.1219291561390143
+      },
+      "prevControl": {
+        "x": 6.148684674397187,
+        "y": 0.7310690644190061
+      },
+      "nextControl": {
+        "x": 5.966917547870184,
+        "y": 2.2760896398985793
+      },
+      "holonomicAngle": -90.0,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": true,
+      "stopEvent": {
+        "names": [
+          "WaitABitMore"
+        ],
+        "executionBehavior": "parallel",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 6.810266076672505,
+        "y": 2.1219291561390143
+      },
+      "prevControl": {
+        "x": 6.619832537910691,
+        "y": 2.303294431150266
+      },
+      "nextControl": {
+        "x": 7.059886067836071,
+        "y": 1.8841958312213334
+      },
+      "holonomicAngle": -90.0,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [],
+        "executionBehavior": "parallel",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 4.6066779852857955,
+        "y": 0.9158500773141907
+      },
+      "prevControl": {
+        "x": 5.6495283166004935,
+        "y": -0.000044561492630990074
+      },
+      "nextControl": null,
+      "holonomicAngle": 90.0,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [
+          "ShootGamePiece"
+        ],
+        "executionBehavior": "sequential",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    }
+  ],
+  "maxVelocity": 4.0,
+  "maxAcceleration": 4.0,
+  "isReversed": null,
+  "markers": [
+    {
+      "position": 1.1454545454545457,
+      "names": [
+        "OpenIntake"
+      ]
+    },
+    {
+      "position": 3.32727272727273,
+      "names": [
+        "GetIntakeToAngle"
+      ]
+    },
+    {
+      "position": 5.4,
+      "names": [
+        "OpenIntake"
+      ]
+    },
+    {
+      "position": 7.3,
+      "names": [
+        "GetIntakeToAngle"
+      ]
+    }
+  ]
+}

@@ -153,7 +153,7 @@ public class IntakeSubsystem extends SubsystemBase {
 					if (this.isIntakeLowered) {
 						this.angleMotor.set(IntakeConstants.kAngleMotorKeepInPlaceOutput * -3.0);
 					} else {
-						this.setAngleMotorWithLimits(IntakeConstants.kAngleMotorKeepInPlaceOutput);
+						this.angleMotor.set(IntakeConstants.kAngleMotorKeepInPlaceOutput);
 					}
 				},
 				this);

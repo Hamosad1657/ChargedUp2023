@@ -17,6 +17,7 @@ import frc.robot.subsystems.arm.ArmSubsystem;
 import frc.robot.subsystems.grabber.GrabberSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.intake.IntakeConstants.ShootHeight;
+import frc.robot.subsystems.swerve.SwerveConstants;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 import frc.robot.subsystems.turret.TurretConstants;
 import frc.robot.subsystems.turret.TurretSubsystem;
@@ -58,8 +59,10 @@ public class RobotContainer {
 		this.driverA_CommandController.L3().onTrue(new InstantCommand(this.swerve::toggleTeleopSwerveSpeed));
 
 		// Intake
-		this.driverA_CommandController.R2().onTrue(this.intake.lowerIntakeCommand());
-		this.driverA_CommandController.L2().onTrue(this.intake.raiseIntakeCommand());
+		this.driverA_CommandController.R2().onTrue(
+				this.intake.lowerIntakeCommand().alongWith(new InstantCommand(() -> this.swerve.setTeleopSpeed(SwerveConstants.kSwerveTranslateRatioSlow, SwerveConstants.kSwerveRotationRatioSlow))));
+		this.driverA_CommandController.L2().onTrue(
+				this.intake.raiseIntakeCommand().alongWith(new InstantCommand(() -> this.swerve.setTeleopSpeed(SwerveConstants.kSwerveTranslateRatioFast, SwerveConstants.kSwerveRotationRatioFast))));
 		this.driverA_CommandController.triangle().onTrue(this.intake.getToShootHeightCommand(ShootHeight.kHigh));
 		this.driverA_CommandController.square().onTrue(this.intake.getToShootHeightCommand(ShootHeight.kMid));
 		this.driverA_CommandController.cross().onTrue(this.intake.getToShootHeightCommand(ShootHeight.kLow));

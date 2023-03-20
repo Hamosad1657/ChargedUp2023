@@ -228,10 +228,18 @@ public class SwerveSubsystem extends SubsystemBase {
 		if (this.currentSwerveTranslateRatio == SwerveConstants.kSwerveTranslateRatioFast) {
 			this.currentSwerveTranslateRatio = SwerveConstants.kSwerveTranslateRatioSlow;
 			this.currentSwerveRotationRatio = SwerveConstants.kSwerveRotationRatioSlow;
-		} else {
+		} else if(this.currentSwerveTranslateRatio == SwerveConstants.kSwerveTranslateRatioSlow){
 			this.currentSwerveTranslateRatio = SwerveConstants.kSwerveTranslateRatioFast;
 			this.currentSwerveRotationRatio = SwerveConstants.kSwerveRotationRatioFast;
+		} else {
+			this.currentSwerveTranslateRatio = SwerveConstants.kSwerveTranslateRatioSlow;
+			this.currentSwerveRotationRatio = SwerveConstants.kSwerveRotationRatioSlow;
 		}
+	}
+
+	public void setTeleopSpeed(double translationSpeedRatio, double rotationSpeedRatio){
+		this.currentSwerveTranslateRatio = translationSpeedRatio;
+		this.currentSwerveRotationRatio = rotationSpeedRatio;
 	}
 
 	/** Enable or disable angle correction. */
@@ -311,7 +319,7 @@ public class SwerveSubsystem extends SubsystemBase {
 	 */
 	public void zeroGyro() {
 		this.gyro.setYaw(SwerveConstants.kNavxYawOffsetFromFrontDeg);
-		this.teleopAngleSetpointRad = Math.PI;
+		this.teleopAngleSetpointRad = this.getYaw().getRadians();
 	}
 
 	/**
@@ -540,7 +548,7 @@ public class SwerveSubsystem extends SubsystemBase {
 		this.addPath("Low Cone & Cube", false, true, false);
 		this.addPath("Low Cone & Cube Intake", false, true, false);
 		this.addPath("Low Cone & Two Low Cube Link", false, false, false);
-		this.addPath("Practice Station", true, false, false);
+		this.addPath("Practice Cable", false, false, false);
 	}
 
 	/**

@@ -121,7 +121,8 @@ public class ArmSubsystem extends SubsystemBase {
 	}
 
 	/**
-	 * @param output - The output of the angle motor in [-1.0, 1.0]. Positive output: arm goes up, negative output: arm
+	 * @param output - The output of the angle motor in [-1.0, 1.0]. Positive
+	 *               output: arm goes up, negative output: arm
 	 *               goes down. Doesn't slow near the limits.
 	 */
 	public void setAngleMotorWithLimits(double output) {
@@ -134,7 +135,8 @@ public class ArmSubsystem extends SubsystemBase {
 	}
 
 	/**
-	 * @param output - The output of the length motor in [-1.0, 1.0]. Positive output extends, negative output retracts.
+	 * @param output - The output of the length motor in [-1.0, 1.0]. Positive
+	 *               output extends, negative output retracts.
 	 *               Doesn't slow near the limits.
 	 */
 	public void setLengthMotorWithLimits(double output) {
@@ -239,11 +241,14 @@ public class ArmSubsystem extends SubsystemBase {
 	}
 
 	/**
-	 * Returns a RunCommand to manually control the arm's length and angle using 3 output suppliers.
+	 * Returns a RunCommand to manually control the arm's length and angle using 3
+	 * output suppliers.
 	 * 
 	 * @param angleOutputSupplier     - The output supplier for the angle motor.
-	 * @param forwardsOutputSupplier  - The output supplier for the arm's forwards extension.
-	 * @param backwardsOutputSupplier - The output supplier for the arm's backwards retraction.
+	 * @param forwardsOutputSupplier  - The output supplier for the arm's forwards
+	 *                                extension.
+	 * @param backwardsOutputSupplier - The output supplier for the arm's backwards
+	 *                                retraction.
 	 */
 	public Command openLoopTeleopCommand(DoubleSupplier angleOutputSupplier, DoubleSupplier forwardsOutputSupplier,
 			DoubleSupplier backwardsOutputSupplier) {
@@ -258,11 +263,14 @@ public class ArmSubsystem extends SubsystemBase {
 	}
 
 	/**
-	 * Returns a RunCommand to manually change the arm's state using 3 output suppliers.
+	 * Returns a RunCommand to manually change the arm's state using 3 output
+	 * suppliers.
 	 * 
 	 * @param angleOutputSupplier     - The output supplier for the angle motor.
-	 * @param forwardsOutputSupplier  - The output supplier for the arm's forwards extension.
-	 * @param backwardsOutputSupplier - The output supplier for the arm's backwards retraction.
+	 * @param forwardsOutputSupplier  - The output supplier for the arm's forwards
+	 *                                extension.
+	 * @param backwardsOutputSupplier - The output supplier for the arm's backwards
+	 *                                retraction.
 	 */
 	public Command closedLoopTeleopCommand(DoubleSupplier angleOutputSupplier, DoubleSupplier forwardsOutputSupplier,
 			DoubleSupplier backwardsOutputSupplier) {
@@ -276,8 +284,13 @@ public class ArmSubsystem extends SubsystemBase {
 			this.setAngleMotorWithLimits(this.calculateAngleMotorOutput());
 
 			// Set length motors
-			double lengthSupplierValue = backwardsOutputSupplier.getAsDouble() - forwardsOutputSupplier.getAsDouble();
-			this.setLengthMotorWithLimits(lengthSupplierValue * ArmConstants.kLengthMotorMaxOutput);
+			double lengthSupplierValue = forwardsOutputSupplier.getAsDouble() - backwardsOutputSupplier.getAsDouble();
+			double newLengthSetpoint = this.lengthPIDController.getSetpoint()
+					+ lengthSupplierValue * ArmConstants.kLengthTeleopSetpointMultiplier;
+			newLengthSetpoint = MathUtil.clamp(newLengthSetpoint, ArmConstants.kLengthMinSetpoint,
+					ArmConstants.kLengthMaxSetpoint);
+			this.lengthPIDController.setSetpoint(newLengthSetpoint);
+			this.setLengthMotorWithLimits(this.calculateLengthMotorOutput());
 		}, this);
 	}
 
