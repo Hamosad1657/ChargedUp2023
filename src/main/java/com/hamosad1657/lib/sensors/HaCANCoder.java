@@ -12,13 +12,14 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 
 public class HaCANCoder implements Sendable {
 	public final WPI_CANCoder cancoder;
-	private int direction = 1;
+	private boolean isReversed = false;
 	private CANCoderSimCollection simCANCoder;
 	private double simAngleDeg = 0, simVelocityDegPS = 0;
 
 	/**
 	 * @param CanId
-	 * @param offsetDeg - To find the offset, set the mechanism in the desired zero position and set the measured angle
+	 * @param offsetDeg - To find the offset, set the mechanism in the desired zero
+	 *                  position and set the measured angle
 	 *                  as the offset.
 	 */
 	public HaCANCoder(int CanId, double offsetDeg) {
@@ -37,8 +38,10 @@ public class HaCANCoder implements Sendable {
 	}
 
 	/**
-	 * @param offsetDeg - Adjusts the zero point for the absolute position. To find the offset, set the mechanism in the
-	 *                  desired zero position and set the measured angle as the offset.
+	 * @param offsetDeg - Adjusts the zero point for the absolute position. To find
+	 *                  the offset, set the mechanism in the
+	 *                  desired zero position and set the measured angle as the
+	 *                  offset.
 	 */
 	public void setOffset(double offsetDeg) {
 		this.cancoder.configMagnetOffset(-offsetDeg);
@@ -56,6 +59,10 @@ public class HaCANCoder implements Sendable {
 	}
 
 	public double getAbsAngleDeg() {
+		if (this.isReversed) {
+			return 360.0 - this.cancoder.getAbsolutePosition();
+		}
+
 		return this.cancoder.getAbsolutePosition();
 	}
 
@@ -63,11 +70,7 @@ public class HaCANCoder implements Sendable {
 	 * Reverses the relative accumulated angle.
 	 */
 	public void setReversed(boolean reversed) {
-		if (reversed) {
-			this.direction = -1;
-		} else {
-			this.direction = 1;
-		}
+		this.isReversed = reversed;
 	}
 
 	/**
@@ -86,7 +89,7 @@ public class HaCANCoder implements Sendable {
 	}
 
 	public double getPositionDeg() {
-		return this.cancoder.getPosition() * direction;
+		return this.cancoder.getPosition();
 	}
 
 	public double getPositionRad() {
@@ -141,37 +144,37 @@ public class HaCANCoder implements Sendable {
 
 	public void setSimAngleDeg(double angleDeg) {
 		this.simAngleDeg = angleDeg;
-		this.simCANCoder.setRawPosition((int)HaUnitConvertor.degreesToCANCoderTicks(simAngleDeg));
+		this.simCANCoder.setRawPosition((int) HaUnitConvertor.degreesToCANCoderTicks(simAngleDeg));
 	}
 
 	public void setSimAngleRad(double angleRad) {
 		this.simAngleDeg = HaUnitConvertor.radToDeg(angleRad);
-		this.simCANCoder.setRawPosition((int)HaUnitConvertor.degreesToCANCoderTicks(simAngleDeg));
+		this.simCANCoder.setRawPosition((int) HaUnitConvertor.degreesToCANCoderTicks(simAngleDeg));
 	}
 
 	public void setSimAngleRotation2d(Rotation2d angleRotation2d) {
 		this.simAngleDeg = angleRotation2d.getDegrees();
-		this.simCANCoder.setRawPosition((int)HaUnitConvertor.degreesToCANCoderTicks(simAngleDeg));
+		this.simCANCoder.setRawPosition((int) HaUnitConvertor.degreesToCANCoderTicks(simAngleDeg));
 	}
 
 	public void setSimVelocityDegPS(double degPS) {
 		this.simVelocityDegPS = degPS;
-		this.simCANCoder.setVelocity((int)HaUnitConvertor.degPSToCANCoderTicksPer100ms(this.simVelocityDegPS));
+		this.simCANCoder.setVelocity((int) HaUnitConvertor.degPSToCANCoderTicksPer100ms(this.simVelocityDegPS));
 	}
 
 	public void setSimVelocityRadPS(double radPS) {
 		this.simVelocityDegPS = HaUnitConvertor.radToDeg(radPS);
-		this.simCANCoder.setVelocity((int)HaUnitConvertor.degPSToCANCoderTicksPer100ms(this.simVelocityDegPS));
+		this.simCANCoder.setVelocity((int) HaUnitConvertor.degPSToCANCoderTicksPer100ms(this.simVelocityDegPS));
 	}
 
 	public void setSimVelocityMPS(double MPS, double wheelRadiusM) {
 		this.simVelocityDegPS = HaUnitConvertor.MPSToDegPS(MPS, wheelRadiusM);
-		this.simCANCoder.setVelocity((int)HaUnitConvertor.degPSToCANCoderTicksPer100ms(this.simVelocityDegPS));
+		this.simCANCoder.setVelocity((int) HaUnitConvertor.degPSToCANCoderTicksPer100ms(this.simVelocityDegPS));
 	}
 
 	public void setSimVelocityRPM(double RPM) {
 		this.simVelocityDegPS = HaUnitConvertor.RPMToDegPS(RPM);
-		this.simCANCoder.setVelocity((int)HaUnitConvertor.degPSToCANCoderTicksPer100ms(this.simVelocityDegPS));
+		this.simCANCoder.setVelocity((int) HaUnitConvertor.degPSToCANCoderTicksPer100ms(this.simVelocityDegPS));
 	}
 
 	// Private unit convertors
