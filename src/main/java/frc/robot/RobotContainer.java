@@ -68,6 +68,7 @@ public class RobotContainer {
 		this.driverA_CommandController.cross().onTrue(this.intake.getToShootHeightCommand(ShootHeight.kLow));
 		this.driverA_CommandController.circle().onTrue(this.intake.getToShootHeightCommand(ShootHeight.kFar));
 		this.driverA_CommandController.R1().onTrue(this.intake.shootCommand());
+		
 		this.driverA_CommandController.L1().onTrue(this.intake.shootCommand());
 
 		// Arm
