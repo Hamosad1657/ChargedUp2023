@@ -40,7 +40,7 @@ public class ArmConstants {
 	public static final double kLengthTolerance = 75.0;
 
 	public static final double kLengthTeleopSetpointMultiplier = 20.0;
-	public static final double kLengthMinSetpoint = 250.0;
+	public static final double kLengthMinSetpoint = 0.0;
 	public static final double kLengthMaxSetpoint = 3200.0;
 
 	public static enum ArmState {

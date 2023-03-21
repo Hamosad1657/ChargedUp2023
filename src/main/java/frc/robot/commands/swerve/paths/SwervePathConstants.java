@@ -123,10 +123,13 @@ public final class SwervePathConstants {
 		SwervePathConstants.kPathCommandsMap.put("ReleaseGamePiece", grabber.releaseCommand());
 
 		// Intake
-		SwervePathConstants.kPathCommandsMap.put("OpenIntake", intake.lowerIntakeCommand());
-		SwervePathConstants.kPathCommandsMap.put("CloseIntake", intake.raiseIntakeCommand());
-		SwervePathConstants.kPathCommandsMap.put("GetIntakeToAngle", intake.getToShootHeightCommand(ShootHeight.kAuto));
+		SwervePathConstants.kPathCommandsMap.put("OpenIntake",
+				intake.lowerIntakeCommand());
+		SwervePathConstants.kPathCommandsMap.put("CloseIntake", intake.autoRaiseIntakeCommand());
+		SwervePathConstants.kPathCommandsMap.put("GetIntakeToAngle",
+				intake.getToShootHeightCommand(ShootHeight.kAuto).withTimeout(0.75));
 		SwervePathConstants.kPathCommandsMap.put("ShootGamePiece", intake.shootCommand());
+		SwervePathConstants.kPathCommandsMap.put("CollectGamePiece", intake.autoCollectPieceCommand());
 
 		// Pickups
 		SwervePathConstants.kPathCommandsMap.put("PickupCone", arm.pickupConeCommand());

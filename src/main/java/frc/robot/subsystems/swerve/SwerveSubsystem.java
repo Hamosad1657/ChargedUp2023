@@ -228,7 +228,7 @@ public class SwerveSubsystem extends SubsystemBase {
 		if (this.currentSwerveTranslateRatio == SwerveConstants.kSwerveTranslateRatioFast) {
 			this.currentSwerveTranslateRatio = SwerveConstants.kSwerveTranslateRatioSlow;
 			this.currentSwerveRotationRatio = SwerveConstants.kSwerveRotationRatioSlow;
-		} else if(this.currentSwerveTranslateRatio == SwerveConstants.kSwerveTranslateRatioSlow){
+		} else if (this.currentSwerveTranslateRatio == SwerveConstants.kSwerveTranslateRatioSlow) {
 			this.currentSwerveTranslateRatio = SwerveConstants.kSwerveTranslateRatioFast;
 			this.currentSwerveRotationRatio = SwerveConstants.kSwerveRotationRatioFast;
 		} else {
@@ -237,7 +237,7 @@ public class SwerveSubsystem extends SubsystemBase {
 		}
 	}
 
-	public void setTeleopSpeed(double translationSpeedRatio, double rotationSpeedRatio){
+	public void setTeleopSpeed(double translationSpeedRatio, double rotationSpeedRatio) {
 		this.currentSwerveTranslateRatio = translationSpeedRatio;
 		this.currentSwerveRotationRatio = rotationSpeedRatio;
 	}
@@ -548,40 +548,58 @@ public class SwerveSubsystem extends SubsystemBase {
 		this.addPath("Low Cone & Cube", false, true, false);
 		this.addPath("Low Cone & Cube Intake", false, true, false);
 		this.addPath("Low Cone & Two Low Cube Link", false, false, false);
+		this.addPath("Three Low Cube");
 		this.addPath("Practice Cable", false, false, false);
+	}
+
+	/**
+	 * Creates a path with no additional commands.
+	 * 
+	 * @param name - The name of the path.
+	 */
+	private void addPath(String name) {
+		this.addPath(name, false, false, false, false);
+	}
+
+	private void addPath(String name, boolean balanceAtEnd, boolean retractAtStart, boolean startHigh) {
+		this.addPath(name, balanceAtEnd, retractAtStart, startHigh, true);
 	}
 
 	/**
 	 * Adds a single path to the drop-down menue in the shuffleboard.
 	 * 
-	 * @param name          - The name of the path.
-	 * @param balanceAtEnd  - Should the robot balance at the end of the path.
-	 * @param startWithCube - Should the robot retract instead of home the arm at
-	 *                      the start of the path.
+	 * @param name           - The name of the path.
+	 * @param balanceAtEnd   - Should the robot balance at the end of the path.
+	 * @param retractAtStart - Should the arm retract at the start instead of
+	 *                       homing.
+	 * @param startHigh      - Should the robot start with a high dropoff or not.
+	 * @param extraCommands  - Use the extra commands like retracting, homing.
 	 */
-	private void addPath(String name, boolean balanceAtEnd, boolean retractAtStart, boolean startHigh) {
+	private void addPath(String name, boolean balanceAtEnd, boolean retractAtStart, boolean startHigh,
+			boolean extraCommands) {
 		ArrayList<Command> commandList = new ArrayList<Command>();
-		if (startHigh) {
-			commandList.add(GrabberSubsystem.getInstance().collectCommand());
+		if (extraCommands) {
+			if (startHigh) {
+				commandList.add(GrabberSubsystem.getInstance().collectCommand());
+			} else {
+				commandList.add(new SequentialCommandGroup(GrabberSubsystem.getInstance().collectCommand(),
+						new WaitCommand(0.2), GrabberSubsystem.getInstance().releaseCommand()));
+			}
 
+			if (retractAtStart) {
+				commandList.add(ArmSubsystem.getInstance().retractCommand());
+			} else {
+				commandList.add(ArmSubsystem.getInstance().autoHomeCommand());
+			}
+
+			commandList.add(this.getPathPlannerAutoCommand(name));
+
+			if (balanceAtEnd) {
+				commandList.add(new BalanceChassisCommand(this));
+			}
 		} else {
-			commandList.add(new SequentialCommandGroup(GrabberSubsystem.getInstance().collectCommand(),
-					new WaitCommand(0.2), GrabberSubsystem.getInstance().releaseCommand()));
-
+			commandList.add(this.getPathPlannerAutoCommand(name));
 		}
-
-		if (retractAtStart) {
-			commandList.add(ArmSubsystem.getInstance().retractCommand());
-		} else {
-			commandList.add(ArmSubsystem.getInstance().autoHomeCommand());
-		}
-
-		commandList.add(this.getPathPlannerAutoCommand(name));
-
-		if (balanceAtEnd) {
-			commandList.add(new BalanceChassisCommand(this));
-		}
-
 		commandList.add(this.crossLockWheelsCommand());
 
 		Command[] commandArray = new Command[commandList.size()];

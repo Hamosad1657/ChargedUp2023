@@ -49,7 +49,7 @@ public class IntakeSubsystem extends SubsystemBase {
 		this.angleMotor = new CANSparkMax(RobotMap.kIntakeAngleMotorID, MotorType.kBrushless);
 		this.angleMotor.setIdleMode(IdleMode.kBrake);
 
-		this.angleController = IntakeConstants.kIntakeMotorGains.toPIDController();
+		this.angleController = IntakeConstants.kAngleMotorGains.toPIDController();
 		this.angleController.setTolerance(IntakeConstants.kAngleTolerance);
 
 		this.angleCANCoder = new HaCANCoder(RobotMap.kIntakeAngleCANCoderID, IntakeConstants.kAngleCANCoderOffset);
@@ -110,7 +110,11 @@ public class IntakeSubsystem extends SubsystemBase {
 
 	public double calculateAngleMotorOutput() {
 		double output = this.angleController.calculate(this.angleCANCoder.getAbsAngleDeg())
-				+ IntakeConstants.kBalanceFFOutput;
+				+ this.angleCANCoder.getAbsAngleDeg() > IntakeConstants.kInitialPIDBoostMaxAngle
+						? -IntakeConstants.kIntitailPIDBoost
+						: this.angleCANCoder.getAbsAngleDeg() < IntakeConstants.kInitialPIDBoostMinAngle
+								? IntakeConstants.kIntitailPIDBoost * 1.5
+								: IntakeConstants.kKeepIntakeUpOutput;
 
 		if (this.angleController.atSetpoint()) {
 			return 0.0;
@@ -192,17 +196,22 @@ public class IntakeSubsystem extends SubsystemBase {
 
 	public Command autoCollectPieceCommand() {
 		return new StartEndCommand(() -> {
+			this.setAngleMotorWithLimits(-IntakeConstants.kAngleMotorDefaultOutput);
 			this.intakeMotor.set(IntakeConstants.kIntakeMotorCollectOutput);
 		}, () -> {
-			this.intakeMotor.set(0.0);
-		}, this).withTimeout(IntakeConstants.kShootDuration);
+			this.setAngleMotorWithLimits(IntakeConstants.kAngleMotorKeepInPlaceOutput * -3.0);
+		}, this).until(() -> !this.lowerLimit.get()).andThen(
+				new StartEndCommand(() -> {
+				}, () -> {
+					this.intakeMotor.set(0.0);
+				}, this).withTimeout(10.0));
 	}
 
-	public Command autoReleasePieceCommand() {
+	public Command autoRaiseIntakeCommand() {
 		return new StartEndCommand(() -> {
-			this.intakeMotor.set(-ShootHeight.kAuto.motorOutput);
+			this.setAngleMotorWithLimits(IntakeConstants.kAngleMotorDefaultOutput * 1.35);
 		}, () -> {
-			this.intakeMotor.set(0.0);
-		}, this).withTimeout(IntakeConstants.kShootDuration);
+			this.setAngleMotorWithLimits(0.0);
+		}, this).until(() -> !this.raiseLimit.get());
 	}
 }
