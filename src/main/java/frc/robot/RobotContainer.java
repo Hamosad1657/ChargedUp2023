@@ -16,6 +16,8 @@ import frc.robot.subsystems.arm.ArmConstants.ArmState;
 import frc.robot.subsystems.arm.ArmSubsystem;
 import frc.robot.subsystems.grabber.GrabberSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
+import frc.robot.subsystems.intake.IntakeConstants.ShootHeight;
+import frc.robot.subsystems.swerve.SwerveConstants;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 import frc.robot.subsystems.turret.TurretConstants;
 import frc.robot.subsystems.turret.TurretSubsystem;
@@ -53,12 +55,20 @@ public class RobotContainer {
 	private void configureButtonsBindings() {
 		// Swerve
 		this.driverA_CommandController.share().onTrue(new InstantCommand(this.swerve::zeroGyro));
-		this.driverA_CommandController.cross().onTrue(this.swerve.crossLockWheelsCommand());
-		this.driverA_CommandController.triangle().onTrue(new InstantCommand(this.swerve::toggleSwerveSpeed));
+		this.driverA_CommandController.PS().onTrue(this.swerve.crossLockWheelsCommand());
+		this.driverA_CommandController.L3().onTrue(new InstantCommand(this.swerve::toggleTeleopSwerveSpeed));
 
 		// Intake
-		this.driverA_CommandController.R2().onTrue(this.intake.lowerIntakeCommand());
-		this.driverA_CommandController.L2().onTrue(this.intake.raiseIntakeCommand());
+		this.driverA_CommandController.R2().onTrue(
+				this.intake.lowerIntakeCommand().alongWith(new InstantCommand(() -> this.swerve.setTeleopSpeed(SwerveConstants.kSwerveTranslateRatioSlow, SwerveConstants.kSwerveRotationRatioSlow))));
+		this.driverA_CommandController.L2().onTrue(
+				this.intake.raiseIntakeCommand().alongWith(new InstantCommand(() -> this.swerve.setTeleopSpeed(SwerveConstants.kSwerveTranslateRatioFast, SwerveConstants.kSwerveRotationRatioFast))));
+		this.driverA_CommandController.triangle().onTrue(this.intake.getToShootHeightCommand(ShootHeight.kHigh));
+		this.driverA_CommandController.square().onTrue(this.intake.getToShootHeightCommand(ShootHeight.kMid));
+		this.driverA_CommandController.cross().onTrue(this.intake.getToShootHeightCommand(ShootHeight.kLow));
+		this.driverA_CommandController.circle().onTrue(this.intake.getToShootHeightCommand(ShootHeight.kFar));
+		this.driverA_CommandController.R1().onTrue(this.intake.shootCommand());
+		this.driverA_CommandController.L1().onTrue(this.intake.shootCommand());
 
 		// Arm
 		this.driverB_CommandController.povUp()
@@ -96,16 +106,15 @@ public class RobotContainer {
 		this.driverB_CommandController.triangle().onTrue(this.grabber.releaseCommand());
 
 		// Turret
-		this.driverB_CommandController.R1()
-				.onTrue(new InstantCommand(() -> this.turret.setSetpoint(TurretConstants.kFrontRotationSetpoint)));
 		this.driverB_CommandController.L1()
-				.onTrue(new InstantCommand(() -> this.turret.setSetpoint(TurretConstants.kBackRotationSetpoint)));
+				.onTrue(new InstantCommand(() -> this.turret.setSetpoint(TurretConstants.kFrontRotationSetpoint)));
 	}
 
 	private void setDefaultCommands() {
 		// All of the actions are detailed in the DRIVING_INSTRUCTIONS.md file.
 
-		// Swerve teleop driving - Left stick for X and Y movement, right X for rotation.
+		// Swerve teleop driving - Left stick for X and Y movement, right X for
+		// rotation.
 		this.swerve.setDefaultCommand(new TeleopDriveCommand(this.swerve,
 				() -> HaUnits.deadband(driverA_Controller.getLeftX(), kJoystickDeadband),
 				() -> HaUnits.deadband(-driverA_Controller.getLeftY(), kJoystickDeadband),
@@ -122,7 +131,7 @@ public class RobotContainer {
 				() -> HaUnits.deadband((driverB_Controller.getL2Axis() + 1.0), kJoystickDeadband)));
 
 		// Intake keep up - Not teleop
-		this.intake.setDefaultCommand(this.intake.keepIntakeUpCommand());
+		this.intake.setDefaultCommand(this.intake.keepInPlaceCommand());
 	}
 
 	/**
@@ -141,7 +150,7 @@ public class RobotContainer {
 		ShuffleboardTab autoTab = Shuffleboard.getTab("Auto");
 		this.comboBoxChooser = new SendableChooser<Command>();
 
-		SwervePathConstants.kPaths.forEach((name, command) -> comboBoxChooser.addOption(name, command));
+		SwervePathConstants.kAutoOptionsMap.forEach((name, command) -> comboBoxChooser.addOption(name, command));
 		autoTab.add("Path Chooser", this.comboBoxChooser).withWidget("ComboBox Chooser").withSize(3, 2);
 	}
 }

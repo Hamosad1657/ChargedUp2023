@@ -3,27 +3,29 @@ package frc.robot.subsystems.swerve;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.hamosad1657.lib.math.HaUnits.PIDGains;
+import com.hamosad1657.lib.swerve.SwerveModuleConstants;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import frc.fusionLib.swerve.SwerveModuleConstants;
 import frc.robot.RobotMap;
 
 public final class SwerveConstants {
 	public static final boolean invertGyro = false; // HaNavX already inverts the navX
+	public static final double kNavxYawOffsetFromFrontDeg = 90.0;
 	public static final double kSwerveTranslateRatioFast = 0.9, kSwerveRotationRatioFast = 0.8;
 	public static final double kSwerveTranslateRatioSlow = 0.3, kSwerveRotationRatioSlow = 0.3;
 	public static final double kSpeedModeRateLimit = 0.75;
 	public static final double robotIsMovingThresholdMPS = 0.1;
 
 	/* Drivetrain Constants */
-	public static final double kTrackWidthM = 0.42;
-	public static final double kWheelBaseM = 0.42;
+	public static final double kTrackWidthM = 0.5903;
+	public static final double kWheelBaseM = 0.5903;
 	public static final double kWheelDiameterM = 0.1016;
 	public static final double kWheelCircumferenceM = kWheelDiameterM * Math.PI;
 
 	/*
-	 * Swerve Kinematics No need to ever change this unless you are not doing a traditional rectangular/square 4 module
+	 * Swerve Kinematics No need to ever change this unless you are not doing a
+	 * traditional rectangular/square 4 module
 	 * swerve
 	 */
 	public static final SwerveDriveKinematics kSwerveKinematics = new SwerveDriveKinematics(
@@ -54,7 +56,8 @@ public final class SwerveConstants {
 	public static final double kDrivePeakCurrentTimeSec = 0.1;
 
 	/*
-	 * These values are used by the drive falcon to ramp in open loop and closed loop driving. We found a small open
+	 * These values are used by the drive falcon to ramp in open loop and closed
+	 * loop driving. We found a small open
 	 * loop ramp (0.25) helps with tread wear, tipping, etc.
 	 */
 	public static final double kOpenLoopRampRate = 0.25;
@@ -73,7 +76,8 @@ public final class SwerveConstants {
 	public static final double kDriveFF = 0.0;
 
 	/*
-	 * Used so that the error is in radians and the output is in RadPS. So for example, if kP is 0.5, and you have an
+	 * Used so that the error is in radians and the output is in RadPS. So for
+	 * example, if kP is 0.5, and you have an
 	 * error of 1 radian, it will output 0.5 radians per second.
 	 */
 
@@ -100,8 +104,10 @@ public final class SwerveConstants {
 	/* Module Specific Constants */
 
 	/*
-	 * To find the offsets set them to zero, deploy, turn the wheels so they all point forwards with the bevel gears
-	 * facing to the left, then take the angle displayed in the "swerve" tab in the Shuffleboard and set them as the
+	 * To find the offsets set them to zero, deploy, turn the wheels so they all
+	 * point forwards with the bevel gears
+	 * facing to the left, then take the angle displayed in the "swerve" tab in the
+	 * Shuffleboard and set them as the
 	 * offsets.
 	 */
 
@@ -110,7 +116,7 @@ public final class SwerveConstants {
 		public static final int kDriveMotorID = RobotMap.kFrontLeftDriveMotorID;
 		public static final int kSteerMotorID = RobotMap.kFrontLeftSteerMotorID;
 		public static final int kCANCoderID = RobotMap.kFrontLeftCANCoderID;
-		public static final Rotation2d kAngleOffset = Rotation2d.fromDegrees(258.0);
+		public static final Rotation2d kAngleOffset = Rotation2d.fromDegrees(220.5 - 180.0);
 		public static final SwerveModuleConstants constants = new SwerveModuleConstants(kDriveMotorID, kSteerMotorID,
 				kCANCoderID, kAngleOffset);
 		public static final double kCrossAngleDeg = 45.0;
@@ -121,7 +127,7 @@ public final class SwerveConstants {
 		public static final int kDriveMotorID = RobotMap.kFrontRightDriveMotorID;
 		public static final int kSteerMotorID = RobotMap.kFrontRightSteerMotorID;
 		public static final int kCANCoderID = RobotMap.kFrontRightCANCoderID;
-		public static final Rotation2d kAngleOffset = Rotation2d.fromDegrees(130.6);
+		public static final Rotation2d kAngleOffset = Rotation2d.fromDegrees(180.51 - 180.0);
 		public static final SwerveModuleConstants constants = new SwerveModuleConstants(kDriveMotorID, kSteerMotorID,
 				kCANCoderID, kAngleOffset);
 		public static final double kCrossAngleDeg = -45.0;
@@ -132,7 +138,7 @@ public final class SwerveConstants {
 		public static final int kDriveMotorID = RobotMap.kBackLeftDriveMotorID;
 		public static final int kSteerMotorID = RobotMap.KBackLeftSteerMotorID;
 		public static final int kCANCoderID = RobotMap.kBackLeftCANCoderID;
-		public static final Rotation2d kAngleOffset = Rotation2d.fromDegrees(355.3);
+		public static final Rotation2d kAngleOffset = Rotation2d.fromDegrees(348.56 - 180.0);
 		public static final SwerveModuleConstants constants = new SwerveModuleConstants(kDriveMotorID, kSteerMotorID,
 				kCANCoderID, kAngleOffset);
 		public static final double kCrossAngleDeg = 135.0;
@@ -143,7 +149,7 @@ public final class SwerveConstants {
 		public static final int kDriveMotorID = RobotMap.kBackRightDriveMotorID;
 		public static final int kSteerMotorID = RobotMap.kBackRightSteerMotorID;
 		public static final int canCoderID = RobotMap.kBackRightCANCoderID;
-		public static final Rotation2d kAngleOffset = Rotation2d.fromDegrees(451.6);
+		public static final Rotation2d kAngleOffset = Rotation2d.fromDegrees(85.33 + 180.0);
 		public static final SwerveModuleConstants constants = new SwerveModuleConstants(kDriveMotorID, kSteerMotorID,
 				canCoderID, kAngleOffset);
 		public static final double kCrossAngleDeg = -135.0;

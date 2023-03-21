@@ -42,15 +42,14 @@ public class TurretSubsystem extends SubsystemBase {
 
 	private TurretSubsystem() {
 		this.rotationMotor = new CANSparkMax(RobotMap.kTurretMotorID, MotorType.kBrushless);
-		this.rotationMotor.setIdleMode(IdleMode.kBrake);
 
 		this.rotationEncoder = new HaCANCoder(RobotMap.kTurretCANCoderID, TurretConstants.kCANCoderOffsetDeg);
 		this.rotationEncoder.setMeasurmentRange(AbsoluteSensorRange.Unsigned_0_to_360);
 
 		this.rotationController = TurretConstants.kRotationPIDGains.toPIDController();
-		this.rotationController.setSetpoint(this.getCurrentAngle());
 		this.rotationController.setTolerance(TurretConstants.kRotationTolerance);
 		this.rotationController.disableContinuousInput();
+		this.resetSetpoint();
 
 		this.rotationCCWLimitSwitch = new DigitalInput(RobotMap.kTurretCCWLimitPort);
 		this.rotationCWLimitSwitch = new DigitalInput(RobotMap.kTurretCWLimitPort);
@@ -116,6 +115,10 @@ public class TurretSubsystem extends SubsystemBase {
 		this.rotationController.setSetpoint(rotation);
 	}
 
+	public void resetSetpoint() {
+		this.setSetpoint(this.getCurrentAngle());
+	}
+
 	public Command getToSetpointCommand(double rotation) {
 		return new InstantCommand(() -> this.setSetpoint(rotation))
 				.andThen(new WaitUntilCommand(() -> this.isAtSetpoint(TurretConstants.kAutoRotationTolerance)));
@@ -157,5 +160,9 @@ public class TurretSubsystem extends SubsystemBase {
 
 			this.rotationMotor.set(this.calculateRotationMotorOutput());
 		}, this);
+	}
+
+	public void setIdleMode(IdleMode idleMode) {
+		this.rotationMotor.setIdleMode(idleMode);
 	}
 }

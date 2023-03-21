@@ -1,5 +1,5 @@
 
-package frc.fusionLib.swerve;
+package com.hamosad1657.lib.swerve;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
@@ -189,7 +189,7 @@ public class SwerveModule implements Sendable {
 	@Override
 	public void initSendable(SendableBuilder builder) {
 		builder.setSmartDashboardType("SwerveModule");
-		builder.addDoubleProperty("Angle Deg", this.getAngle()::getDegrees, null);
+		builder.addDoubleProperty("Angle Deg", () -> this.getAngle().getDegrees(), null);
 		builder.addDoubleProperty("Angle Error Deg", this::getSteerErrorDeg, null);
 		builder.addDoubleProperty("Speed MPS", () -> this.getModuleState().speedMetersPerSecond, null);
 		builder.addDoubleProperty("Drive Percent Output", this::getDrivePercentOutput, null);

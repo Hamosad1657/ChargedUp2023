@@ -10,17 +10,20 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.arm.ArmConstants.ArmState;
 import frc.robot.subsystems.arm.ArmSubsystem;
 import frc.robot.subsystems.grabber.GrabberSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
+import frc.robot.subsystems.intake.IntakeConstants.ShootHeight;
 import frc.robot.subsystems.turret.TurretConstants;
 import frc.robot.subsystems.turret.TurretSubsystem;
 
 public final class SwervePathConstants {
 	/**
-	 * The start position of the first auto path. Should match real life because apriltags.
+	 * The start position of the first auto path. Should match real life because
+	 * apriltags.
 	 */
 	public static final Pose2d kStartPose = new Pose2d(0, 0, new Rotation2d());
 
@@ -32,8 +35,10 @@ public final class SwervePathConstants {
 
 	// PID gains for path following. If zero it works on only feedforwards.
 	/*
-	 * How it works: for example, if the proportional gain for X and Y is 1.5, then the controller will add another 1.5
-	 * meter/second for every meter of error. If the proportional gain for angle is 2, then the controller will add 2
+	 * How it works: for example, if the proportional gain for X and Y is 1.5, then
+	 * the controller will add another 1.5
+	 * meter/second for every meter of error. If the proportional gain for angle is
+	 * 2, then the controller will add 2
 	 * radians/second for every radian of error.
 	 */
 
@@ -57,11 +62,31 @@ public final class SwervePathConstants {
 	public static final TrapezoidProfile.Constraints kThetaControllerConstraints = new TrapezoidProfile.Constraints(
 			kMaxAngularSpeedRadPS, kMaxAngularAccelRadPSSquared);
 
-	// For use with getPathFollowingCommand
+	/**
+	 * Command to be used in PathPlanner paths + their names, are added to this map
+	 * in
+	 * {@link SwervePathConstants#createPathCommands()}. The names in the
+	 * PathPlanner app must match the names in the
+	 * code.
+	 * <p>
+	 * this map is passed as a parameter when constructing the auto builder in
+	 * SwerveSubsystem.
+	 */
 	public static final HashMap<String, Command> kPathCommandsMap = new HashMap<String, Command>();
-	public static final HashMap<String, Command> kPaths = new HashMap<String, Command>();
 
-	public static void createCommands() {
+	/**
+	 * A HashMap of command groups and their names, to choose from in the drop-down
+	 * menue in the shuffleboard and then
+	 * run in autonomous.
+	 * <p>
+	 * Options are added to this map using SwerveSubsystem.addPath(), which is
+	 * called as
+	 * many times as needed in SwerveSubsystem.createPaths().
+	 */
+	public static final HashMap<String, SequentialCommandGroup> kAutoOptionsMap = new HashMap<String, SequentialCommandGroup>();
+
+	/** Add command options to use in PathPlanner paths. */
+	public static void createPathCommands() {
 		ArmSubsystem arm = ArmSubsystem.getInstance();
 		GrabberSubsystem grabber = GrabberSubsystem.getInstance();
 		IntakeSubsystem intake = IntakeSubsystem.getInstance();
@@ -71,6 +96,9 @@ public final class SwervePathConstants {
 		SwervePathConstants.kPathCommandsMap.put("WaitABitLess", new WaitCommand(0.10));
 		SwervePathConstants.kPathCommandsMap.put("WaitABit", new WaitCommand(0.15));
 		SwervePathConstants.kPathCommandsMap.put("WaitABitMore", new WaitCommand(0.35));
+		SwervePathConstants.kPathCommandsMap.put("WaitABitMore++", new WaitCommand(0.5));
+		SwervePathConstants.kPathCommandsMap.put("WaitABitMore#", new WaitCommand(0.75));
+		SwervePathConstants.kPathCommandsMap.put("WaitABitMoreJava", new WaitCommand(1.0));
 
 		// Turret
 		SwervePathConstants.kPathCommandsMap.put("RotateTurretBack",
@@ -95,8 +123,13 @@ public final class SwervePathConstants {
 		SwervePathConstants.kPathCommandsMap.put("ReleaseGamePiece", grabber.releaseCommand());
 
 		// Intake
-		SwervePathConstants.kPathCommandsMap.put("OpenIntake", intake.lowerIntakeCommand());
-		SwervePathConstants.kPathCommandsMap.put("CloseIntake", intake.raiseIntakeCommand());
+		SwervePathConstants.kPathCommandsMap.put("OpenIntake",
+				intake.lowerIntakeCommand());
+		SwervePathConstants.kPathCommandsMap.put("CloseIntake", intake.autoRaiseIntakeCommand());
+		SwervePathConstants.kPathCommandsMap.put("GetIntakeToAngle",
+				intake.getToShootHeightCommand(ShootHeight.kAuto).withTimeout(0.75));
+		SwervePathConstants.kPathCommandsMap.put("ShootGamePiece", intake.shootCommand());
+		SwervePathConstants.kPathCommandsMap.put("CollectGamePiece", intake.autoCollectPieceCommand());
 
 		// Pickups
 		SwervePathConstants.kPathCommandsMap.put("PickupCone", arm.pickupConeCommand());
