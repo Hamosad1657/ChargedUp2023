@@ -10,7 +10,7 @@ public class TurretConstants {
 	public static final double kRotationMinAngle = 32.0;
 	public static final double kRotationMaxAngle = 350.0;
 
-	public static final PIDGains kRotationPIDGains = new PIDGains(0.03, 0.0, 0.0002);
+	public static final PIDGains kRotationPIDGains = new PIDGains(0.035, 0.0, 0.0002);
 	public static final double kRotationTolerance = 2.0;
 	public static final double kAutoRotationTolerance = 20.0;
 	public static final double kRotationTeleopSetpointMultiplier = 1.4;

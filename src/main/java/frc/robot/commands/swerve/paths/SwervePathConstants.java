@@ -21,7 +21,8 @@ import frc.robot.subsystems.turret.TurretSubsystem;
 
 public final class SwervePathConstants {
 	/**
-	 * The start position of the first auto path. Should match real life because apriltags.
+	 * The start position of the first auto path. Should match real life because
+	 * apriltags.
 	 */
 	public static final Pose2d kStartPose = new Pose2d(0, 0, new Rotation2d());
 
@@ -33,8 +34,10 @@ public final class SwervePathConstants {
 
 	// PID gains for path following. If zero it works on only feedforwards.
 	/*
-	 * How it works: for example, if the proportional gain for X and Y is 1.5, then the controller will add another 1.5
-	 * meter/second for every meter of error. If the proportional gain for angle is 2, then the controller will add 2
+	 * How it works: for example, if the proportional gain for X and Y is 1.5, then
+	 * the controller will add another 1.5
+	 * meter/second for every meter of error. If the proportional gain for angle is
+	 * 2, then the controller will add 2
 	 * radians/second for every radian of error.
 	 */
 
@@ -59,19 +62,24 @@ public final class SwervePathConstants {
 			kMaxAngularSpeedRadPS, kMaxAngularAccelRadPSSquared);
 
 	/**
-	 * Command to be used in PathPlanner paths + their names, are added to this map in
-	 * {@link SwervePathConstants#createPathCommands()}. The names in the PathPlanner app must match the names in the
+	 * Command to be used in PathPlanner paths + their names, are added to this map
+	 * in
+	 * {@link SwervePathConstants#createPathCommands()}. The names in the
+	 * PathPlanner app must match the names in the
 	 * code.
 	 * <p>
-	 * this map is passed as a parameter when constructing the auto builder in SwerveSubsystem.
+	 * this map is passed as a parameter when constructing the auto builder in
+	 * SwerveSubsystem.
 	 */
 	public static final HashMap<String, Command> kPathCommandsMap = new HashMap<String, Command>();
 
 	/**
-	 * A HashMap of command groups and their names, to choose from in the drop-down menue in the shuffleboard and then
+	 * A HashMap of command groups and their names, to choose from in the drop-down
+	 * menue in the shuffleboard and then
 	 * run in autonomous.
 	 * <p>
-	 * Options are added to this map using SwerveSubsystem.addPath(), which is called as
+	 * Options are added to this map using SwerveSubsystem.addPath(), which is
+	 * called as
 	 * many times as needed in SwerveSubsystem.createPaths().
 	 */
 	public static final HashMap<String, SequentialCommandGroup> kAutoOptionsMap = new HashMap<String, SequentialCommandGroup>();

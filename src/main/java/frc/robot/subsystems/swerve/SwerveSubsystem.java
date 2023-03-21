@@ -61,7 +61,8 @@ public class SwerveSubsystem extends SubsystemBase {
 	private final SwerveAutoBuilder autoBuilder;
 
 	/**
-	 * There's a button that changes the swerve speed from fast to slow. In order to make the change smooth, we put a
+	 * There's a button that changes the swerve speed from fast to slow. In order to
+	 * make the change smooth, we put a
 	 * slew-rate limiter on the speed ratio.
 	 */
 	private final SlewRateLimiter speedModeRateLimiter;
@@ -90,7 +91,8 @@ public class SwerveSubsystem extends SubsystemBase {
 				this.getModulesPositions(), SwervePathConstants.kStartPose);
 		this.speedModeRateLimiter = new SlewRateLimiter(SwerveConstants.kSpeedModeRateLimit);
 
-		// Create the AutoBuilder. This only needs to be created once when robot code starts, not every time you want to
+		// Create the AutoBuilder. This only needs to be created once when robot code
+		// starts, not every time you want to
 		// create an auto command.
 		this.autoBuilder = new SwerveAutoBuilder(
 				// Pose2d supplier
@@ -102,9 +104,11 @@ public class SwerveSubsystem extends SubsystemBase {
 				SwervePathConstants.kRotationControllerGains.toPathPlannerPIDConstants(),
 				// Module states consumer used to output to the drive subsystem
 				this::setModuleStates, SwervePathConstants.kPathCommandsMap,
-				// Should the path be automatically mirrored depending on alliance color. Optional, defaults to true
+				// Should the path be automatically mirrored depending on alliance color.
+				// Optional, defaults to true
 				true,
-				// The drive subsystem. Used to properly set the requirements of path following commands
+				// The drive subsystem. Used to properly set the requirements of path following
+				// commands
 				this);
 
 		this.anglePIDController = SwerveConstants.kRobotAnglePIDGains.toPIDController();
@@ -136,7 +140,8 @@ public class SwerveSubsystem extends SubsystemBase {
 		this.createPaths();
 
 		/*
-		 * By pausing init for a second before setting module offsets, we avoid a bug with inverting motors. See
+		 * By pausing init for a second before setting module offsets, we avoid a bug
+		 * with inverting motors. See
 		 * https://github.com/Team364/BaseFalconSwerve/issues/8 for more info.
 		 */
 		Timer.delay(0.1);
@@ -144,15 +149,21 @@ public class SwerveSubsystem extends SubsystemBase {
 	}
 
 	/**
-	 * Drive the swerve using translation and rotation speeds and directions. Most suitable for driving using joystick
-	 * inputs (hence the name "teleop drive"), but may also be used in other ways. For driving using ChassisSpeeds, use
-	 * the alternative method {@link SwerveSubsystem#autonomousDrive(ChassisSpeeds, boolean, boolean)}.
+	 * Drive the swerve using translation and rotation speeds and directions. Most
+	 * suitable for driving using joystick
+	 * inputs (hence the name "teleop drive"), but may also be used in other ways.
+	 * For driving using ChassisSpeeds, use
+	 * the alternative method
+	 * {@link SwerveSubsystem#autonomousDrive(ChassisSpeeds, boolean, boolean)}.
 	 * 
-	 * @param translation     - A field-relative or robot-relative direction+speed to move in.
+	 * @param translation     - A field-relative or robot-relative direction+speed
+	 *                        to move in.
 	 * @param rotationRadPS   - A rotation speed in RadPS. Open-loop
-	 * @param isRobotRelative - Whether the passed Translation2d is field-relative or robot-relative (true if robot
+	 * @param isRobotRelative - Whether the passed Translation2d is field-relative
+	 *                        or robot-relative (true if robot
 	 *                        relative).
-	 * @param isOpenLoop      - Should the wheel speeds be controlled open-loop or closed-loop. Open-loop is perfectly
+	 * @param isOpenLoop      - Should the wheel speeds be controlled open-loop or
+	 *                        closed-loop. Open-loop is perfectly
 	 *                        fine for most cases.
 	 */
 	public void teleopDrive(Translation2d translation, double rotationRadPS, boolean isRobotRelative,
@@ -177,15 +188,20 @@ public class SwerveSubsystem extends SubsystemBase {
 	}
 
 	/**
-	 * Drive the swerve using ChassisSpeeds. Most sutiable for driving when controlling robot position (hence the name
-	 * "autonomous drive"), but may also be used in other ways. For driving using translation and rotation speeds and
+	 * Drive the swerve using ChassisSpeeds. Most sutiable for driving when
+	 * controlling robot position (hence the name
+	 * "autonomous drive"), but may also be used in other ways. For driving using
+	 * translation and rotation speeds and
 	 * directions, use the alternative method
 	 * {@link SwerveSubsystem#teleopDrive(Translation2d, double, boolean, boolean)}.
 	 * 
-	 * @param chassisSpeeds   - A field-relative or robot-relative ChassisSpeeds to move in.
-	 * @param isRobotRelative - Whether the passed ChassisSpeeds is field-relative or robot-relative (true if robot
+	 * @param chassisSpeeds   - A field-relative or robot-relative ChassisSpeeds to
+	 *                        move in.
+	 * @param isRobotRelative - Whether the passed ChassisSpeeds is field-relative
+	 *                        or robot-relative (true if robot
 	 *                        relative).
-	 * @param isOpenLoop      - Should the wheel speeds be controlled open-loop or closed-loop. Open-loop is perfectly
+	 * @param isOpenLoop      - Should the wheel speeds be controlled open-loop or
+	 *                        closed-loop. Open-loop is perfectly
 	 *                        fine for most cases.
 	 */
 	public void autonomousDrive(ChassisSpeeds chassisSpeeds, boolean isRobotRelative, boolean isOpenLoop) {
@@ -239,7 +255,8 @@ public class SwerveSubsystem extends SubsystemBase {
 	}
 
 	/**
-	 * @return The robot position as measured by the odometry. Units in meters and Rotation2d.
+	 * @return The robot position as measured by the odometry. Units in meters and
+	 *         Rotation2d.
 	 */
 	public Pose2d getOdometryPose() {
 		return this.odometry.getPoseMeters();
@@ -254,14 +271,16 @@ public class SwerveSubsystem extends SubsystemBase {
 	}
 
 	/**
-	 * Set the odometry to the origin point and facing away from the driver. Units in meters and Rotation2d.
+	 * Set the odometry to the origin point and facing away from the driver. Units
+	 * in meters and Rotation2d.
 	 */
 	public void resetOdometry() {
 		this.resetOdometry(new Pose2d());
 	}
 
 	/**
-	 * @return An array of the current module states, which are speed in MPS and angle in Rotation2d. Ordered
+	 * @return An array of the current module states, which are speed in MPS and
+	 *         angle in Rotation2d. Ordered
 	 *         front-left, front-right, back-left, back-right.
 	 */
 	public SwerveModuleState[] getModuleStates() {
@@ -273,7 +292,8 @@ public class SwerveSubsystem extends SubsystemBase {
 	}
 
 	/**
-	 * @return An array of the current module positions, which are distance in meters and angle in Rotation2d. Ordered
+	 * @return An array of the current module positions, which are distance in
+	 *         meters and angle in Rotation2d. Ordered
 	 *         front-left, front-right, back-left, back-right.
 	 */
 	public SwerveModulePosition[] getModulesPositions() {
@@ -285,15 +305,17 @@ public class SwerveSubsystem extends SubsystemBase {
 	}
 
 	/**
-	 * Sets the yaw angle as 270. This can be used to set the angle the robot is currently facing as "forwards".
+	 * Sets the yaw angle as 270. This can be used to set the angle the robot is
+	 * currently facing as "forwards".
 	 */
 	public void zeroGyro() {
 		this.gyro.setYaw(SwerveConstants.kNavxYawOffsetFromFrontDeg);
-		this.teleopAngleSetpointRad = Math.PI;
+		this.teleopAngleSetpointRad = this.getYaw().getRadians();
 	}
 
 	/**
-	 * Sets the yaw angle as offsetDeg + 270. If offsetDeg is 0, the angle the robot is currently facing is considered
+	 * Sets the yaw angle as offsetDeg + 270. If offsetDeg is 0, the angle the robot
+	 * is currently facing is considered
 	 * "forwards".
 	 * 
 	 * @param offsetDeg
@@ -309,7 +331,8 @@ public class SwerveSubsystem extends SubsystemBase {
 	}
 
 	/**
-	 * @return The yaw angle measured by the navX, inverted to adhere to WPILib's coordinate system conventions.
+	 * @return The yaw angle measured by the navX, inverted to adhere to WPILib's
+	 *         coordinate system conventions.
 	 */
 	public Rotation2d getYaw() {
 		return Rotation2d.fromDegrees(this.gyro.getYawAngleDeg());
@@ -331,7 +354,8 @@ public class SwerveSubsystem extends SubsystemBase {
 	}
 
 	/**
-	 * @return The rate of change in degrees per second measured by the navX, inverted to adhere to WPILib's coordinate
+	 * @return The rate of change in degrees per second measured by the navX,
+	 *         inverted to adhere to WPILib's coordinate
 	 *         system conventions
 	 */
 	public double getYawDegPS() {
@@ -339,7 +363,8 @@ public class SwerveSubsystem extends SubsystemBase {
 	}
 
 	/**
-	 * @return The rate of change in radidans per second measured by the navX, inverted to adhere to WPILib's coordinate
+	 * @return The rate of change in radidans per second measured by the navX,
+	 *         inverted to adhere to WPILib's coordinate
 	 *         system conventions
 	 */
 	public double getYawRadPS() {
@@ -347,7 +372,8 @@ public class SwerveSubsystem extends SubsystemBase {
 	}
 
 	/**
-	 * Reset the steer motors's internal encoders using the absolute CANCoder measurments.
+	 * Reset the steer motors's internal encoders using the absolute CANCoder
+	 * measurments.
 	 */
 	public void resetModulesToAbsolute() {
 		for (SwerveModule mod : modules) {
@@ -356,7 +382,8 @@ public class SwerveSubsystem extends SubsystemBase {
 	}
 
 	/**
-	 * Make the wheels stop spinning and do an X shape. Used to stop the swerve from being pushed, or from slipping down
+	 * Make the wheels stop spinning and do an X shape. Used to stop the swerve from
+	 * being pushed, or from slipping down
 	 * a slope (like an unbalanced charging station in 2023).
 	 */
 	public void crossLockWheels() {
@@ -400,7 +427,8 @@ public class SwerveSubsystem extends SubsystemBase {
 	}
 
 	/**
-	 * Get the command used to run a PathPlanner path, with events and stop points in it. When run, this resets the
+	 * Get the command used to run a PathPlanner path, with events and stop points
+	 * in it. When run, this resets the
 	 * odometry pose to the begininng of the path.
 	 */
 	public Command getPathPlannerAutoCommand(String pathGroupName) {
@@ -410,15 +438,18 @@ public class SwerveSubsystem extends SubsystemBase {
 	}
 
 	/**
-	 * Make the wheels stop spinning and do an X shape. Used to stop the swerve from being pushed, or from slipping down
-	 * a slope (like an unbalanced charging station in 2023). This command ends when the driver A joysticks move.
+	 * Make the wheels stop spinning and do an X shape. Used to stop the swerve from
+	 * being pushed, or from slipping down
+	 * a slope (like an unbalanced charging station in 2023). This command ends when
+	 * the driver A joysticks move.
 	 */
 	public Command crossLockWheelsCommand() {
 		return new RunCommand(this::crossLockWheels, this).until(() -> this.joysticksMoved());
 	}
 
 	/**
-	 * @return Whether any of the driver A joysticks are outside the deadband (on the axises used to drive the swerve).
+	 * @return Whether any of the driver A joysticks are outside the deadband (on
+	 *         the axises used to drive the swerve).
 	 */
 	public boolean joysticksMoved() {
 		double leftX = RobotContainer.driverA_Controller.getLeftX();
@@ -430,7 +461,8 @@ public class SwerveSubsystem extends SubsystemBase {
 	}
 
 	/**
-	 * @return Whether any of the wheel speeds are moving faster than the threshold specified in SwerveConstants.
+	 * @return Whether any of the wheel speeds are moving faster than the threshold
+	 *         specified in SwerveConstants.
 	 */
 	public boolean isChassisMoving() {
 		return Math
@@ -444,7 +476,8 @@ public class SwerveSubsystem extends SubsystemBase {
 	}
 
 	/**
-	 * @return The current translation ratio, filtered through a slew-rate limiter to make it change smoothly.
+	 * @return The current translation ratio, filtered through a slew-rate limiter
+	 *         to make it change smoothly.
 	 */
 	public double getCurrentTranslationSpeedRatio() {
 		return this.filteredTranslationRatio;
@@ -458,8 +491,10 @@ public class SwerveSubsystem extends SubsystemBase {
 	}
 
 	/**
-	 * @param angularVelocityRadPS     - Desired angular velocity as commanded by the drivers.
-	 * @param shouldResetAngleSetpoint - Should the current angle be the next setpoint (in teleop this would be set from
+	 * @param angularVelocityRadPS     - Desired angular velocity as commanded by
+	 *                                 the drivers.
+	 * @param shouldResetAngleSetpoint - Should the current angle be the next
+	 *                                 setpoint (in teleop this would be set from
 	 *                                 the joysticks)
 	 * 
 	 * @return An adjusted angular velocity accounting for skew.
@@ -490,18 +525,14 @@ public class SwerveSubsystem extends SubsystemBase {
 	}
 
 	/**
-	 * Used to put all path options in the drop-down menue in the shuffleboard. To change the options, edit them
+	 * Used to put all path options in the drop-down menue in the shuffleboard. To
+	 * change the options, edit them
 	 * manually here.
 	 */
 	private void createPaths() {
 		this.addPath("High Cone & Protector", false, false);
-		this.addPath("High Cone & Cube Pickup & Station", false, true);
-		this.addPath("High Dropoff & Station", true, true);
+		this.addPath("High Dropoff & Station", true, false);
 		this.addPath("High Cone & Cube", false, true);
-		this.addPath("High Cone & Cube & Station", true, false);
-		this.addPath("Low Cone & Cube & Station", true, true);
-		this.addPath("Low Cone & Cube", false, true);
-		this.addPath("Practice Station", true, false);
 	}
 
 	/**
@@ -509,7 +540,8 @@ public class SwerveSubsystem extends SubsystemBase {
 	 * 
 	 * @param name          - The name of the path.
 	 * @param balanceAtEnd  - Should the robot balance at the end of the path.
-	 * @param startWithCube - Should the robot retract instead of home the arm at the start of the path.
+	 * @param startWithCube - Should the robot retract instead of home the arm at
+	 *                      the start of the path.
 	 */
 	private void addPath(String name, boolean balanceAtEnd, boolean retractAtStart) {
 		ArrayList<Command> commandList = new ArrayList<Command>();
@@ -536,7 +568,8 @@ public class SwerveSubsystem extends SubsystemBase {
 
 	@Override
 	public void periodic() {
-		// There's a button that changes the swerve speed from fast to slow. In order to make the change smooth, we put
+		// There's a button that changes the swerve speed from fast to slow. In order to
+		// make the change smooth, we put
 		// a slew-rate limiter on the speed ratio.
 		this.filteredTranslationRatio = this.speedModeRateLimiter.calculate(currentSwerveTranslateRatio);
 
