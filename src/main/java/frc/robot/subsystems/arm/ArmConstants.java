@@ -36,7 +36,7 @@ public class ArmConstants {
 	public static final double kAngleMinSetpoint = 35.0;
 	public static final double kAngleMaxSetpoint = 119.0;
 
-	public static final PIDGains kArmLengthPIDGains = new PIDGains(0.0015, 0.0000325, 0.0);
+	public static final PIDGains kArmLengthPIDGains = new PIDGains(0.002, 0.0000325, 0.0);
 	public static final double kLengthTolerance = 75.0;
 
 	public static final double kLengthTeleopSetpointMultiplier = 20.0;
@@ -47,7 +47,7 @@ public class ArmConstants {
 		// Uses the relativity of the encoders as setpoints
 		kHigh(119.0, 3000.0), kMid(96.0, 1100.0), kLowCone(54.5, 1200.0), kLowConePickup(52.5, 2200.0),
 		kLowRaiseCone(50.0, 2300.0), kLowConeDropoff(65.0, 1000.0), kLowCube(47.0, 1800.0), kShelf(107.0, 0.0),
-		kHalfClosed(48.0, 400.0);
+		kHalfClosed(65.0, 900.0);
 
 		public final double angleDeg;
 		public final double lengthDeg;
