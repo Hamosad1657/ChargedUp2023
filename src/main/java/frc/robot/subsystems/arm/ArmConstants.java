@@ -46,7 +46,7 @@ public class ArmConstants {
 	public static enum ArmState {
 		// Uses the relativity of the encoders as setpoints
 		kHigh(119.0, 3000.0), kMid(96.0, 1100.0), kLowCone(54.5, 1200.0), kLowConePickup(52.5, 2200.0),
-		kLowRaiseCone(50.0, 2300.0), kLowConeDropoff(65.0, 1000.0), kLowCube(47.0, 1800.0), kShelf(107.0, 0.0),
+		kLowRaiseCone(50.0, 2300.0), kLowConeDropoff(65.0, 1000.0), kLowCube(47.0, 1700.0), kShelf(107.0, 0.0),
 		kHalfClosed(65.0, 900.0);
 
 		public final double angleDeg;
