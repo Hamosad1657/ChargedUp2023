@@ -357,6 +357,8 @@ public class ArmSubsystem extends SubsystemBase {
 		return new StartEndCommand(() -> this.setLengthMotorWithLimits(ArmConstants.kHomingLengthOutput), () -> {
 			this.setLengthMotorWithLimits(0.0);
 			this.resetLengthCANCoder();
+			this.lengthPIDController.reset();
+			this.anglePIDController.reset(this.getCurrentAngle());
 		}, this).until(() -> !this.retractLimit.get());
 	}
 
