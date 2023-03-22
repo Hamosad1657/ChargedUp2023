@@ -66,9 +66,9 @@ public class ArmSubsystem extends SubsystemBase {
 		this.lengthCANCoder.setPosition(0.0);
 
 		this.lengthMotor = new WPI_TalonFX(RobotMap.kArmLengthMotorID);
-		this.lengthMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 35.0, 40.0, 0.25));
-		this.lengthMotor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 35.0, 40.0, 0.25));
-		this.lengthMotor.configNeutralDeadband(0.1);
+		this.lengthMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 35.0, 40.0, 0.1));
+		this.lengthMotor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 35.0, 40.0, 0.1));
+		this.lengthMotor.configNeutralDeadband(0.075);
 
 		this.anglePIDController = ArmConstants.kAnglePIDGains.toProfiledPIDController(ArmConstants.kAnglePIDConstrains);
 		this.anglePIDController.setTolerance(ArmConstants.kAngleTolerance);
@@ -136,7 +136,7 @@ public class ArmSubsystem extends SubsystemBase {
 
 	/**
 	 * @param output - The output of the length motor in [-1.0, 1.0]. Positive
-	 *               output extends, negative output retracts.
+	 *               output retracts, negative output extends.
 	 *               Doesn't slow near the limits.
 	 */
 	public void setLengthMotorWithLimits(double output) {
@@ -167,6 +167,15 @@ public class ArmSubsystem extends SubsystemBase {
 	 */
 	public double calculateLengthMotorOutput() {
 		double output = -this.lengthPIDController.calculate(this.getCurrentLength());
+
+		if (this.lengthPIDController.atSetpoint()) {
+			return ArmConstants.kLengthKeepInPlaceOutput;
+		}
+
+		// if (output > 0.0) {
+		// output *= ArmConstants.kLengthRetractRatio;
+		// }
+
 		return MathUtil.clamp(output, -ArmConstants.kLengthMotorMaxOutput, ArmConstants.kLengthMotorMaxOutput);
 	}
 
@@ -227,7 +236,7 @@ public class ArmSubsystem extends SubsystemBase {
 			}
 
 			if (this.lengthAtGoal) {
-				this.setLengthMotorWithLimits(ArmConstants.kHomingLengthKeepRetractedOutput / 2.0);
+				this.setLengthMotorWithLimits(ArmConstants.kLengthKeepInPlaceOutput);
 				this.setAngleMotorWithLimits(this.calculateAngleMotorOutput());
 			} else {
 				this.setLengthMotorWithLimits(this.calculateLengthMotorOutput());

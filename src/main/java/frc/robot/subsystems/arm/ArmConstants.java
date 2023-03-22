@@ -13,16 +13,16 @@ public class ArmConstants {
 
 	public static final double kHomingAngleOutput = -0.2;
 	public static final double kHomingLengthOutput = 1.0;
-	public static final double kHomingLengthKeepRetractedOutput = 0.125;
+	public static final double kHomingLengthKeepRetractedOutput = 0.1;
 	public static final double kHomingAnglePIDRatio = 1.45;
 	/** For homing - The max arm's length that still counts as retracted. */
 	public static final double kHomingRetractedMaxLength = 300.0;
 	/** For homing - The lowest angle the arm can go to when it's extended. */
 	public static final double kHomingExtendedMinAngle = 80.0;
 
-	public static final PIDGains kAnglePIDGains = new PIDGains(0.025, 0.0075, 0.0);
+	public static final PIDGains kAnglePIDGains = new PIDGains(0.0225, 0.0075, 0.0);
 	public static final double kAngleTolerance = 1.0;
-	public static final double kAngleMotorMaxPIDOutput = 0.7;
+	public static final double kAngleMotorMaxPIDOutput = 0.75;
 	public static final double kAngleDownOutputRatio = 0.5;
 
 	public static final double kLengthRetractMinAngle = 50.0;
@@ -36,8 +36,10 @@ public class ArmConstants {
 	public static final double kAngleMinSetpoint = 35.0;
 	public static final double kAngleMaxSetpoint = 119.0;
 
-	public static final PIDGains kArmLengthPIDGains = new PIDGains(0.001, 0.0000325, 0.0);
+	public static final PIDGains kArmLengthPIDGains = new PIDGains(0.0025, 0.0, 0.000125);
 	public static final double kLengthTolerance = 75.0;
+	public static final double kLengthRetractRatio = 1.0;
+	public static final double kLengthKeepInPlaceOutput = 0.076;
 
 	public static final double kLengthTeleopSetpointMultiplier = 20.0;
 	public static final double kLengthMinSetpoint = 0.0;

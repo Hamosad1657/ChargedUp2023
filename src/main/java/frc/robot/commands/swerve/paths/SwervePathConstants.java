@@ -10,6 +10,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.arm.ArmConstants.ArmState;
@@ -115,7 +116,8 @@ public final class SwervePathConstants {
 		SwervePathConstants.kPathCommandsMap.put("ArmLowCone", arm.getToStateCommand(ArmState.kLowCone, true));
 		SwervePathConstants.kPathCommandsMap.put("ArmLowCube", arm.getToStateCommand(ArmState.kLowCube, true));
 		SwervePathConstants.kPathCommandsMap.put("ArmHalfClosed",
-				arm.getToStateLengthFirstCommand(ArmState.kHalfClosed, true));
+				arm.getToStateLengthFirstCommand(ArmState.kHalfClosed, true).withTimeout(4.0)
+						.handleInterrupt(() -> CommandScheduler.getInstance().schedule(arm.autoHomeCommand())));
 		SwervePathConstants.kPathCommandsMap.put("RetractArm", arm.retractCommand().withTimeout(4.0));
 
 		// Grabber
