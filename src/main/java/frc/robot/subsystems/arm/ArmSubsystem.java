@@ -222,15 +222,19 @@ public class ArmSubsystem extends SubsystemBase {
 			this.lengthAtGoal = false;
 			this.setState(newState);
 		}, () -> {
-			this.setLengthMotorWithLimits(this.calculateLengthMotorOutput());
 			if (this.lengthPIDController.atSetpoint()) {
 				this.lengthAtGoal = true;
 			}
 
 			if (this.lengthAtGoal) {
+				this.setLengthMotorWithLimits(ArmConstants.kHomingLengthKeepRetractedOutput / 2.0);
 				this.setAngleMotorWithLimits(this.calculateAngleMotorOutput());
+			} else {
+				this.setLengthMotorWithLimits(this.calculateLengthMotorOutput());
 			}
-		}, (interrupted) -> {
+		}, (interrupted) ->
+
+		{
 			this.setLengthMotorWithLimits(0.0);
 		}, () -> (endAtSetpoint ? (this.lengthAtGoal && this.anglePIDController.atGoal()) : this.joysticksMoved()),
 				this);
