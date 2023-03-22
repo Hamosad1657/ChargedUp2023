@@ -1,0 +1,212 @@
+{
+  "waypoints": [
+    {
+      "anchorPoint": {
+        "x": 4.416244446523981,
+        "y": 0.6
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 4.440365985520533,
+        "y": 0.6353032189921417
+      },
+      "holonomicAngle": 95.0,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": true,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [
+          "GetIntakeToAngle",
+          "ShootGamePiece",
+          "RetractArm"
+        ],
+        "executionBehavior": "sequential",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 5.758347481607244,
+        "y": 0.8
+      },
+      "prevControl": {
+        "x": 5.032149958907422,
+        "y": 0.8
+      },
+      "nextControl": {
+        "x": 6.203062384569458,
+        "y": 0.8
+      },
+      "holonomicAngle": -90.0,
+      "isReversal": false,
+      "velOverride": 2.0,
+      "isLocked": true,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [],
+        "executionBehavior": "sequential",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 6.755856494169129,
+        "y": 0.8
+      },
+      "prevControl": {
+        "x": 6.420564699018558,
+        "y": 0.8
+      },
+      "nextControl": {
+        "x": 7.0911482893197,
+        "y": 0.8
+      },
+      "holonomicAngle": 270.0,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": true,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [],
+        "executionBehavior": "parallel",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 4.8,
+        "y": 0.9
+      },
+      "prevControl": {
+        "x": 6.233137168179393,
+        "y": 0.9
+      },
+      "nextControl": {
+        "x": 4.736522153746062,
+        "y": 0.9
+      },
+      "holonomicAngle": 75.0,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": true,
+      "isStopPoint": true,
+      "stopEvent": {
+        "names": [
+          "GetIntakeToAngle",
+          "ShootGamePiece"
+        ],
+        "executionBehavior": "sequential",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 6.048531921625247,
+        "y": 1.1969662535816301
+      },
+      "prevControl": {
+        "x": 5.138197017892893,
+        "y": 0.43310457161200755
+      },
+      "nextControl": {
+        "x": 6.9588668253576005,
+        "y": 1.9608279355512526
+      },
+      "holonomicAngle": -45.0,
+      "isReversal": false,
+      "velOverride": 2.0,
+      "isLocked": true,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [],
+        "executionBehavior": "sequential",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 6.82840260417363,
+        "y": 1.9405638811277623
+      },
+      "prevControl": {
+        "x": 6.665173856663503,
+        "y": 1.8045399248693232
+      },
+      "nextControl": {
+        "x": 6.991631351683757,
+        "y": 2.0765878373862012
+      },
+      "holonomicAngle": -45.0,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": true,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [],
+        "executionBehavior": "parallel",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 4.48,
+        "y": 0.89
+      },
+      "prevControl": {
+        "x": 5.63166949632145,
+        "y": 0.34590417496624426
+      },
+      "nextControl": null,
+      "holonomicAngle": 85.0,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": true,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [
+          "GetIntakeToAngle",
+          "ShootGamePiece"
+        ],
+        "executionBehavior": "sequential",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    }
+  ],
+  "maxVelocity": 4.0,
+  "maxAcceleration": 4.0,
+  "isReversed": null,
+  "markers": [
+    {
+      "position": 2.3,
+      "names": [
+        "CloseIntake"
+      ]
+    },
+    {
+      "position": 5.2,
+      "names": [
+        "CloseIntake"
+      ]
+    },
+    {
+      "position": 0.4,
+      "names": [
+        "CollectGamePiece"
+      ]
+    },
+    {
+      "position": 3.5,
+      "names": [
+        "CollectGamePiece"
+      ]
+    }
+  ]
+}
