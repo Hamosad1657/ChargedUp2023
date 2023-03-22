@@ -146,7 +146,7 @@ public final class SwervePathConstants {
 		SwervePathConstants.kPathCommandsMap.put("DropoffMid",
 				arm.getToStateCommand(ArmState.kMid, true).andThen(grabber.releaseCommand()));
 		SwervePathConstants.kPathCommandsMap.put("DropoffHigh",
-				arm.getToStateCommand(ArmState.kHigh, true).andThen(grabber.releaseCommand()));
+				arm.getToStateCommand(ArmState.kHigh, true).withTimeout(8.0).andThen(grabber.releaseCommand()));
 
 		// Turret & Pickups
 		SwervePathConstants.kPathCommandsMap.put("FlipTurretPickupCube",
