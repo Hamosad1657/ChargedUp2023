@@ -62,6 +62,7 @@ public class RobotContainer {
 		this.driverA_CommandController.R2().onTrue(
 				this.intake.lowerIntakeCommand().alongWith(new InstantCommand(() -> this.swerve.setTeleopSpeed(SwerveConstants.kSwerveTranslateRatioSlow, SwerveConstants.kSwerveRotationRatioSlow))));
 		this.driverA_CommandController.L2().onTrue(
+			
 				this.intake.raiseIntakeCommand().alongWith(new InstantCommand(() -> this.swerve.setTeleopSpeed(SwerveConstants.kSwerveTranslateRatioFast, SwerveConstants.kSwerveRotationRatioFast))));
 		this.driverA_CommandController.triangle().onTrue(this.intake.getToShootHeightCommand(ShootHeight.kHigh));
 		this.driverA_CommandController.square().onTrue(this.intake.getToShootHeightCommand(ShootHeight.kMid));
