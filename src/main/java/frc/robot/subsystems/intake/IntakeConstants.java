@@ -19,6 +19,12 @@ public class IntakeConstants {
 
 	public static final double kIntakeMotorCollectOutput = -0.4;
 
+	public static final double kInitialPIDBoostMaxAngle = 176.0;
+	public static final double kInitialPIDBoostMinAngle = 100.0;
+	public static final double kKeepIntakeUpOutput = 0.0;
+	public static final double kIntitailPIDBoost = 0.25;
+	public static final double kAngleMotorPositiveCompensation = 0.1;
+
 	public enum ShootHeight {
 		kMid(167, 0.155), kHigh(165.70, 0.23), kLow(90, 0.25), kFar(130.0, 1.0), kAuto(130.0, 0.33);
 
@@ -30,10 +36,4 @@ public class IntakeConstants {
 			this.motorOutput = motorOutput;
 		}
 	}
-
-	public static final double kInitialPIDBoostMaxAngle = 176.0;
-	public static final double kInitialPIDBoostMinAngle = 100.0;
-	public static final double kKeepIntakeUpOutput = 0.0;
-	public static final double kIntitailPIDBoost = 0.25;
-	public static final double kAngleMotorPositiveCompensation = 0.1;
 }
