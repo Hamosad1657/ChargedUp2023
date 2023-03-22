@@ -20,7 +20,7 @@ public class IntakeConstants {
 	public static final double kIntakeMotorCollectOutput = -0.4;
 
 	public enum ShootHeight {
-		kMid(167, 0.155), kHigh(167.0, 0.275), kLow(75.0, 0.125), kFar(130.0, 1.0), kAuto(90.0, 0.33);
+		kMid(167, 0.155), kHigh(165.70, 0.23), kLow(75.0, 0.125), kFar(130.0, 1.0), kAuto(130.0, 0.33);
 
 		public final double motorOutput;
 		public final double angle;
