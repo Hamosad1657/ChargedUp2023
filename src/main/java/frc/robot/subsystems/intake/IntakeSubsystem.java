@@ -92,6 +92,9 @@ public class IntakeSubsystem extends SubsystemBase {
 		}
 	}
 
+	/**
+	 * @return The speed of the intake motor shaft, in encoder ticks (2048) per second. 
+	 */
 	public double getIntakeVelocity() {
 		return this.intakeSensors.getIntegratedSensorVelocity() / 10.0;
 	}
@@ -100,6 +103,10 @@ public class IntakeSubsystem extends SubsystemBase {
 		this.angleMotor.setIdleMode(idleMode);
 	}
 
+	/**
+	 * Sets the output for the angle motor. If a limit is pressed and the output is for the direction of the limit, set 0.
+	 * @param output - Percent output 1 to -1.
+	 */
 	public void setAngleMotorWithLimits(double output) {
 		if ((output > 0.0 && !this.raiseLimit.get()) || (output < 0.0 && !this.lowerLimit.get())) {
 			this.angleMotor.set(0.0);
@@ -108,6 +115,9 @@ public class IntakeSubsystem extends SubsystemBase {
 		}
 	}
 
+	/**
+	 * @return The PID output (according to the angle setpoint) in percent output 1 to -1.
+	 */
 	public double calculateAngleMotorOutput() {
 		double output = this.angleController.calculate(this.angleCANCoder.getAbsAngleDeg());
 
@@ -174,6 +184,9 @@ public class IntakeSubsystem extends SubsystemBase {
 		}, this);
 	}
 
+	/**
+	 * Shoots a cube and then raises the intake. This assumes that the angle of the intake is already correct.
+	 */
 	public Command shootCommand() {
 		return new RunCommand(() -> {
 			this.intakeMotor.set(IntakeConstants.kIntakeMotorCollectOutput);
