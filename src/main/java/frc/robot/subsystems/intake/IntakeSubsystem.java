@@ -92,6 +92,10 @@ public class IntakeSubsystem extends SubsystemBase {
 		}
 	}
 
+	/**
+	 * @return The speed of the intake motor shaft, in encoder ticks (2048) per
+	 *         second.
+	 */
 	public double getIntakeVelocity() {
 		return this.intakeSensors.getIntegratedSensorVelocity() / 10.0;
 	}
@@ -100,6 +104,12 @@ public class IntakeSubsystem extends SubsystemBase {
 		this.angleMotor.setIdleMode(idleMode);
 	}
 
+	/**
+	 * Sets the output for the angle motor. If a limit is pressed and the output is
+	 * for the direction of the limit, set 0.
+	 * 
+	 * @param output - Percent output 1 to -1.
+	 */
 	public void setAngleMotorWithLimits(double output) {
 		if ((output > 0.0 && !this.raiseLimit.get()) || (output < 0.0 && !this.lowerLimit.get())) {
 			this.angleMotor.set(0.0);
@@ -108,13 +118,12 @@ public class IntakeSubsystem extends SubsystemBase {
 		}
 	}
 
+	/**
+	 * @return The PID output (according to the angle setpoint) in percent output 1
+	 *         to -1.
+	 */
 	public double calculateAngleMotorOutput() {
-		double output = this.angleController.calculate(this.angleCANCoder.getAbsAngleDeg())
-				+ this.angleCANCoder.getAbsAngleDeg() > IntakeConstants.kInitialPIDBoostMaxAngle
-						? -IntakeConstants.kIntitailPIDBoost
-						: this.angleCANCoder.getAbsAngleDeg() < IntakeConstants.kInitialPIDBoostMinAngle
-								? IntakeConstants.kIntitailPIDBoost * 1.5
-								: IntakeConstants.kKeepIntakeUpOutput;
+		double output = this.angleController.calculate(this.angleCANCoder.getAbsAngleDeg());
 
 		if (this.angleController.atSetpoint()) {
 			return 0.0;
@@ -127,7 +136,7 @@ public class IntakeSubsystem extends SubsystemBase {
 	}
 
 	/** Lowers the intake untill the limit switch is pressed. */
-	public Command lowerIntakeCommand() {
+	public Command lowerCommand() {
 		return new StartEndCommand(() -> {
 			this.setAngleMotorWithLimits(-IntakeConstants.kAngleMotorDefaultOutput);
 			this.intakeMotor.set(IntakeConstants.kIntakeMotorCollectOutput);
@@ -140,7 +149,7 @@ public class IntakeSubsystem extends SubsystemBase {
 	}
 
 	/** Raises the intake untill the limit switch is pressed. */
-	public Command raiseIntakeCommand() {
+	public Command raiseCommand() {
 		return new StartEndCommand(() -> {
 			this.setAngleMotorWithLimits(IntakeConstants.kAngleMotorDefaultOutput);
 		}, () -> {
@@ -179,7 +188,14 @@ public class IntakeSubsystem extends SubsystemBase {
 		}, this);
 	}
 
-	public Command shootCommand() {
+	/**
+	 * Shoots a cube and then raises the intake. This assumes that the angle of the
+	 * intake is already correct.
+	 * 
+	 * @param isAuto - Should the command use auto raise command or teleop raise
+	 *               command.
+	 */
+	public Command shootCommand(boolean isAuto) {
 		return new RunCommand(() -> {
 			this.intakeMotor.set(IntakeConstants.kIntakeMotorCollectOutput);
 		}, this)
@@ -191,7 +207,17 @@ public class IntakeSubsystem extends SubsystemBase {
 							this.intakeMotor.set(0.0);
 						}, this)
 								.withTimeout(IntakeConstants.kShootDuration))
-				.andThen(this.raiseIntakeCommand());
+				.andThen((isAuto ? this.autoRaiseCommand() : this.raiseCommand()).withTimeout(1.0));
+	}
+
+	/**
+	 * Shoots a cube and then raises the intake. This assumes that the angle of the
+	 * intake is already correct.
+	 * 
+	 * Defaults to teleop raise after the shooting.
+	 */
+	public Command shootCommand() {
+		return this.shootCommand(false);
 	}
 
 	public Command autoCollectPieceCommand() {
@@ -207,7 +233,7 @@ public class IntakeSubsystem extends SubsystemBase {
 				}, this).withTimeout(10.0));
 	}
 
-	public Command autoRaiseIntakeCommand() {
+	public Command autoRaiseCommand() {
 		return new StartEndCommand(() -> {
 			this.setAngleMotorWithLimits(IntakeConstants.kAngleMotorDefaultOutput * 1.35);
 		}, () -> {

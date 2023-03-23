@@ -8,7 +8,6 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
 import frc.robot.commands.swerve.paths.SwervePathConstants;
 import frc.robot.commands.swerve.teleop.TeleopDriveCommand;
@@ -55,41 +54,30 @@ public class RobotContainer {
 	private void configureButtonsBindings() {
 		// Swerve
 		this.driverA_CommandController.share().onTrue(new InstantCommand(this.swerve::zeroGyro));
-		this.driverA_CommandController.PS().onTrue(this.swerve.crossLockWheelsCommand());
-		this.driverA_CommandController.L3().onTrue(new InstantCommand(this.swerve::toggleTeleopSwerveSpeed));
+		this.driverA_CommandController.cross().onTrue(this.swerve.crossLockWheelsCommand());
+		this.driverA_CommandController.triangle().onTrue(new InstantCommand(this.swerve::toggleTeleopSwerveSpeed));
 
 		// Intake
 		this.driverA_CommandController.R2().onTrue(
-				this.intake.lowerIntakeCommand().alongWith(new InstantCommand(() -> this.swerve.setTeleopSpeed(SwerveConstants.kSwerveTranslateRatioSlow, SwerveConstants.kSwerveRotationRatioSlow))));
+				this.intake.lowerCommand().alongWith(
+						new InstantCommand(() -> this.swerve.setTeleopSpeed(SwerveConstants.kSwerveTranslateRatioSlow,
+								SwerveConstants.kSwerveRotationRatioSlow))));
 		this.driverA_CommandController.L2().onTrue(
-				this.intake.raiseIntakeCommand().alongWith(new InstantCommand(() -> this.swerve.setTeleopSpeed(SwerveConstants.kSwerveTranslateRatioFast, SwerveConstants.kSwerveRotationRatioFast))));
-		this.driverA_CommandController.triangle().onTrue(this.intake.getToShootHeightCommand(ShootHeight.kHigh));
-		this.driverA_CommandController.square().onTrue(this.intake.getToShootHeightCommand(ShootHeight.kMid));
-		this.driverA_CommandController.cross().onTrue(this.intake.getToShootHeightCommand(ShootHeight.kLow));
-		this.driverA_CommandController.circle().onTrue(this.intake.getToShootHeightCommand(ShootHeight.kFar));
+				this.intake.raiseCommand().alongWith(
+						new InstantCommand(() -> this.swerve.setTeleopSpeed(SwerveConstants.kSwerveTranslateRatioFast,
+								SwerveConstants.kSwerveRotationRatioFast))));
+		this.driverA_CommandController.povUp().onTrue(this.intake.getToShootHeightCommand(ShootHeight.kHigh));
+		this.driverA_CommandController.povLeft().onTrue(this.intake.getToShootHeightCommand(ShootHeight.kMid));
+		this.driverA_CommandController.povDown().onTrue(this.intake.getToShootHeightCommand(ShootHeight.kLow));
+		this.driverA_CommandController.povRight().onTrue(this.intake.getToShootHeightCommand(ShootHeight.kFar));
 		this.driverA_CommandController.R1().onTrue(this.intake.shootCommand());
 		this.driverA_CommandController.L1().onTrue(this.intake.shootCommand());
 
 		// Arm
-		this.driverB_CommandController.povUp()
-				.onTrue(new SequentialCommandGroup(
-						this.turret.getToSetpointCommand(TurretConstants.kFrontRotationSetpoint),
-						this.arm.getToStateCommand(ArmState.kHigh)));
-
-		this.driverB_CommandController.povLeft()
-				.onTrue(new SequentialCommandGroup(
-						this.turret.getToSetpointCommand(TurretConstants.kFrontRotationSetpoint),
-						this.arm.getToStateCommand(ArmState.kMid)));
-
-		this.driverB_CommandController.povRight()
-				.onTrue(new SequentialCommandGroup(
-						this.turret.getToSetpointCommand(TurretConstants.kFrontRotationSetpoint),
-						this.arm.pickupConeCommand()));
-
-		this.driverB_CommandController.povDown()
-				.onTrue(new SequentialCommandGroup(
-						this.turret.getToSetpointCommand(TurretConstants.kFrontRotationSetpoint),
-						this.arm.getToStateCommand(ArmState.kLowCube)));
+		this.driverB_CommandController.povUp().onTrue(this.arm.getToStateCommand(ArmState.kHigh));
+		this.driverB_CommandController.povLeft().onTrue(this.arm.getToStateCommand(ArmState.kMid));
+		this.driverB_CommandController.povRight().onTrue(this.arm.pickupConeCommand());
+		this.driverB_CommandController.povDown().onTrue(this.arm.getToStateCommand(ArmState.kLowCube));
 
 		this.driverB_CommandController.options()
 				.onTrue(this.grabber.collectCommand().alongWith(this.arm.getToStateCommand(ArmState.kShelf)));
