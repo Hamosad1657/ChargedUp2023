@@ -34,6 +34,7 @@ import frc.robot.RobotMap;
 import frc.robot.commands.swerve.chargestation.BalanceChassisCommand;
 import frc.robot.commands.swerve.paths.SwervePathConstants;
 import frc.robot.subsystems.arm.ArmSubsystem;
+import frc.robot.subsystems.arm.ArmConstants.ArmState;
 import frc.robot.subsystems.grabber.GrabberSubsystem;
 
 public class SwerveSubsystem extends SubsystemBase {
@@ -543,6 +544,16 @@ public class SwerveSubsystem extends SubsystemBase {
 		this.addPath("High Cone & Cube", false, true, true);
 		this.addPath("Three Low Cube Link - Blue");
 		this.addPath("Three Low Cube Link - Red");
+
+		// An auto that isn't a path, but a single SequentialCommandGroup.
+		SwervePathConstants.kAutoOptionsMap.putIfAbsent(
+				"High Cone",
+				new SequentialCommandGroup(
+						ArmSubsystem.getInstance().autoHomeCommand(),
+						ArmSubsystem.getInstance().getToStateCommand(ArmState.kAlmostHome, true).withTimeout(6.0),
+						ArmSubsystem.getInstance().autoHomeCommand(),
+						ArmSubsystem.getInstance().getToStateCommand(ArmState.kHigh, true).withTimeout(6.0),
+						GrabberSubsystem.getInstance().releaseCommand()));
 	}
 
 	/**
