@@ -238,6 +238,7 @@ public class IntakeSubsystem extends SubsystemBase {
 			this.setAngleMotorWithLimits(IntakeConstants.kAngleMotorDefaultOutput * 1.35);
 		}, () -> {
 			this.setAngleMotorWithLimits(0.0);
+			this.isIntakeLowered = false;
 		}, this).until(() -> !this.raiseLimit.get());
 	}
 }
