@@ -118,6 +118,7 @@ public final class SwervePathConstants {
 				arm.getToStateLengthFirstCommand(ArmState.kHalfClosed, true).withTimeout(4.0)
 						.handleInterrupt(() -> arm.autoHomeCommand().schedule()));
 		SwervePathConstants.kPathCommandsMap.put("RetractArm", arm.retractCommand().withTimeout(4.0));
+		SwervePathConstants.kPathCommandsMap.put("AlmostHome", arm.getToStateCommand(ArmState.kAlmostHome, true));
 
 		// Grabber
 		SwervePathConstants.kPathCommandsMap.put("CollectGamePiece", grabber.collectCommand());
