@@ -542,6 +542,7 @@ public class SwerveSubsystem extends SubsystemBase {
 	private void createPaths() {
 		this.addPath("High Dropoff & Station", true, true, true);
 		this.addPath("High Cone & Cube", false, true, true);
+		this.addPath("High Cone & Mobility", false, true, true);
 		this.addPath("Three Low Cube Link - Blue");
 		this.addPath("Three Low Cube Link - Red");
 
