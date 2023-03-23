@@ -5,7 +5,7 @@ import com.hamosad1657.lib.math.HaUnits.PIDGains;
 
 public class IntakeConstants {
 	public static final double kAngleMotorDefaultOutput = 0.625;
-	public static final double kAngleMotorKeepInPlaceOutput = 0.1;
+	public static final double kAngleMotorKeepInPlaceOutput = 0.15;
 
 	public static final double kAngleCANCoderOffset = -77;
 
