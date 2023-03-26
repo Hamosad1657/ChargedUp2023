@@ -225,7 +225,7 @@ public class IntakeSubsystem extends SubsystemBase {
 			this.setAngleMotorWithLimits(-IntakeConstants.kAngleMotorDefaultOutput);
 			this.intakeMotor.set(IntakeConstants.kIntakeMotorCollectOutput);
 		}, () -> {
-			this.setAngleMotorWithLimits(IntakeConstants.kAngleMotorKeepInPlaceOutput * -3.0);
+			this.setAngleMotorWithLimits(IntakeConstants.kAngleMotorKeepInPlaceOutput * -2.0);
 		}, this).until(() -> !this.lowerLimit.get()).andThen(
 				new StartEndCommand(() -> {
 				}, () -> {
@@ -238,6 +238,7 @@ public class IntakeSubsystem extends SubsystemBase {
 			this.setAngleMotorWithLimits(IntakeConstants.kAngleMotorDefaultOutput * 1.35);
 		}, () -> {
 			this.setAngleMotorWithLimits(0.0);
+			this.isIntakeLowered = false;
 		}, this).until(() -> !this.raiseLimit.get());
 	}
 }

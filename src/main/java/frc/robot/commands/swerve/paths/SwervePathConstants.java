@@ -109,7 +109,7 @@ public final class SwervePathConstants {
 				turret.flipTurretCommand().deadlineWith(arm.getToStateCommand(ArmState.kHalfClosed, true)));
 
 		// Arm
-		SwervePathConstants.kPathCommandsMap.put("HomeArm", arm.autoHomeCommand().withTimeout(3.0));
+		SwervePathConstants.kPathCommandsMap.put("HomeArm", arm.autoHomeCommand().withTimeout(6.0));
 		SwervePathConstants.kPathCommandsMap.put("ArmHigh", arm.getToStateCommand(ArmState.kHigh, true));
 		SwervePathConstants.kPathCommandsMap.put("ArmMid", arm.getToStateCommand(ArmState.kMid, true));
 		SwervePathConstants.kPathCommandsMap.put("ArmLowCone", arm.getToStateCommand(ArmState.kLowCone, true));
@@ -118,6 +118,7 @@ public final class SwervePathConstants {
 				arm.getToStateLengthFirstCommand(ArmState.kHalfClosed, true).withTimeout(4.0)
 						.handleInterrupt(() -> arm.autoHomeCommand().schedule()));
 		SwervePathConstants.kPathCommandsMap.put("RetractArm", arm.retractCommand().withTimeout(4.0));
+		SwervePathConstants.kPathCommandsMap.put("AlmostHome", arm.getToStateCommand(ArmState.kAlmostHome, true));
 
 		// Grabber
 		SwervePathConstants.kPathCommandsMap.put("CollectGamePiece", grabber.collectCommand());
