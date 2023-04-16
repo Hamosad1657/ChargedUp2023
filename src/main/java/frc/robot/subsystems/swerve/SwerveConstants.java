@@ -138,11 +138,12 @@ public final class SwerveConstants {
 		public static final int kDriveMotorID = RobotMap.kBackLeftDriveMotorID;
 		public static final int kSteerMotorID = RobotMap.KBackLeftSteerMotorID;
 		public static final int kCANCoderID = RobotMap.kBackLeftCANCoderID;
-		public static final Rotation2d kAngleOffset = Rotation2d.fromDegrees(348.56 - 180.0);
+		public static final Rotation2d kAngleOffset = Rotation2d.fromDegrees(47.0 - 180.0);
 		public static final SwerveModuleConstants constants = new SwerveModuleConstants(kDriveMotorID, kSteerMotorID,
 				kCANCoderID, kAngleOffset);
 		public static final double kCrossAngleDeg = 135.0;
 	}
+	
 
 	/* Back Right Module - Module 3 */
 	public static final class BackRightModule {
