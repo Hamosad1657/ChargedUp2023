@@ -93,9 +93,9 @@ public final class SwerveConstants {
 	/*
 	 * Drive motors characterization values.
 	 */
-	public static final double driveKS = (0.32 / 12);
-	public static final double driveKV = (1.51 / 12);
-	public static final double driveKA = (0.27 / 12);
+	public static final double driveKS = (0.32 / 12.0);
+	public static final double driveKV = (1.51 / 12.0);
+	public static final double driveKA = (0.27 / 12.0);
 
 	/* Neutral Modes */
 	public static final NeutralMode kSteerNeutralMode = NeutralMode.Brake;
