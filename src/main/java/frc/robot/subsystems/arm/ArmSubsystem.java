@@ -74,7 +74,7 @@ public class ArmSubsystem extends SubsystemBase {
 		this.anglePIDController.setTolerance(ArmConstants.kAngleTolerance);
 
 		this.lengthPIDController = ArmConstants.kArmLengthPIDGains.toPIDController();
-		this.lengthPIDController.setTolerance(ArmConstants.kLengthTolerance);
+		this.lengthPIDController.setTolerance(10.0);
 
 		this.bottomAngleLimit = new DigitalInput(RobotMap.kBottomArmAngleLimitport);
 		this.topAngleLimit = new DigitalInput(RobotMap.kTopArmAngleLimitport);
@@ -101,7 +101,7 @@ public class ArmSubsystem extends SubsystemBase {
 			armTab.addDouble("Length Setpoint", this.lengthPIDController::getSetpoint).withPosition(6, 1).withSize(2,
 					1);
 			armTab.addBoolean("Angle At Goal", this.anglePIDController::atGoal).withPosition(6, 2).withSize(2, 1);
-			armTab.addBoolean("Length At Setpoint", this.lengthPIDController::atSetpoint).withPosition(6, 3).withSize(2,
+			armTab.addBoolean("Length At Setpoint", this::withinLengthTolerance).withPosition(6, 3).withSize(2,
 					1);
 			armTab.add("Subsystem", this).withPosition(0, 1).withSize(2, 3);
 			armTab.addDouble("Angle Error", this.anglePIDController::getPositionError);
@@ -218,7 +218,7 @@ public class ArmSubsystem extends SubsystemBase {
 			}
 		}, (interrupted) -> {
 			this.setLengthMotorWithLimits(0.0);
-		}, () -> (endAtSetpoint ? (this.angleAtGoal && this.lengthPIDController.atSetpoint()) : this.joysticksMoved()),
+		}, () -> (endAtSetpoint ? (this.angleAtGoal && this.withinLengthTolerance()) : this.joysticksMoved()),
 				this);
 	}
 
@@ -231,7 +231,7 @@ public class ArmSubsystem extends SubsystemBase {
 			this.lengthAtGoal = false;
 			this.setState(newState);
 		}, () -> {
-			if (this.lengthPIDController.atSetpoint()) {
+			if (this.withinLengthTolerance()) {
 				this.lengthAtGoal = true;
 			}
 
@@ -381,5 +381,10 @@ public class ArmSubsystem extends SubsystemBase {
 		} else {
 			this.lengthMotor.setNeutralMode(NeutralMode.Coast);
 		}
+	}
+
+	private boolean withinLengthTolerance() {
+		double error = lengthPIDController.getSetpoint() - this.getCurrentLength();
+		return Math.abs(error) < ArmConstants.kLengthTolerance;
 	}
 }
