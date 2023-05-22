@@ -10,7 +10,7 @@ public class IntakeConstants {
 	public static final double kAngleCANCoderOffset = -77;
 
 	public static final PIDGains kAngleMotorGains = new PIDGains(0.006, 0.0006, 0.0005);
-	public static final double kAngleMotorMaxPIDOutput = 1.0;
+	public static final double kAngleMotorMaxPIDOutput = 7.0;
 	public static final double kAngleTolerance = 1.0;
 	public static final double kCollectWithCubeMaxVelocity = 50.0;
 
