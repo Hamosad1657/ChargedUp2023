@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.subsystems.arm.ArmSubsystem;
 import frc.robot.subsystems.grabber.GrabberSubsystem;
+import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 import frc.robot.subsystems.turret.TurretSubsystem;
 
@@ -59,6 +60,7 @@ public class Robot extends TimedRobot {
 	@Override
 	public void disabledInit() {
 		SwerveSubsystem.getInstance().crossLockWheels();
+		IntakeSubsystem.getInstance().setAngleIdleMode(IdleMode.kCoast);
 	}
 
 	@Override
@@ -68,6 +70,7 @@ public class Robot extends TimedRobot {
 		ArmSubsystem.getInstance().setAngleIdleMode(IdleMode.kBrake);
 		ArmSubsystem.getInstance().setLengthIdleMode(IdleMode.kBrake);
 		GrabberSubsystem.getInstance().setIdleMode(IdleMode.kBrake);
+		IntakeSubsystem.getInstance().setAngleIdleMode(IdleMode.kBrake);
 	}
 
 	@Override
