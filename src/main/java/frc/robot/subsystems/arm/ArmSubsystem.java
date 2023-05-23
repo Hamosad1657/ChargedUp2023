@@ -74,7 +74,7 @@ public class ArmSubsystem extends SubsystemBase {
 		this.anglePIDController.setTolerance(ArmConstants.kAngleTolerance);
 
 		this.lengthPIDController = ArmConstants.kArmLengthPIDGains.toPIDController();
-		this.lengthPIDController.setTolerance(10.0);
+		this.lengthPIDController.setTolerance(2.0);
 
 		this.bottomAngleLimit = new DigitalInput(RobotMap.kBottomArmAngleLimitport);
 		this.topAngleLimit = new DigitalInput(RobotMap.kTopArmAngleLimitport);
