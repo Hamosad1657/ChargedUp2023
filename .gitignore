@@ -163,3 +163,12 @@ bin/
 *-window.json
 
 .idea/
+.run/Build & Deploy Robot for Debugging.run.xml
+.run/Build & Deploy Robot.run.xml
+.run/Build Robot.run.xml
+.run/Debug Robot via USB.run.xml
+.run/Debug Robot via IP.run.xml
+.run/Clean.run.xml
+.run/Clean Build Robot.run.xml
+.run/Clean Build & Deploy Robot.run.xml
+.run/Clean Build & Deploy Robot for Debugging.run.xml
