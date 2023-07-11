@@ -119,11 +119,6 @@ public class TurretSubsystem extends SubsystemBase {
 		this.setSetpoint(this.getCurrentAngle());
 	}
 
-	public Command getToSetpointCommand(double rotation) {
-		return new InstantCommand(() -> this.setSetpoint(rotation))
-				.andThen(new WaitUntilCommand(() -> this.isAtSetpoint(TurretConstants.kAutoRotationTolerance)));
-	}
-
 	public Command getToSetpointWithHomingCommand(double rotation) {
 		return new InstantCommand(() -> this.setSetpoint(rotation))
 				.andThen(new WaitUntilCommand(() -> this.isAtSetpoint(TurretConstants.kAutoRotationTolerance)))
@@ -145,12 +140,6 @@ public class TurretSubsystem extends SubsystemBase {
 		}).andThen(new WaitUntilCommand(() -> this.isAtSetpoint(TurretConstants.kAutoRotationTolerance)));
 	}
 
-	public Command openLoopTeleopCommand(DoubleSupplier outputSupplier) {
-		return new RunCommand(() -> {
-			this.rotateWithLimits(outputSupplier.getAsDouble() * TurretConstants.kMotorMaxOutput);
-		}, this);
-	}
-
 	public Command closedLoopTeleopCommand(DoubleSupplier outputSupplier) {
 		return new RunCommand(() -> {
 			double newSetpoint = this.rotationController.getSetpoint()
@@ -158,7 +147,7 @@ public class TurretSubsystem extends SubsystemBase {
 			this.rotationController.setSetpoint(
 					MathUtil.clamp(newSetpoint, TurretConstants.kRotationMinAngle, TurretConstants.kRotationMaxAngle));
 
-			this.rotationMotor.set(this.calculateRotationMotorOutput());
+			this.rotateWithLimits(this.calculateRotationMotorOutput());
 		}, this);
 	}
 
